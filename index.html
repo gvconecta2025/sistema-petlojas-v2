@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema PetLojas V2</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Estilo Profissional do Menu */
+        .menu-item { @apply flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent; }
+        .menu-item.active { @apply bg-blue-600 text-white shadow-lg shadow-blue-900/50 border-blue-500 font-bold; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-gray-100 flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-[#0f172a] flex flex-col shrink-0 transition-transform duration-300 relative z-30 shadow-2xl" id="sidebar">
+        <div class="h-16 flex items-center px-6 border-b border-slate-800 shrink-0">
+            <i class="fa-solid fa-paw text-blue-500 text-2xl mr-3"></i>
+            <span class="text-white text-xl font-black tracking-tight">PetLojas</span>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1.5 custom-scrollbar">
+            
+            <a onclick="mudarModulo(this, 'welcome')" class="menu-item active" id="menu-dashboard">
+                <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
+            </a>
+            
+            <div class="pt-5 pb-2">
+                <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Gestão & Vendas</p>
+            </div>
+            
+            <a onclick="mudarModulo(this, 'crm.html')" class="menu-item">
+                <i class="fa-solid fa-table-columns w-5 text-center"></i> CRM Kanban
+            </a>
+            <a onclick="mudarModulo(this, 'ficha-cadastro/index.html')" class="menu-item">
+                <i class="fa-solid fa-address-book w-5 text-center"></i> Painel de Fichas
+            </a>
+            
+            <div class="pt-5 pb-2">
+                <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Marketing & Tração</p>
+            </div>
+            
+            <a onclick="mudarModulo(this, 'disparadorcrm/index.html')" class="menu-item">
+                <i class="fa-solid fa-paper-plane w-5 text-center"></i> Disparador Oficial
+            </a>
+            <a onclick="mudarModulo(this, 'disparofive.html')" class="menu-item">
+                <i class="fa-solid fa-rocket w-5 text-center"></i> Disparo Five
+            </a>
+
+            <div class="pt-5 pb-2">
+                <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Mídia (Isca Digital)</p>
+            </div>
+            
+            <a onclick="mudarModulo(this, 'painel/index.html')" class="menu-item">
+                <i class="fa-solid fa-pen-nib w-5 text-center"></i> Editor da Revista
+            </a>
+            <a onclick="window.open('sua-url-da-revista', '_blank')" class="menu-item text-slate-300 hover:text-white">
+                <i class="fa-solid fa-arrow-up-right-from-square w-5 text-center"></i> Ver Revista <span class="text-[8px] bg-slate-700 px-1.5 rounded ml-auto">WEB</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-800 bg-[#0b1120] shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold border border-slate-700">
+                    <img src="https://ui-avatars.com/api/?name=Giselle+Conecta&background=2563eb&color=fff" class="rounded-full w-full h-full">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-white truncate">Giselle</p>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">GV Conecta</p>
+                </div>
+                <button class="text-slate-500 hover:text-red-500 transition"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0 bg-gray-50 h-screen">
+        
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 z-20 shrink-0 shadow-sm">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-blue-600 transition lg:hidden bg-gray-100 p-2 rounded-lg">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="flex flex-col">
+                    <h2 id="topbar-title" class="text-lg font-black text-gray-800 leading-tight">Dashboard Central</h2>
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sistema PetLojas</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-5">
+                <button class="text-gray-400 hover:text-blue-600 transition relative">
+                    <i class="fa-solid fa-bell text-lg"></i>
+                    <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center border-2 border-white">3</span>
+                </button>
+                <button class="text-gray-400 hover:text-blue-600 transition">
+                    <i class="fa-solid fa-gear text-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 relative overflow-hidden">
+            
+            <div id="welcome-screen" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-gray-50 z-0 overflow-y-auto">
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                    <i class="fa-solid fa-bolt text-3xl text-blue-600"></i>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-3 tracking-tighter">Ecossistema Conectado</h2>
+                <p class="text-gray-500 max-w-lg mx-auto mb-10 text-sm leading-relaxed">Bem-vinda ao Sistema PetLojas V2. Todas as suas ferramentas de gestão, CRM e marketing agora operam em um único ambiente centralizado.</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-left">
+                        <div class="w-8 h-8 rounded bg-blue-50 text-blue-600 flex items-center justify-center mb-3"><i class="fa-solid fa-table-columns"></i></div>
+                        <p class="text-2xl font-black text-gray-800">--</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Leads no CRM</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-left">
+                        <div class="w-8 h-8 rounded bg-green-50 text-green-600 flex items-center justify-center mb-3"><i class="fa-solid fa-eye"></i></div>
+                        <p class="text-2xl font-black text-gray-800">--</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Leituras Revista</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-left">
+                        <div class="w-8 h-8 rounded bg-yellow-50 text-yellow-600 flex items-center justify-center mb-3"><i class="fa-solid fa-dollar-sign"></i></div>
+                        <p class="text-2xl font-black text-gray-800">R$ --</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Faturamento</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-left">
+                        <div class="w-8 h-8 rounded bg-indigo-50 text-indigo-600 flex items-center justify-center mb-3"><i class="fa-solid fa-server"></i></div>
+                        <p class="text-2xl font-black text-green-500"><i class="fa-solid fa-check"></i></p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Status Sistema</p>
+                    </div>
+                </div>
+                
+                <p class="mt-10 text-xs text-gray-400">Selecione um módulo no menu lateral para iniciar.</p>
+            </div>
+
+            <iframe id="app-frame" class="absolute inset-0 w-full h-full border-none z-10 hidden bg-white" src=""></iframe>
+            
+            <div id="loader" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-20 flex items-center justify-center hidden">
+                <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-600"></i>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function mudarModulo(elemento, url) {
+            // Remove classe ativa de todos
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+            // Adiciona no clicado
+            elemento.classList.add('active');
+            
+            // Atualiza Título do Cabeçalho
+            document.getElementById('topbar-title').innerText = elemento.innerText.trim();
+
+            const iframe = document.getElementById('app-frame');
+            const welcome = document.getElementById('welcome-screen');
+            const loader = document.getElementById('loader');
+
+            if(url === 'welcome') {
+                iframe.classList.add('hidden');
+                iframe.src = '';
+                welcome.classList.remove('hidden');
+            } else {
+                welcome.classList.add('hidden');
+                loader.classList.remove('hidden'); // Mostra loader
+                iframe.classList.remove('hidden');
+                
+                // Carrega a URL
+                iframe.src = url;
+                
+                // Esconde loader quando carregar
+                iframe.onload = () => { loader.classList.add('hidden'); };
+            }
+
+            // Fecha a barra lateral no mobile
+            if(window.innerWidth < 1024) {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        // Menu Mobile Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if(sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        // Esconde menu no mobile ao iniciar
+        if(window.innerWidth < 1024) {
+            document.getElementById('sidebar').classList.add('absolute', '-translate-x-full');
+            document.getElementById('sidebar').classList.remove('relative');
+        }
+    </script>
+</body>
+</html>
