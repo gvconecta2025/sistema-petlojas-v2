@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relatórios PetLojas - Inteligência de Negócio</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js para os gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --brand-blue: #3B5B85; --brand-coral: #F29C5A; }
@@ -15,16 +13,11 @@
         .border-brand { border-color: var(--brand-blue); }
         .card-stat { @apply bg-white p-6 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        
-        /* Estilos para o botão Master */
-        .btn-master-off { @apply bg-gray-100 text-gray-400 border-gray-200 hover:bg-gray-200; }
-        .btn-master-on { @apply bg-amber-500 text-white border-amber-600 shadow-lg shadow-amber-200 animate-pulse; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen font-sans pb-20">
 
-    <!-- Barra de Navegação Superior -->
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <div class="bg-brand p-2 rounded-xl text-white">
@@ -34,16 +27,9 @@
             </div>
             
             <div class="flex items-center gap-4">
-                <!-- BOTAO LIMPAR DADOS -->
-                <button onclick="limparDadosTeste()" class="flex items-center gap-2 px-4 py-2 rounded-full border border-red-200 text-red-500 hover:bg-red-50 text-xs font-bold transition-all duration-300">
+                <button id="btn-limpar" class="flex items-center gap-2 px-4 py-2 rounded-full border border-red-200 text-red-500 hover:bg-red-50 text-xs font-bold transition-all duration-300">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    LIMPAR TUDO
-                </button>
-
-                <!-- BOTÃO MODO MESTRE (Invisibilidade) -->
-                <button id="btn-master-toggle" onclick="toggleMasterMode()" class="flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-black transition-all duration-300">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    <span id="master-label">MODO MESTRE</span>
+                    LIMPAR MEUS TESTES
                 </button>
 
                 <div id="sync-badge" class="flex items-center gap-2 text-sm font-bold text-amber-500 bg-amber-50 px-4 py-2 rounded-full border border-amber-100">
@@ -59,7 +45,6 @@
 
     <main class="max-w-7xl mx-auto px-6 py-8">
         
-        <!-- KPIs Principais -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="card-stat">
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Visitantes Únicos</p>
@@ -85,79 +70,68 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <!-- Coluna de Gráficos e Rankings -->
             <div class="lg:col-span-2 space-y-8">
                 
-                <!-- Gráfico de Origem -->
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
                     <div class="flex justify-between items-center mb-8">
                         <h3 class="font-bold text-gray-800 flex items-center gap-2">
                             <svg class="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                             Origem dos Leads
                         </h3>
-                        <span class="text-xs text-gray-400 font-medium">Classificado por Visitante</span>
                     </div>
                     <div class="h-[250px] relative">
                         <canvas id="chartOrigin"></canvas>
                     </div>
                 </div>
 
-                <!-- Ranking FAQ -->
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
                     <h3 class="font-bold text-gray-800 mb-6 flex items-center gap-2">
                         <svg class="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                         Interesse por Tópico (Mapa de Dores)
                     </h3>
                     <div id="faq-ranking" class="space-y-4">
-                        <!-- Gerado via JS -->
-                    </div>
+                        </div>
                 </div>
 
             </div>
 
-            <!-- Lista Lateral: Visitas Recentes -->
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-fit">
                 <div class="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                     <h3 class="font-bold text-gray-800">Diretório de Leads</h3>
                     <span class="bg-brand text-white text-[10px] font-black px-2 py-1 rounded-md">ÚNICOS</span>
                 </div>
                 <div id="visit-list" class="max-h-[800px] overflow-y-auto divide-y divide-gray-50 hide-scrollbar">
-                    <!-- Gerado via JS -->
-                </div>
+                    </div>
             </div>
 
         </div>
     </main>
 
-    <!-- Modal do Dossiê Detalhado -->
-    <div id="modal-dossie" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-[100]">
-        <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+    <div id="modal-dossie" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden">
             <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                 <div>
                     <h3 class="text-2xl font-black text-gray-800">Dossiê do Visitante</h3>
                     <p class="text-sm text-gray-500 font-medium" id="modal-subtitle">Carregando...</p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="apagarEsteDossie()" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-100 transition">
+                    <button id="btn-excluir-lead" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-100 transition cursor-pointer">
                         Excluir Lead
                     </button>
-                    <button onclick="closeModal()" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 hover:bg-gray-50 transition">
+                    <button id="btn-fechar-modal" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 hover:bg-gray-50 transition cursor-pointer">
                         <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
             </div>
             <div class="p-8" id="modal-body">
-                <!-- Conteúdo dinâmico -->
-            </div>
+                </div>
         </div>
     </div>
 
-    <!-- Scripts de Integração -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, query, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Chaves do Projeto landing-page-83fd1
         const firebaseConfig = {
             apiKey: "AIzaSyAb07mX-XJYbC3gqwstrgbo1sM3QNVi8AE",
             authDomain: "landing-page-83fd1.firebaseapp.com",
@@ -171,84 +145,63 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // FUNÇÃO DE CONTROLE DO MODO MESTRE
-        window.toggleMasterMode = () => {
-            const current = localStorage.getItem('ptl_admin_mode') === 'true';
-            localStorage.setItem('ptl_admin_mode', !current);
-            updateMasterUI();
-            
-            if (!current) {
-                alert("Modo Mestre ATIVADO neste navegador.\nAcesse a Landing Page e seus dados não serão mais captados.");
-            } else {
-                alert("Modo Público ATIVADO.\nSeus próximos acessos à Landing Page serão gravados.");
-            }
-        };
+        // VARIÁVEIS GLOBAIS
+        let myChart = null;
+        let allSessions = [];
+        let groupedVisitors = [];
+        let currentVisitorId = null;
 
-        function updateMasterUI() {
-            const btn = document.getElementById('btn-master-toggle');
-            const label = document.getElementById('master-label');
-            const isMaster = localStorage.getItem('ptl_admin_mode') === 'true';
-            
-            if (isMaster) {
-                btn.className = "flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-black transition-all duration-300 btn-master-on";
-                label.innerText = "MESTRE: INVISÍVEL";
-            } else {
-                btn.className = "flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-black transition-all duration-300 btn-master-off";
-                label.innerText = "MESTRE: RASTREAR";
-            }
-        }
-        updateMasterUI();
-
-        // FUNÇÕES PARA LIMPEZA DE DADOS
-        window.limparDadosTeste = async () => {
-            if(confirm("ATENÇÃO: Isto vai apagar TODOS os registros do Firebase.\nDeseja continuar?")) {
-                if(!window.allSessions || window.allSessions.length === 0) {
+        // ATRIBUINDO EVENTOS AOS BOTÕES DIRETAMENTE NO JAVASCRIPT (Garante que o clique funciona)
+        document.getElementById('btn-limpar').addEventListener('click', async () => {
+            if(confirm("ATENÇÃO: Isto vai apagar TODOS os registros do Firebase. Como você ainda não lançou o site, use isso para apagar seus testes de Governador Valadares.\n\nDeseja continuar?")) {
+                if(allSessions.length === 0) {
                     alert("O banco de dados já está vazio.");
                     return;
                 }
-                
                 let apagados = 0;
-                for (const session of window.allSessions) {
+                for (const session of allSessions) {
                     try {
                         await deleteDoc(doc(db, "lp_acessos", session.id));
                         apagados++;
-                    } catch (e) {}
+                    } catch (e) {
+                        console.error(e);
+                    }
                 }
-                alert(`Limpeza concluída! ${apagados} sessões apagadas.`);
+                alert(`Limpeza concluída! ${apagados} sessões de teste apagadas.`);
             }
-        };
+        });
 
-        window.currentVisitorId = null;
-        window.apagarEsteDossie = async () => {
-             if(confirm("Deseja excluir TODO o histórico de acessos deste visitante específico?")) {
-                 if(window.currentVisitorId) {
-                     const visitor = window.groupedVisitors.find(v => v.visitante_id === window.currentVisitorId);
+        document.getElementById('btn-fechar-modal').addEventListener('click', () => {
+            document.getElementById('modal-dossie').classList.add('hidden');
+            currentVisitorId = null;
+        });
+
+        document.getElementById('btn-excluir-lead').addEventListener('click', async () => {
+             if(confirm("Deseja excluir TODO o histórico deste visitante específico?")) {
+                 if(currentVisitorId) {
+                     const visitor = groupedVisitors.find(v => v.visitante_id === currentVisitorId);
                      try {
-                         // Apaga TODAS as sessões (reloads) vinculadas a este visitante
                          for(const sId of visitor.ids_sessoes) {
                              await deleteDoc(doc(db, "lp_acessos", sId));
                          }
-                         closeModal();
+                         document.getElementById('modal-dossie').classList.add('hidden');
                      } catch(e) {
                          alert("Erro ao excluir.");
                      }
                  }
              }
-        };
+        });
 
-        let myChart = null;
-
+        // O MOTOR DE RENDERIZAÇÃO
         function renderDashboard(docs) {
-            const sessions = docs.map(d => ({ id: d.id, ...d.data() }));
-            window.allSessions = sessions; // Guardamos o bruto para o botão Limpar Tudo
+            allSessions = docs.map(d => ({ id: d.id, ...d.data() }));
             
-            // 🧠 O NOVO CÉREBRO: Agrupando sessões por Visitante Único
+            // Agrupando sessões por Visitante Único (A compressão)
             const visitorsMap = new Map();
             
-            sessions.forEach(s => {
+            allSessions.forEach(s => {
                 const vId = s.visitante_id || 'Desconhecido';
                 if (!visitorsMap.has(vId)) {
-                    // Primeiro acesso deste visitante
                     visitorsMap.set(vId, { 
                         visitante_id: vId,
                         referencia_lead: s.referencia_lead || 'Orgânico',
@@ -262,60 +215,53 @@
                         ids_sessoes: [s.id]
                     });
                 } else {
-                    // Já existe, vamos fundir/somar os dados
                     const v = visitorsMap.get(vId);
                     v.total_sessoes += 1;
-                    v.tempo_segundos += (s.tempo_segundos || 0); // Soma o tempo de todas as visitas
-                    v.scroll_max = Math.max(v.scroll_max, s.scroll_max || 0); // Pega o maior scroll atingido
-                    v.eventos = [...v.eventos, ...(s.eventos || [])]; // Junta todos os cliques
-                    v.ids_sessoes.push(s.id); // Guarda a sessão para exclusão futura
+                    v.tempo_segundos += (s.tempo_segundos || 0);
+                    v.scroll_max = Math.max(v.scroll_max, s.scroll_max || 0);
+                    v.eventos = [...v.eventos, ...(s.eventos || [])];
+                    v.ids_sessoes.push(s.id);
                     
-                    // Mantém a data do acesso mais recente
                     if(s.data_entrada && v.data_entrada) {
                         if(s.data_entrada.seconds > v.data_entrada.seconds) {
                             v.data_entrada = s.data_entrada;
                         }
                     }
-                    
-                    // Se em alguma sessão ele deixou de ser orgânico, atualiza a origem
                     if(s.referencia_lead && s.referencia_lead !== 'Orgânico') {
                         v.referencia_lead = s.referencia_lead;
                     }
                 }
             });
 
-            const uniqueVisitors = Array.from(visitorsMap.values());
-            window.groupedVisitors = uniqueVisitors; // Guarda agrupado para a interface
+            groupedVisitors = Array.from(visitorsMap.values());
 
-            // 1. Cálculos de KPIs baseados nos ÚNICOS
-            document.getElementById('stat-visitors').innerText = uniqueVisitors.length;
+            // 1. Atualizar KPIs
+            document.getElementById('stat-visitors').innerText = groupedVisitors.length;
 
-            const avgTime = uniqueVisitors.length > 0 
-                ? Math.round(uniqueVisitors.reduce((a, b) => a + b.tempo_segundos, 0) / uniqueVisitors.length) 
+            const avgTime = groupedVisitors.length > 0 
+                ? Math.round(groupedVisitors.reduce((a, b) => a + b.tempo_segundos, 0) / groupedVisitors.length) 
                 : 0;
             document.getElementById('stat-time').innerText = avgTime + 's';
 
-            const avgScroll = uniqueVisitors.length > 0 
-                ? Math.round(uniqueVisitors.reduce((a, b) => a + b.scroll_max, 0) / uniqueVisitors.length) 
+            const avgScroll = groupedVisitors.length > 0 
+                ? Math.round(groupedVisitors.reduce((a, b) => a + b.scroll_max, 0) / groupedVisitors.length) 
                 : 0;
             document.getElementById('stat-scroll').innerText = avgScroll + '%';
 
-            // Taxa de Conversão 
-            const conversionEvents = uniqueVisitors.filter(v => v.eventos.some(e => e.acao.includes('CLIQUE: Assinar') || e.acao.includes('CLIQUE: Falar')));
-            const conversionRate = uniqueVisitors.length > 0 ? ((conversionEvents.length / uniqueVisitors.length) * 100).toFixed(1) : 0;
+            const conversionEvents = groupedVisitors.filter(v => v.eventos.some(e => e.acao.includes('CLIQUE: Assinar') || e.acao.includes('CLIQUE: Falar')));
+            const conversionRate = groupedVisitors.length > 0 ? ((conversionEvents.length / groupedVisitors.length) * 100).toFixed(1) : 0;
             document.getElementById('stat-conversion').innerText = conversionRate + '%';
 
-            // 2. Gráfico de Origem
-            const originData = uniqueVisitors.reduce((acc, v) => {
+            // 2. Gráfico e Ranking
+            const originData = groupedVisitors.reduce((acc, v) => {
                 const type = v.referencia_lead === 'Orgânico' ? 'Orgânico' : 'Ativo (WA)';
                 acc[type] = (acc[type] || 0) + 1;
                 return acc;
             }, {});
             updateChart(originData);
 
-            // 3. Ranking FAQ
             const faqs = {};
-            uniqueVisitors.forEach(v => {
+            groupedVisitors.forEach(v => {
                 v.eventos.forEach(e => {
                     if(e.acao.startsWith('FAQ:')) {
                         faqs[e.acao] = (faqs[e.acao] || 0) + 1;
@@ -324,8 +270,8 @@
             });
             renderFAQRanking(faqs);
 
-            // 4. Lista de Visitas (Ordenada pela data do último acesso)
-            renderVisitList(uniqueVisitors.sort((a, b) => (b.data_entrada?.seconds || 0) - (a.data_entrada?.seconds || 0)));
+            // 3. Renderizar a lista
+            renderVisitList(groupedVisitors.sort((a, b) => (b.data_entrada?.seconds || 0) - (a.data_entrada?.seconds || 0)));
         }
 
         function updateChart(data) {
@@ -374,38 +320,48 @@
         function renderVisitList(data) {
             const list = document.getElementById('visit-list');
             if(data.length === 0) {
-                list.innerHTML = `<div class="p-8 text-center text-gray-400">Nenhum lead detectado ainda.</div>`;
+                list.innerHTML = `<div class="p-8 text-center text-gray-400 font-medium">Nenhum acesso no banco de dados.</div>`;
                 return;
             }
+            
+            // GERAÇÃO DOS CARDS
             list.innerHTML = data.map(v => `
                 <div class="p-6 hover:bg-slate-50 transition-all border-l-4 border-transparent hover:border-brand flex flex-col md:flex-row justify-between md:items-center gap-4">
                     <div class="flex-1">
                         <div class="flex justify-between items-start mb-2">
-                            <span class="font-bold text-gray-800 text-lg">${v.referencia_lead === 'Orgânico' ? 'Curioso Anônimo' : v.referencia_lead}</span>
-                            <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">${v.data_entrada ? new Date(v.data_entrada.seconds * 1000).toLocaleString('pt-BR') : 'Agora'}</span>
+                            <span class="font-bold text-gray-800 text-lg">${v.referencia_lead === 'Orgânico' ? 'Visitante Anônimo' : v.referencia_lead}</span>
+                            <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                ${v.data_entrada ? new Date(v.data_entrada.seconds * 1000).toLocaleString('pt-BR') : 'Agora'}
+                            </span>
                         </div>
-                        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
-                            <span class="flex items-center gap-1 font-bold text-brand bg-blue-50 px-2 py-1 rounded">🔄 ${v.total_sessoes} views</span>
-                            <span class="flex items-center gap-1">📍 ${v.local?.cidade || 'Brasil'}</span>
-                            <span class="flex items-center gap-1">📱 ${v.dispositivo}</span>
-                            <span class="flex items-center gap-1">⏱️ ${v.tempo_segundos}s total</span>
+                        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500 font-medium">
+                            <span class="font-bold text-brand bg-blue-50 px-2 py-1 rounded">ID: ${v.visitante_id}</span>
+                            <span>📍 ${v.local?.cidade || 'Brasil'}</span>
+                            <span>📱 ${v.dispositivo}</span>
+                            <span>⏱️ ${v.tempo_segundos}s</span>
                         </div>
                     </div>
                     
-                    <!-- NOVO BOTÃO DE AÇÃO CLARO E CLICÁVEL -->
-                    <button onclick="window.openDossie('${v.visitante_id}')" class="bg-brand text-white px-5 py-3 rounded-xl text-sm font-bold shadow-md hover:bg-brand-dark transition-all whitespace-nowrap">
+                    <button data-id="${v.visitante_id}" class="btn-abrir-dossie bg-brand text-white px-5 py-3 rounded-xl text-sm font-bold shadow-md hover:bg-brand-dark transition-all whitespace-nowrap cursor-pointer">
                         Abrir Dossiê
                     </button>
                 </div>
             `).join('');
+
+            // Adicionar os ouvintes de clique dinamicamente (100% à prova de falhas)
+            document.querySelectorAll('.btn-abrir-dossie').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    abrirDossieModal(e.target.getAttribute('data-id'));
+                });
+            });
         }
 
-        window.openDossie = (vId) => {
-            window.currentVisitorId = vId;
-            const v = window.groupedVisitors.find(item => item.visitante_id === vId);
+        function abrirDossieModal(vId) {
+            currentVisitorId = vId;
+            const v = groupedVisitors.find(item => item.visitante_id === vId);
             const modal = document.getElementById('modal-dossie');
             const body = document.getElementById('modal-body');
-            document.getElementById('modal-subtitle').innerText = `ID Único: ${v.visitante_id} | Origem: ${v.referencia_lead}`;
+            document.getElementById('modal-subtitle').innerText = `ID: ${v.visitante_id} | Origem: ${v.referencia_lead}`;
 
             body.innerHTML = `
                 <div class="grid grid-cols-2 gap-4 mb-8">
@@ -423,7 +379,7 @@
 
                 <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
                     <svg class="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Histórico de Interações (Soma de todos os acessos)
+                    Histórico de Interações
                 </h4>
                 <div class="space-y-3 max-h-[250px] overflow-y-auto pr-2 custom-scroll">
                     ${(v.eventos || []).length > 0 
@@ -433,7 +389,7 @@
                                 <span class="text-[10px] font-bold text-gray-400">${ev.hora}</span>
                             </div>
                         `).join('')
-                        : '<p class="text-sm text-gray-400 italic py-4">O visitante apenas navegou sem clicar em botões ou FAQ.</p>'
+                        : '<p class="text-sm text-gray-400 italic py-4">O visitante não clicou em nada específico.</p>'
                     }
                 </div>
 
@@ -444,11 +400,6 @@
                 </div>
             `;
             modal.classList.remove('hidden');
-        };
-
-        window.closeModal = () => {
-            document.getElementById('modal-dossie').classList.add('hidden');
-            window.currentVisitorId = null;
         }
 
         // Escuta Realtime do Firebase
