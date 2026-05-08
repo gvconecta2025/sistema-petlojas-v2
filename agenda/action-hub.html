@@ -3,160 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Action Hub - PetLojas</title>
+    <title>Action Hub Pro - PetLojas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: transparent; }
-        
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
-        /* Estilos das Guias Horizontais */
-        .tab-btn { @apply px-4 py-1.5 text-slate-500 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2; }
-        .tab-btn.active { @apply bg-white text-blue-600 shadow-sm ring-1 ring-slate-200/50; }
+        /* Segmented Control Visual */
+        .segmented-control { @apply flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner; }
+        .segment-btn { @apply px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all duration-200 flex items-center gap-2 text-slate-500; }
+        .segment-btn.active { @apply bg-white text-blue-600 shadow-sm ring-1 ring-slate-200/50; }
+
+        /* Grid Google Agenda Style */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; @apply bg-slate-200 border border-slate-200 rounded-xl overflow-hidden shadow-sm; }
+        .calendar-day { @apply bg-white min-h-[120px] p-2 transition-colors hover:bg-slate-50; }
+        .calendar-day.today { @apply bg-blue-50/30; }
+        .calendar-header-cell { @apply bg-slate-50 p-2 text-center border-b border-slate-200 font-bold text-[10px] uppercase text-slate-500; }
+        
+        .event-chip { @apply p-1.5 rounded-md text-[10px] font-bold mb-1 truncate cursor-grab active:cursor-grabbing shadow-sm border-l-4 transition-transform hover:scale-[1.02]; }
+        .event-alta { @apply bg-red-50 text-red-700 border-red-500; }
+        .event-media { @apply bg-yellow-50 text-yellow-700 border-yellow-500; }
+        .event-baixa { @apply bg-blue-50 text-blue-700 border-blue-500; }
     </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden text-slate-800 p-4 md:p-6 gap-4">
+<body class="flex flex-col h-screen overflow-hidden text-slate-800 p-4 gap-4">
 
-    <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-2 rounded-xl border border-slate-200 shadow-sm shrink-0 gap-3">
+    <div class="flex flex-wrap items-center justify-between bg-white/80 backdrop-blur-md p-3 rounded-2xl border border-slate-200 shadow-sm shrink-0 gap-4">
         
-        <div class="flex items-center p-1 bg-slate-100 rounded-lg w-full sm:w-auto">
-            <button onclick="mudarVisao('hibrida', this)" class="tab-btn active w-full sm:w-auto justify-center">
-                <i class="fa-solid fa-table-columns"></i> Visão Híbrida
+        <div class="segmented-control">
+            <button onclick="mudarModo('hibrida', this)" class="segment-btn active">
+                <i class="fa-solid fa-table-columns"></i> Híbrida
             </button>
-            <button onclick="mudarVisao('tarefas', this)" class="tab-btn w-full sm:w-auto justify-center">
-                <i class="fa-solid fa-list-check"></i> Só Tarefas
+            <button onclick="mudarModo('tarefas', this)" class="segment-btn">
+                <i class="fa-solid fa-list-check"></i> Tarefas
             </button>
-            <button onclick="mudarVisao('agenda', this)" class="tab-btn w-full sm:w-auto justify-center hidden lg:flex">
-                <i class="fa-regular fa-calendar"></i> Só Agenda
+            <button onclick="mudarModo('agenda', this)" class="segment-btn">
+                <i class="fa-solid fa-calendar-days"></i> Agenda
             </button>
         </div>
 
-        <button onclick="abrirModalNovaTarefa()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm shadow-blue-600/30 transition-all active:scale-95">
-            <i class="fa-solid fa-plus"></i> Nova Ação
+        <div class="flex items-center gap-3">
+            <div class="flex bg-slate-100 rounded-lg p-1 border border-slate-200">
+                <button onclick="navegarData(-1)" class="p-1.5 hover:bg-white rounded-md transition text-slate-500"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                <button onclick="irParaHoje()" class="px-3 text-[10px] font-black uppercase text-slate-600 hover:text-blue-600 transition">Hoje</button>
+                <button onclick="navegarData(1)" class="p-1.5 hover:bg-white rounded-md transition text-slate-500"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+            </div>
+            
+            <h2 id="display-periodo" class="text-sm font-black text-slate-700 min-w-[150px] text-center">Maio 2026</h2>
+
+            <div class="segmented-control">
+                <button onclick="mudarPeriodo('dia', this)" class="segment-btn">Dia</button>
+                <button onclick="mudarPeriodo('semana', this)" class="segment-btn active">Semana</button>
+                <button onclick="mudarPeriodo('2semanas', this)" class="segment-btn">2 Sem.</button>
+                <button onclick="mudarPeriodo('mes', this)" class="segment-btn">Mês</button>
+            </div>
+        </div>
+
+        <button onclick="abrirModalNovaTarefa()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-tighter flex items-center gap-2 shadow-lg shadow-blue-600/20 transition-all active:scale-95">
+            <i class="fa-solid fa-plus text-sm"></i> Criar Ação
         </button>
     </div>
 
-    <div class="flex-1 flex gap-6 overflow-hidden">
+    <div class="flex-1 flex gap-4 overflow-hidden">
         
-        <div id="coluna-tarefas" class="w-full lg:w-1/3 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full transition-all duration-300">
-            <div class="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-xl shrink-0">
-                <h2 class="font-bold text-sm text-slate-700"><i class="fa-solid fa-bolt text-blue-500 mr-2"></i>Ações e Follow-ups</h2>
-                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-200/50 px-2 py-0.5 rounded">Tempo Real</span>
+        <div id="coluna-tarefas" class="w-1/4 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full transition-all duration-500">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-2xl">
+                <h3 class="font-black text-[11px] uppercase tracking-widest text-slate-500">Backlog de Ações</h3>
+                <span id="count-tarefas" class="bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
             </div>
-            
             <div id="lista-tarefas" class="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
-                <div class="p-4 text-center text-slate-400 text-xs font-bold animate-pulse">
-                    <i class="fa-solid fa-circle-notch fa-spin mb-2 text-xl text-slate-300"></i><br>
-                    Sincronizando tarefas...
                 </div>
-            </div>
         </div>
 
-        <div id="coluna-agenda" class="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 flex-col h-full overflow-hidden hidden lg:flex transition-all duration-300">
-            <div class="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-xl shrink-0">
-                <h2 class="font-bold text-sm text-slate-700"><i class="fa-regular fa-calendar-days text-blue-500 mr-2"></i>Agenda Semanal</h2>
-                <div class="flex gap-3 text-[9px] font-black text-slate-500 uppercase tracking-wider">
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Fechamento</span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> Follow-up</span>
+        <div id="coluna-agenda" class="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden transition-all duration-500">
+            <div id="calendar-headers" class="grid grid-cols-7 bg-slate-50 border-b border-slate-200 shrink-0">
                 </div>
-            </div>
             
-            <div class="flex-1 flex items-center justify-center bg-slate-50/50 relative p-4">
-               <div class="text-center">
-                    <div class="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
-                        <i class="fa-regular fa-calendar-check text-3xl text-slate-300"></i>
+            <div id="calendar-body" class="flex-1 overflow-y-auto custom-scrollbar p-1">
+                <div id="grid-container" class="calendar-grid">
                     </div>
-                    <h3 class="text-base font-bold text-slate-600 mb-1">Módulo de Calendário</h3>
-                    <p class="text-xs text-slate-400 max-w-xs mx-auto font-medium">Os eventos com data marcada aparecerão aqui. Por enquanto, utilize a lista rápida de ações à esquerda para operar.</p>
-               </div>
             </div>
         </div>
 
     </div>
 
     <div id="modal-nova-tarefa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="modal-content">
-            <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-black text-sm uppercase tracking-wider text-slate-700"><i class="fa-solid fa-bolt text-blue-500 mr-2"></i>Nova Ação</h3>
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="modal-content">
+            <div class="bg-slate-50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-black text-sm uppercase tracking-wider text-slate-700">Nova Ação / Evento</h3>
                 <button onclick="fecharModalNovaTarefa()" class="text-slate-400 hover:text-red-500 transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <form id="form-nova-tarefa" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">O que precisa ser feito?</label>
-                    <input type="text" id="input-titulo" required class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-bold text-sm text-slate-700 transition" placeholder="Ex: Ligar para PetShop X">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Título</label>
+                    <input type="text" id="input-titulo" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-sm" placeholder="O que agendar?">
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Prioridade</label>
-                        <select id="input-prioridade" class="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-bold text-slate-700 transition cursor-pointer">
-                            <option value="alta">🔴 Fechamento</option>
-                            <option value="media">🟡 Follow-up</option>
-                            <option value="baixa">⚪ Pesquisa Fria</option>
-                        </select>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Data</label>
+                        <input type="date" id="input-data" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-xs">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">WhatsApp (Opcional)</label>
-                        <input type="text" id="input-telefone" class="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-bold text-slate-700 transition" placeholder="(33) 9...">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Prioridade</label>
+                        <select id="input-prioridade" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-xs">
+                            <option value="baixa">🔵 Normal / Pesquisa</option>
+                            <option value="media">🟡 Follow-up</option>
+                            <option value="alta">🔴 Fechamento / Urgente</option>
+                        </select>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-widest py-3.5 rounded-lg mt-4 transition shadow-lg flex items-center justify-center gap-2 active:scale-95">
-                    <i class="fa-solid fa-check"></i> Salvar Ação
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">WhatsApp / Notas</label>
+                    <input type="text" id="input-telefone" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-sm" placeholder="(33) 9...">
+                </div>
+
+                <button type="submit" class="w-full bg-slate-900 hover:bg-black text-white font-black uppercase tracking-[0.2em] py-4 rounded-2xl mt-4 transition shadow-xl active:scale-95">
+                    Salvar Registro
                 </button>
             </form>
         </div>
     </div>
 
+    <script type="module" src="agenda.js"></script>
     <script>
-        // Lógica das Guias Horizontais (Tabs)
-        function mudarVisao(modo, botao) {
-            // Atualiza botões
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            botao.classList.add('active');
-
-            const colTarefas = document.getElementById('coluna-tarefas');
-            const colAgenda = document.getElementById('coluna-agenda');
-
-            if (modo === 'hibrida') {
-                colTarefas.className = 'w-full lg:w-1/3 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full transition-all duration-300';
-                colTarefas.style.display = 'flex';
-                colAgenda.style.display = window.innerWidth >= 1024 ? 'flex' : 'none'; // lg:flex
-            } else if (modo === 'tarefas') {
-                colTarefas.className = 'w-full bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full transition-all duration-300';
-                colTarefas.style.display = 'flex';
-                colAgenda.style.display = 'none';
-            } else if (modo === 'agenda') {
-                colTarefas.style.display = 'none';
-                colAgenda.style.display = 'flex';
-                colAgenda.classList.remove('hidden', 'lg:flex');
-            }
-        }
-
-        // Lógica do Modal
-        function abrirModalNovaTarefa() {
-            const modal = document.getElementById('modal-nova-tarefa');
-            const content = document.getElementById('modal-content');
-            modal.classList.remove('hidden');
+        // Funções de Interface UI
+        window.abrirModalNovaTarefa = () => {
+            document.getElementById('modal-nova-tarefa').classList.remove('hidden');
             setTimeout(() => {
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
+                document.getElementById('modal-content').classList.remove('scale-95', 'opacity-0');
+                document.getElementById('modal-content').classList.add('scale-100', 'opacity-100');
             }, 10);
-        }
-
-        function fecharModalNovaTarefa() {
-            const modal = document.getElementById('modal-nova-tarefa');
+        };
+        window.fecharModalNovaTarefa = () => {
             const content = document.getElementById('modal-content');
             content.classList.remove('scale-100', 'opacity-100');
             content.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => modal.classList.add('hidden'), 300);
+            setTimeout(() => document.getElementById('modal-nova-tarefa').classList.add('hidden'), 300);
+        };
+        
+        // Responsividade manual para o modo Híbrido
+        window.mudarModo = (modo, btn) => {
+            document.querySelectorAll('.segmented-control button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const colT = document.getElementById('coluna-tarefas');
+            const colA = document.getElementById('coluna-agenda');
+            if(modo === 'tarefas') { colT.className = 'w-full block'; colA.className = 'hidden'; }
+            else if(modo === 'agenda') { colT.className = 'hidden'; colA.className = 'flex-1 block'; }
+            else { colT.className = 'w-1/4 block'; colA.className = 'flex-1 block'; }
         }
     </script>
-    
-    <script type="module" src="agenda.js"></script>
 </body>
 </html>
