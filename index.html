@@ -12,159 +12,142 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; @apply bg-gray-50; }
         
-        /* EFEITO EXPANDIR SIDEBAR */
         #sidebar { @apply w-20 transition-all duration-300 ease-in-out overflow-hidden; }
         #sidebar:hover { @apply w-64; }
         
-        /* Estilo dos Itens do Menu */
         .menu-item { @apply flex items-center gap-4 px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent whitespace-nowrap; }
         .menu-item.active { @apply bg-blue-600 text-white shadow-lg shadow-blue-900/50 border-blue-500 font-bold; }
         
-        /* Labels e Categorias (Escondidas por padrão, mostram no hover do sidebar) */
         .menu-label, .menu-category { @apply opacity-0 transition-opacity duration-300; }
         #sidebar:hover .menu-label, #sidebar:hover .menu-category { @apply opacity-100; }
-
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <aside class="bg-[#0f172a] flex flex-col shrink-0 relative z-30 shadow-2xl h-full" id="sidebar">
-        
-        <div class="h-16 flex items-center px-6 border-b border-slate-800 shrink-0">
-            <i class="fa-solid fa-paw text-blue-500 text-2xl min-w-[32px] text-center"></i>
-            <span class="text-white text-xl font-black tracking-tight ml-4 menu-label">PetLojas</span>
+    <div id="tela-login-mestre" class="fixed inset-0 bg-[#0f172a] z-[100] flex flex-col items-center justify-center p-4 fade-in">
+        <div class="bg-white p-10 rounded-3xl shadow-2xl max-w-sm w-full text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-paw text-3xl text-blue-600"></i>
+            </div>
+            <h2 class="text-2xl font-black text-gray-900 mb-2">PetLojas OS</h2>
+            <p class="text-sm text-gray-500 mb-8 font-medium">Acesso restrito ao ecossistema.</p>
+            
+            <input type="password" id="senha-mestre" placeholder="Senha do Sistema" class="w-full bg-gray-50 border border-gray-300 rounded-xl p-4 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition text-center mb-4 font-bold tracking-widest text-lg" onkeypress="if(event.key === 'Enter') destravarSistema()">
+            
+            <button onclick="destravarSistema()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg hover:shadow-blue-600/50 transition">ACESSAR MÓDULOS</button>
+            <p id="erro-senha" class="text-xs text-red-500 mt-4 font-bold hidden">Senha incorreta. Tente novamente.</p>
         </div>
+    </div>
 
-        <nav class="flex-1 overflow-y-auto py-6 px-2 space-y-1.5 custom-scrollbar">
-            
-            <a onclick="mudarModulo(this, 'welcome')" class="menu-item active" id="menu-dashboard">
-                <i class="fa-solid fa-chart-pie min-w-[20px] text-center text-lg"></i> 
-                <span class="menu-label">Dashboard Central</span>
-            </a>
-            
-            <div class="pt-5 pb-2 px-6">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest menu-category">Gestão & Vendas</p>
-            </div>
-            
-            <a onclick="mudarModulo(this, 'crm.html')" class="menu-item">
-                <i class="fa-solid fa-table-columns min-w-[20px] text-center text-lg"></i> 
-                <span class="menu-label">CRM Kanban</span>
-            </a>
-            <a onclick="mudarModulo(this, 'ficha-cadastro/index.html')" class="menu-item">
-                <i class="fa-solid fa-address-book min-w-[20px] text-center text-lg"></i> 
-                <span class="menu-label">Painel de Fichas</span>
-            </a>
-            
-            <div class="pt-5 pb-2 px-6">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest menu-category">Marketing & Tração</p>
-            </div>
-            
-            <a onclick="mudarModulo(this, 'disparadorcrm/index.html')" class="menu-item">
-                <i class="fa-solid fa-paper-plane min-w-[20px] text-center text-lg"></i> 
-                <span class="menu-label">Disparador Oficial</span>
-            </a>
-            <a onclick="mudarModulo(this, 'disparofive.html')" class="menu-item">
-                <i class="fa-solid fa-rocket min-w-[20px] text-center text-lg"></i> 
-                <span class="menu-label">Disparo Five</span>
-            </a>
-
-            <div class="pt-5 pb-2 px-6">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest menu-category">Mídia (Isca Digital)</p>
-            </div>
-            
-            <a onclick="mudarModulo(this, 'painel/index.html')" class="menu-item">
-                <i class="fa-solid fa-pen-nib min-w-[20px] text-center text-lg"></i> 
-                <span class="menu-label">Editor da Revista</span>
-            </a>
-            <a onclick="window.open('https://ocodigopet.vercel.app/', '_blank')" class="menu-item">
-                <i class="fa-solid fa-arrow-up-right-from-square min-w-[20px] text-center text-lg text-blue-400"></i> 
-                <span class="menu-label">Ver Revista Online</span>
-            </a>
-        </nav>
-
-        <div class="p-4 border-t border-slate-800 bg-[#0b1120] shrink-0">
-            <div class="flex items-center">
-                <div class="w-10 h-10 min-w-[40px] rounded-full bg-blue-600 flex items-center justify-center text-white font-bold border border-slate-700 shadow-inner overflow-hidden">
-                    <img src="https://ui-avatars.com/api/?name=Giselle+Conecta&background=2563eb&color=fff" class="w-full h-full">
-                </div>
-                <div class="flex-1 min-w-0 ml-4 menu-label">
-                    <p class="text-sm font-bold text-white truncate">Giselle</p>
-                    <p class="text-[10px] font-bold text-blue-400 uppercase tracking-wider truncate">GV Conecta</p>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <div class="flex-1 flex flex-col min-w-0 h-screen relative">
+    <div id="sistema-container" class="flex w-full h-full hidden opacity-0 transition-opacity duration-500">
         
-        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-20 shrink-0 shadow-sm relative">
-            <div class="flex flex-col">
-                <h2 id="topbar-title" class="text-lg font-black text-gray-800 leading-tight">Dashboard Central</h2>
-                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Plataforma SaaS PetLojas V2</span>
+        <aside class="bg-[#0f172a] flex flex-col shrink-0 relative z-30 shadow-2xl h-full" id="sidebar">
+            <div class="h-16 flex items-center px-6 border-b border-slate-800 shrink-0">
+                <i class="fa-solid fa-paw text-blue-500 text-2xl min-w-[32px] text-center"></i>
+                <span class="text-white text-xl font-black tracking-tight ml-4 menu-label">PetLojas</span>
             </div>
-            
-            <div class="flex items-center gap-5">
-                <div class="hidden md:flex flex-col text-right mr-2">
-                    <p class="text-xs font-bold text-gray-800">Ambiente de Controle</p>
-                    <p class="text-[9px] text-green-500 font-bold uppercase">Sistema Online</p>
-                </div>
-                <button class="text-gray-400 hover:text-blue-600 transition"><i class="fa-solid fa-gear text-lg"></i></button>
-            </div>
-        </header>
 
-        <main class="flex-1 relative overflow-hidden bg-gray-100">
-            
-            <div id="welcome-screen" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-gray-50 z-0 overflow-y-auto">
-                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6 shadow-inner animate-bounce">
-                    <i class="fa-solid fa-bolt text-3xl text-blue-600"></i>
-                </div>
-                <h2 class="text-4xl font-black text-gray-900 mb-3 tracking-tighter">Sistema Integrado PetLojas</h2>
-                <p class="text-gray-500 max-w-lg mx-auto mb-10 text-sm leading-relaxed font-medium">A arquitetura unificada de todas as suas ferramentas. Escolha um módulo à esquerda para começar a operar.</p>
+            <nav class="flex-1 overflow-y-auto py-6 px-2 space-y-1.5 custom-scrollbar">
+                <a onclick="mudarModulo(this, 'welcome')" class="menu-item active" id="menu-dashboard">
+                    <i class="fa-solid fa-chart-pie min-w-[20px] text-center text-lg"></i> <span class="menu-label">Dashboard Central</span>
+                </a>
                 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
-                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-left hover:border-blue-300 transition">
-                        <i class="fa-solid fa-database text-blue-500 mb-3 block"></i>
-                        <p class="text-xs font-bold text-gray-400 uppercase">Banco de Dados</p>
-                        <p class="text-sm font-black text-gray-800">Conectado</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-left hover:border-blue-300 transition">
-                        <i class="fa-solid fa-shield-halved text-green-500 mb-3 block"></i>
-                        <p class="text-xs font-bold text-gray-400 uppercase">Segurança</p>
-                        <p class="text-sm font-black text-gray-800">Ativa</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-left hover:border-blue-300 transition">
-                        <i class="fa-solid fa-server text-indigo-500 mb-3 block"></i>
-                        <p class="text-xs font-bold text-gray-400 uppercase">Módulos</p>
-                        <p class="text-sm font-black text-gray-800">6 Operacionais</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-left hover:border-blue-300 transition">
-                        <i class="fa-solid fa-cloud-arrow-up text-orange-500 mb-3 block"></i>
-                        <p class="text-xs font-bold text-gray-400 uppercase">Versão</p>
-                        <p class="text-sm font-black text-gray-800">2.2 Elite</p>
-                    </div>
-                </div>
-            </div>
+                <div class="pt-5 pb-2 px-6"><p class="text-[10px] font-black text-slate-500 uppercase tracking-widest menu-category">Gestão & Vendas</p></div>
+                <a onclick="mudarModulo(this, 'crm.html')" class="menu-item">
+                    <i class="fa-solid fa-table-columns min-w-[20px] text-center text-lg"></i> <span class="menu-label">CRM Kanban</span>
+                </a>
+                <a onclick="mudarModulo(this, 'ficha-cadastro/index.html')" class="menu-item">
+                    <i class="fa-solid fa-address-book min-w-[20px] text-center text-lg"></i> <span class="menu-label">Painel de Fichas</span>
+                </a>
+                
+                <div class="pt-5 pb-2 px-6"><p class="text-[10px] font-black text-slate-500 uppercase tracking-widest menu-category">Marketing & Tração</p></div>
+                <a onclick="mudarModulo(this, 'disparadorcrm/index.html')" class="menu-item">
+                    <i class="fa-solid fa-paper-plane min-w-[20px] text-center text-lg"></i> <span class="menu-label">Disparador Oficial</span>
+                </a>
+                <a onclick="mudarModulo(this, 'disparofive/index.html')" class="menu-item">
+                    <i class="fa-solid fa-rocket min-w-[20px] text-center text-lg"></i> <span class="menu-label">Disparo Five</span>
+                </a>
 
-            <iframe id="app-frame" class="absolute inset-0 w-full h-full border-none z-10 hidden bg-white shadow-inner" src=""></iframe>
-            
-            <div id="loader" class="absolute inset-0 bg-white/95 backdrop-blur-sm z-20 flex items-center justify-center hidden">
-                <div class="flex flex-col items-center">
-                    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-600 mb-4"></i>
-                    <p class="text-[10px] font-black text-blue-900 uppercase tracking-[0.3em]">Carregando Ecossistema</p>
+                <div class="pt-5 pb-2 px-6"><p class="text-[10px] font-black text-slate-500 uppercase tracking-widest menu-category">Mídia (Isca Digital)</p></div>
+                <a onclick="mudarModulo(this, 'painel/index.html')" class="menu-item">
+                    <i class="fa-solid fa-pen-nib min-w-[20px] text-center text-lg"></i> <span class="menu-label">Editor da Revista</span>
+                </a>
+                <a onclick="window.open('revista/index.html', '_blank')" class="menu-item">
+                    <i class="fa-solid fa-arrow-up-right-from-square min-w-[20px] text-center text-lg text-blue-400"></i> <span class="menu-label">Ver Revista Online</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-slate-800 bg-[#0b1120] shrink-0">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 min-w-[40px] rounded-full bg-blue-600 flex items-center justify-center text-white font-bold border border-slate-700 shadow-inner overflow-hidden">
+                        <img src="https://ui-avatars.com/api/?name=Giselle+Conecta&background=2563eb&color=fff" class="w-full h-full">
+                    </div>
+                    <div class="flex-1 min-w-0 ml-4 menu-label">
+                        <p class="text-sm font-bold text-white truncate">Giselle</p>
+                        <p class="text-[10px] font-bold text-blue-400 uppercase tracking-wider truncate">GV Conecta</p>
+                    </div>
                 </div>
             </div>
-        </main>
+        </aside>
+
+        <div class="flex-1 flex flex-col min-w-0 h-screen relative">
+            
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-20 shrink-0 shadow-sm relative">
+                <div class="flex flex-col">
+                    <h2 id="topbar-title" class="text-lg font-black text-gray-800 leading-tight">Dashboard Central</h2>
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Plataforma SaaS PetLojas</span>
+                </div>
+                
+                <div class="flex items-center gap-5">
+                    <div class="hidden md:flex flex-col text-right mr-2">
+                        <p class="text-xs font-bold text-gray-800">Ambiente Protegido</p>
+                        <p class="text-[9px] text-green-500 font-bold uppercase">Sistema Online</p>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 relative overflow-hidden bg-gray-50">
+                <div id="welcome-screen" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-0 overflow-y-auto">
+                    <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6 shadow-inner animate-bounce"><i class="fa-solid fa-bolt text-3xl text-blue-600"></i></div>
+                    <h2 class="text-4xl font-black text-gray-900 mb-3 tracking-tighter">Sistema Integrado PetLojas</h2>
+                    <p class="text-gray-500 max-w-lg mx-auto mb-10 text-sm leading-relaxed font-medium">Selecione um módulo na barra lateral esquerda.</p>
+                </div>
+
+                <iframe id="app-frame" class="absolute inset-0 w-full h-full border-none z-10 hidden bg-transparent" src=""></iframe>
+                
+                <div id="loader" class="absolute inset-0 bg-white/95 backdrop-blur-sm z-20 flex items-center justify-center hidden">
+                    <div class="flex flex-col items-center">
+                        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-600 mb-4"></i>
+                        <p class="text-[10px] font-black text-blue-900 uppercase tracking-[0.3em]">Carregando Módulo...</p>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
     <script>
+        // LOGIN ÚNICO
+        function destravarSistema() {
+            const senha = document.getElementById('senha-mestre').value;
+            if(senha === 'gv2026' || senha === 'gvrevista2024') {
+                document.getElementById('tela-login-mestre').classList.add('hidden');
+                const sistema = document.getElementById('sistema-container');
+                sistema.classList.remove('hidden');
+                setTimeout(() => sistema.classList.remove('opacity-0'), 50);
+            } else {
+                document.getElementById('erro-senha').classList.remove('hidden');
+            }
+        }
+
         function mudarModulo(elemento, url) {
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
             elemento.classList.add('active');
             
-            // Extrai o texto da label para o topo (ignora o ícone)
             const menuText = elemento.querySelector('.menu-label').innerText.trim();
             document.getElementById('topbar-title').innerText = menuText;
 
@@ -181,13 +164,10 @@
                 loader.classList.remove('hidden');
                 iframe.classList.remove('hidden');
                 
-                // Limpa o cache do iframe para carregar sempre a última versão dos dados
                 const uniqueUrl = url + "?v=" + Date.now();
                 iframe.src = uniqueUrl;
                 
-                iframe.onload = () => { 
-                    setTimeout(() => { loader.classList.add('hidden'); }, 300); 
-                };
+                iframe.onload = () => { setTimeout(() => { loader.classList.add('hidden'); }, 300); };
             }
         }
     </script>
