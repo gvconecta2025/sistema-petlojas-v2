@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CMS Revista - Módulo Integrado</title>
+    <title>CMS Revista - Módulo Integrado Avançado</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,17 +11,14 @@
     <style type="text/tailwindcss">
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
         
-        /* Fundo transparente para herdar o fundo do App Shell mestre */
         body { font-family: 'Inter', sans-serif; background-color: transparent; } 
         
         .tf-input { @apply w-full bg-white border border-gray-300 rounded-lg p-3 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition shadow-sm; }
-        .tf-label { @apply block text-sm font-bold text-gray-600 mb-1; }
+        .tf-label { @apply block text-sm font-bold text-gray-700 mb-1; }
         
-        /* Estilos das Abas */
         .tab-active { @apply bg-blue-600 text-white font-bold border-blue-600; }
         .tab-inactive { @apply bg-white text-gray-500 font-medium border-gray-200 hover:bg-gray-50 border; }
         
-        /* Animação suave */
         .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -33,7 +30,7 @@
             <i class="fa-solid fa-list"></i> Gerenciar Artigos
         </button>
         <button id="btn-tab-editor" onclick="window.mudarAba('editor')" class="px-6 py-2.5 rounded-lg transition-all tab-inactive shadow-sm flex items-center gap-2">
-            <i class="fa-solid fa-pen-to-square"></i> Editor (Novo/Agendar)
+            <i class="fa-solid fa-pen-to-square"></i> Editor Multiblocos
         </button>
     </div>
 
@@ -41,7 +38,7 @@
         
         <div id="aba-lista" class="space-y-4">
             <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-4">
-                <h3 class="text-lg font-black text-gray-900">Artigos Publicados / Agendados</h3>
+                <h3 class="text-lg font-black text-gray-900">Acervo Editorial</h3>
                 <button onclick="window.carregarListaArtigos()" class="text-sm bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg font-bold hover:bg-gray-200 transition flex items-center gap-2">
                     <i class="fa-solid fa-rotate-right"></i> Atualizar
                 </button>
@@ -52,7 +49,7 @@
                     <thead>
                         <tr class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
                             <th class="p-4 font-bold border-b">Data/Hora</th>
-                            <th class="p-4 font-bold border-b">Categoria</th>
+                            <th class="p-4 font-bold border-b">Categoria & Tag</th>
                             <th class="p-4 font-bold border-b">Título</th>
                             <th class="p-4 font-bold border-b text-center">Status</th>
                             <th class="p-4 font-bold border-b text-center">Ações</th>
@@ -77,11 +74,18 @@
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <div>
+                        <label class="tf-label text-blue-600"><i class="fa-solid fa-toggle-on"></i> Status do Artigo</label>
+                        <select id="art-status" class="tf-input font-bold">
+                            <option value="publicado">🟢 Publicado (Visível)</option>
+                            <option value="rascunho">🟠 Rascunho (Oculto)</option>
+                        </select>
+                    </div>
                     <div>
                         <label class="tf-label">Categoria Principal</label>
                         <select id="cat-id" required class="tf-input">
-                            <option value="" disabled selected>Selecione a aba da revista...</option>
+                            <option value="" disabled selected>Aba da Revista...</option>
                             <option value="varejo">Pet Shop (Varejo)</option>
                             <option value="clinica">Clínica Veterinária</option>
                             <option value="estetica">Banho & Tosa</option>
@@ -89,61 +93,98 @@
                             <option value="hospedagem">Hotelzinho</option>
                         </select>
                     </div>
-                    
                     <div>
-                        <label class="tf-label">Tag Menor (Ex: Finanças)</label>
-                        <input type="text" id="cat-nome" placeholder="Opcional..." class="tf-input">
+                        <label class="tf-label">Tag Menor (Assunto)</label>
+                        <select id="cat-nome" required class="tf-input">
+                            <option value="" disabled selected>Escolha a tag...</option>
+                            <option value="Vendas & Merchandising">Vendas & Merchandising</option>
+                            <option value="Gestão & Liderança">Gestão & Liderança</option>
+                            <option value="Atendimento & Retenção">Atendimento & Retenção</option>
+                            <option value="Marketing Digital">Marketing Digital</option>
+                            <option value="Operação & Processos">Operação & Processos</option>
+                            <option value="Finanças & Estoque">Finanças & Estoque</option>
+                        </select>
                     </div>
-                    
                     <div>
-                        <label class="tf-label text-blue-600"><i class="fa-solid fa-calendar-days"></i> Data da Publicação</label>
-                        <input type="datetime-local" id="art-data" class="tf-input border-blue-300 bg-blue-50/30">
+                        <label class="tf-label"><i class="fa-solid fa-calendar-days"></i> Data de Publicação</label>
+                        <input type="datetime-local" id="art-data" class="tf-input">
                     </div>
                 </div>
 
                 <div>
-                    <label class="tf-label">Título do Artigo</label>
-                    <input type="text" id="art-titulo" required placeholder="Escreva o título aqui..." class="tf-input text-lg font-bold text-gray-900">
+                    <label class="tf-label text-lg">Título do Artigo</label>
+                    <input type="text" id="art-titulo" required placeholder="Ex: Fotos que Vendem: A Vitrine do Banho e Tosa" class="tf-input text-xl font-black text-gray-900 border-gray-400">
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-                    <div class="md:col-span-2 space-y-6">
-                        <div>
-                            <label class="tf-label">Link da Imagem de Capa</label>
-                            <input type="url" id="art-img" required placeholder="https://..." class="tf-input text-sm" onchange="window.atualizarPreview()">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="col-span-2">
+                                <label class="tf-label">Link da Imagem de Capa</label>
+                                <input type="url" id="art-img" required placeholder="https://images.unsplash.com/..." class="tf-input text-sm" onchange="window.atualizarPreview()">
+                            </div>
+                            <div>
+                                <label class="tf-label text-orange-600"><i class="fa-solid fa-crop-simple"></i> Enquadramento</label>
+                                <select id="art-img-pos" class="tf-input text-sm" onchange="window.atualizarPreview()">
+                                    <option value="object-center">Centro (Padrão)</option>
+                                    <option value="object-top">Fixar no Topo</option>
+                                    <option value="object-bottom">Fixar na Base</option>
+                                    <option value="object-left">Esquerda</option>
+                                    <option value="object-right">Direita</option>
+                                </select>
+                            </div>
                         </div>
                         <div>
                             <label class="tf-label">Resumo Estratégico (Chamada para o Feed)</label>
-                            <textarea id="art-resumo" required rows="3" placeholder="Resumo que vai aparecer na capa da revista..." class="tf-input text-sm resize-none"></textarea>
+                            <textarea id="art-resumo" required rows="3" placeholder="Resumo curto para instigar o clique..." class="tf-input text-sm resize-none"></textarea>
                         </div>
                     </div>
                     
-                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-2 flex flex-col items-center justify-center h-48">
-                        <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">Preview da Capa</span>
-                        <div id="preview-box" class="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-                            <i class="fa-solid fa-image text-4xl text-gray-400"></i>
+                    <div class="bg-gray-800 rounded-xl p-3 flex flex-col items-center justify-center relative shadow-lg">
+                        <span class="text-[10px] font-black text-gray-300 uppercase mb-2">Simulador de Capa Mobile (Proporção 4:5)</span>
+                        <div id="preview-box" class="w-full aspect-[4/5] bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden border border-gray-600">
+                            <i class="fa-solid fa-image text-4xl text-gray-600"></i>
                         </div>
                     </div>
                 </div>
 
-                <div>
-                    <label class="tf-label">Corpo do Artigo (HTML formatado)</label>
-                    <textarea id="art-conteudo" required rows="10" placeholder="<p>Texto aqui...</p>" class="tf-input font-mono text-sm leading-relaxed bg-gray-50"></textarea>
+                <div class="border-t border-gray-200 pt-6 space-y-5">
+                    <h4 class="font-black text-gray-900 text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-blue-600"></i> Editor Estruturado (Multiblocos)
+                    </h4>
+                    
+                    <div>
+                        <label class="tf-label">Bloco 1: Introdução & Corpo Principal</label>
+                        <p class="text-[10px] text-gray-500 mb-1.5 font-medium">Formato do Frame: <b>Largura 100% | Altura flexível (Auto)</b>. Recomendado para o texto âncora do artigo.</p>
+                        <textarea id="art-conteudo-1" rows="8" placeholder="<p>Texto inicial...</p>" class="tf-input font-mono text-sm leading-relaxed bg-gray-50"></textarea>
+                    </div>
+
+                    <div class="pl-4 border-l-4 border-amber-400">
+                        <label class="tf-label text-amber-700">Bloco 2: Espaço Híbrido (Meio do Artigo)</label>
+                        <p class="text-[10px] text-gray-500 mb-1.5 font-medium">Formato do Frame: <b>Largura 100% | Altura flexível (Auto)</b>. Ideal para inserir Banners Nativos, Divisórias ou Pesquisas.</p>
+                        <textarea id="art-conteudo-2" rows="5" placeholder="" class="tf-input font-mono text-sm leading-relaxed bg-amber-50/30"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="tf-label">Bloco 3: Conclusão & Captação</label>
+                        <p class="text-[10px] text-gray-500 mb-1.5 font-medium">Formato do Frame: <b>Largura 100% | Altura flexível (Auto)</b>. Recomendado para fechamento, Formulário de Leads e Leituras Recomendadas.</p>
+                        <textarea id="art-conteudo-3" rows="8" placeholder="<p>Para concluir...</p> " class="tf-input font-mono text-sm leading-relaxed bg-gray-50"></textarea>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-3 bg-yellow-50 border border-yellow-200 p-4 rounded-xl">
-                    <input type="checkbox" id="art-premium" class="w-5 h-5 text-yellow-600 rounded cursor-pointer">
-                    <label for="art-premium" class="text-sm font-bold text-yellow-800 cursor-pointer flex items-center gap-1.5">
-                        <i class="fa-solid fa-lock"></i> Marcar como Artigo Premium (Exige Captura de Lead)
+                <div class="flex items-center gap-3 bg-indigo-50 border border-indigo-200 p-4 rounded-xl">
+                    <input type="checkbox" id="art-premium" class="w-5 h-5 text-indigo-600 rounded cursor-pointer">
+                    <label for="art-premium" class="text-sm font-bold text-indigo-800 cursor-pointer flex items-center gap-1.5">
+                        <i class="fa-solid fa-crown text-amber-500"></i> Marcar como Artigo Premium (Conteúdo Bloqueado)
                     </label>
                 </div>
 
                 <div class="pt-6 border-t border-gray-200 flex justify-end gap-4">
-                    <button type="button" onclick="window.limparCampos()" class="px-6 py-3 text-sm font-bold text-gray-500 hover:text-gray-800 transition rounded-xl hover:bg-gray-100">
-                        Cancelar / Limpar Tudo
+                    <button type="button" onclick="window.limparCampos()" class="px-6 py-3 text-sm font-bold text-gray-500 hover:text-red-600 transition rounded-xl hover:bg-red-50">
+                        Descartar Alterações
                     </button>
                     <button type="submit" id="btn-publicar" class="bg-blue-600 hover:bg-blue-700 text-white font-black py-3 px-8 rounded-xl shadow-lg transition flex items-center gap-2">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Salvar no Firebase
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Salvar na Nuvem
                     </button>
                 </div>
             </form>
@@ -154,7 +195,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, Timestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CREDENCIAIS DA PETLOJAS
+        // CHAVES DO AMBIENTE
         const firebaseConfig = {
           apiKey: "AIzaSyBjuvcJvTWw7lMrIwej5lHbIUXe99lJDN4",
           authDomain: "crmpetshop.firebaseapp.com",
@@ -163,60 +204,54 @@
           messagingSenderId: "381013124221",
           appId: "1:381013124221:web:6a1860b4249c2939b6fd14"
         };
+        
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Expondo para o objeto Window para as funções HTML usarem
-        window.db = db;
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.getDocs = getDocs;
-        window.doc = doc;
-        window.updateDoc = updateDoc;
-        window.deleteDoc = deleteDoc;
-        window.Timestamp = Timestamp;
-        window.query = query;
-        window.orderBy = orderBy;
+        // Exposição para funções nativas
+        window.db = db; window.collection = collection; window.addDoc = addDoc; window.getDocs = getDocs; 
+        window.doc = doc; window.updateDoc = updateDoc; window.deleteDoc = deleteDoc; window.Timestamp = Timestamp;
+        window.query = query; window.orderBy = orderBy;
         
-        // Dispara o carregamento inicial da lista
+        // Disparo Inicial
         window.carregarListaArtigos();
     </script>
 
     <script>
-        // Lógica de navegação de abas
+        let listaCache = [];
+
+        // NAVEGAÇÃO
         window.mudarAba = (aba) => {
-            const bLista = document.getElementById('btn-tab-lista');
-            const bEditor = document.getElementById('btn-tab-editor');
-            const cLista = document.getElementById('aba-lista');
-            const cEditor = document.getElementById('aba-editor');
+            const bLista = document.getElementById('btn-tab-lista'); const bEditor = document.getElementById('btn-tab-editor');
+            const cLista = document.getElementById('aba-lista'); const cEditor = document.getElementById('aba-editor');
 
             if(aba === 'lista') {
                 bLista.className = "px-6 py-2.5 rounded-lg transition-all tab-active shadow-sm flex items-center gap-2";
                 bEditor.className = "px-6 py-2.5 rounded-lg transition-all tab-inactive shadow-sm flex items-center gap-2";
-                cLista.classList.remove('hidden');
-                cEditor.classList.add('hidden');
+                cLista.classList.remove('hidden'); cEditor.classList.add('hidden');
                 window.carregarListaArtigos();
             } else {
                 bEditor.className = "px-6 py-2.5 rounded-lg transition-all tab-active shadow-sm flex items-center gap-2";
                 bLista.className = "px-6 py-2.5 rounded-lg transition-all tab-inactive shadow-sm flex items-center gap-2";
-                cEditor.classList.remove('hidden');
-                cLista.classList.add('hidden');
+                cEditor.classList.remove('hidden'); cLista.classList.add('hidden');
                 window.definirDataHoraPadrao();
             }
         };
 
-        // Lógica para mostrar a imagem
+        // SIMULADOR DE CAPA (ASPECT RATIO 4:5 E REPOSICIONAMENTO)
         window.atualizarPreview = () => {
             const url = document.getElementById('art-img').value.trim();
+            const pos = document.getElementById('art-img-pos').value;
             const box = document.getElementById('preview-box');
+            
             if(url.startsWith('http')) {
-                box.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+                // Aplica a classe de alinhamento escolhida pelo usuário
+                box.innerHTML = `<img src="${url}" class="w-full h-full object-cover ${pos}">`;
             } else {
-                box.innerHTML = `<i class="fa-solid fa-image text-4xl text-gray-400"></i>`;
+                box.innerHTML = `<i class="fa-solid fa-image text-4xl text-gray-600"></i>`;
             }
         };
 
-        // Lógica para colocar a data atual se estiver vazio
         window.definirDataHoraPadrao = () => {
             const inputData = document.getElementById('art-data');
             if(!inputData.value) {
@@ -226,23 +261,20 @@
             }
         };
 
-        // Lógica para limpar tudo
         window.limparCampos = () => {
-            document.getElementById('form-cms').reset();
+            document.getElementById('form-cms').reset(); 
             document.getElementById('art-id').value = '';
-            document.getElementById('alerta-edicao').classList.add('hidden');
+            document.getElementById('alerta-edicao').classList.add('hidden'); 
             document.getElementById('art-data').value = '';
-            window.atualizarPreview();
+            window.atualizarPreview(); 
             window.definirDataHoraPadrao();
         };
 
-        let listaCache = [];
-
-        // Lógica para READ (Buscar do banco)
+        // LEITURA DO BANCO (READ)
         window.carregarListaArtigos = async () => {
             if(!window.db) return;
             const tabela = document.getElementById('tabela-artigos');
-            tabela.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-gray-400"><i class="fa-solid fa-circle-notch fa-spin"></i> Buscando no Firebase...</td></tr>`;
+            tabela.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-gray-400"><i class="fa-solid fa-circle-notch fa-spin"></i> Sincronizando com a Nuvem...</td></tr>`;
             
             try {
                 const q = window.query(window.collection(window.db, "revista_artigos"), window.orderBy("dataPublicacao", "desc"));
@@ -260,45 +292,51 @@
                     let dataPub = data.dataPublicacao ? data.dataPublicacao.toDate() : new Date();
                     let dataFormatada = dataPub.toLocaleDateString('pt-BR') + ' ' + dataPub.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
                     
-                    let statusBadge = dataPub > agora 
-                        ? `<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-sm"><i class="fa-regular fa-clock"></i> Agendado</span>`
-                        : `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-sm"><i class="fa-solid fa-check"></i> No Ar</span>`;
+                    // Lógica de Status combinando a data e a Flag manual de rascunho
+                    let isRascunho = data.status === 'rascunho';
+                    let statusBadge = '';
+                    
+                    if (isRascunho) {
+                        statusBadge = `<span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-sm"><i class="fa-solid fa-pen-ruler"></i> Rascunho</span>`;
+                    } else if (dataPub > agora) {
+                        statusBadge = `<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-sm"><i class="fa-regular fa-clock"></i> Agendado</span>`;
+                    } else {
+                        statusBadge = `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-sm"><i class="fa-solid fa-check"></i> Publicado</span>`;
+                    }
 
                     html += `
                         <tr class="hover:bg-gray-50 transition border-b border-gray-100">
                             <td class="p-4 text-xs font-bold text-gray-500">${dataFormatada}</td>
-                            <td class="p-4 text-xs font-bold text-blue-600 uppercase tracking-widest">${data.categoriaId || 'Geral'}</td>
+                            <td class="p-4 text-xs font-bold text-blue-600 uppercase tracking-widest leading-tight">${data.categoriaId || 'Geral'}<br><span class="text-[9px] text-gray-400 font-medium">${data.categoriaNome || 'Sem Tag'}</span></td>
                             <td class="p-4 font-bold text-gray-900 line-clamp-1 max-w-[250px]" title="${data.titulo}">${data.titulo}</td>
                             <td class="p-4 text-center">${statusBadge}</td>
                             <td class="p-4 text-center space-x-2">
-                                <button onclick="window.editarArtigo('${id}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded transition" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="window.excluirArtigo('${id}')" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded transition" title="Apagar"><i class="fa-solid fa-trash-can"></i></button>
+                                <button onclick="window.editarArtigo('${id}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded transition" title="Editar / Ver"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="window.excluirArtigo('${id}')" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded transition" title="Excluir Definitivamente"><i class="fa-solid fa-trash-can"></i></button>
                             </td>
                         </tr>
                     `;
                 });
                 
-                if(html === '') html = `<tr><td colspan="5" class="p-6 text-center text-gray-400 font-medium">Nenhum artigo encontrado.</td></tr>`;
+                if(html === '') html = `<tr><td colspan="5" class="p-6 text-center text-gray-400 font-medium">Nenhum artigo editorial encontrado.</td></tr>`;
                 tabela.innerHTML = html;
                 
             } catch (error) { 
-                tabela.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-red-500 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Erro: ${error.message}</td></tr>`; 
+                tabela.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-red-500 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Falha de comunicação: ${error.message}</td></tr>`; 
             }
         };
 
-        // Lógica para DELETE
+        // DELETAR
         window.excluirArtigo = async (id) => {
-            if(confirm("🚨 ATENÇÃO: Tem certeza que deseja apagar este artigo permanentemente?")) {
+            if(confirm("🚨 CRÍTICO: Tem a certeza que deseja APAGAR este artigo? Não é possível reverter! Se quiser apenas esconder da revista, edite e marque como RASCUNHO.")) {
                 try {
                     await window.deleteDoc(window.doc(window.db, "revista_artigos", id));
                     window.carregarListaArtigos();
-                } catch(err) { 
-                    alert("Erro ao excluir: " + err.message); 
-                }
+                } catch(err) { alert("Erro ao excluir: " + err.message); }
             }
         };
 
-        // Lógica para PREENCHER O FORM COM DADOS ANTIGOS (Edição)
+        // PREPARAR FORMULÁRIO (EDIT)
         window.editarArtigo = (id) => {
             const artigo = listaCache.find(a => a.id === id);
             if(!artigo) return;
@@ -306,10 +344,17 @@
             document.getElementById('art-id').value = artigo.id;
             document.getElementById('cat-id').value = artigo.categoriaId || '';
             document.getElementById('cat-nome').value = artigo.categoriaNome || '';
+            document.getElementById('art-status').value = artigo.status || 'publicado'; // Puxa o status
             document.getElementById('art-titulo').value = artigo.titulo || '';
             document.getElementById('art-img').value = artigo.img || '';
+            document.getElementById('art-img-pos').value = artigo.imgPos || 'object-center'; // Puxa alinhamento
             document.getElementById('art-resumo').value = artigo.resumo || '';
-            document.getElementById('art-conteudo').value = artigo.conteudo || '';
+            
+            // Retrocompatibilidade: Se tiver o campo antigo "conteudo" único, joga no Bloco 1.
+            document.getElementById('art-conteudo-1').value = artigo.conteudo1 || artigo.conteudo || '';
+            document.getElementById('art-conteudo-2').value = artigo.conteudo2 || '';
+            document.getElementById('art-conteudo-3').value = artigo.conteudo3 || '';
+            
             document.getElementById('art-premium').checked = artigo.premium || false;
 
             if(artigo.dataPublicacao) {
@@ -323,25 +368,32 @@
             window.mudarAba('editor');
         };
 
-        // Lógica de SUBMIT (Criar ou Atualizar)
+        // SALVAR (CREATE/UPDATE)
         document.getElementById('form-cms').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const btn = document.getElementById('btn-publicar');
             const originalText = btn.innerHTML;
             btn.disabled = true; 
-            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Processando...`;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Encryptando...`;
 
             const dataStr = document.getElementById('art-data').value;
             const dataFirebase = window.Timestamp.fromDate(new Date(dataStr));
 
             const artigoData = {
+                status: document.getElementById('art-status').value, // Publicado ou Rascunho
                 categoriaId: document.getElementById('cat-id').value,
-                categoriaNome: document.getElementById('cat-nome').value.trim(),
+                categoriaNome: document.getElementById('cat-nome').value,
                 titulo: document.getElementById('art-titulo').value.trim(),
                 img: document.getElementById('art-img').value.trim(),
+                imgPos: document.getElementById('art-img-pos').value, // Ex: object-top
                 resumo: document.getElementById('art-resumo').value.trim(),
-                conteudo: document.getElementById('art-conteudo').value.trim(),
+                // Salvando os 3 blocos
+                conteudo1: document.getElementById('art-conteudo-1').value.trim(),
+                conteudo2: document.getElementById('art-conteudo-2').value.trim(),
+                conteudo3: document.getElementById('art-conteudo-3').value.trim(),
+                // Limpando o campo antigo para não pesar o banco
+                conteudo: "", 
                 premium: document.getElementById('art-premium').checked,
                 dataPublicacao: dataFirebase
             };
@@ -357,7 +409,7 @@
                 window.limparCampos(); 
                 window.mudarAba('lista');
             } catch (error) { 
-                alert("Erro ao gravar no banco: " + error.message); 
+                alert("Falha de Comunicação: " + error.message); 
             } finally { 
                 btn.disabled = false; 
                 btn.innerHTML = originalText; 
