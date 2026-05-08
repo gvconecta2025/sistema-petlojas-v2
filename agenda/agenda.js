@@ -1,234 +1,242 @@
-<!DOCTYPE html>
-<html lang="pt-PT">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Action Hub Pro - PetLojas</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: transparent; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        /* Segmented Control - Estilo Apple/iOS */
-        .segmented-control { @apply flex bg-slate-200/70 p-1 rounded-xl shadow-inner; }
-        .segment-btn { @apply px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 flex items-center gap-2 text-slate-500 cursor-pointer; }
-        .segment-btn.active { @apply bg-white text-slate-800 shadow-sm ring-1 ring-slate-200; }
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        /* Estilos do Calendário Proporcional */
-        .calendar-grid { display: grid; gap: 0; }
-        .day-column { @apply relative border-r border-slate-100 transition-colors hover:bg-slate-50/50 cursor-crosshair; }
-        .day-column.today { @apply bg-blue-50/10; }
-        
-        /* Chip de Evento na Grade */
-        .event-block { @apply absolute left-1 right-1 rounded-md p-1.5 text-[10px] leading-tight overflow-hidden shadow-sm border-l-4 transition-all hover:z-30 hover:scale-[1.02] cursor-pointer; }
-        
-        /* Cores de Prioridade */
-        .event-alta { @apply bg-red-100 text-red-800 border-red-500; }
-        .event-media { @apply bg-yellow-100 text-yellow-800 border-yellow-500; }
-        .event-baixa { @apply bg-blue-100 text-blue-800 border-blue-500; }
-    </style>
-</head>
-<body class="flex flex-col h-screen overflow-hidden text-slate-800 p-4 gap-4">
+const firebaseConfig = {
+    apiKey: "AIzaSyBjuvcJvTWw7lMrIwej5lHbIUXe99lJDN4",
+    authDomain: "crmpetshop.firebaseapp.com",
+    projectId: "crmpetshop",
+    storageBucket: "crmpetshop.firebasestorage.app",
+    messagingSenderId: "381013124221",
+    appId: "1:381013124221:web:6a1860b4249c2939b6fd14"
+};
 
-    <div class="flex flex-wrap items-center justify-between bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl border border-slate-200 shadow-sm shrink-0 gap-4">
-        
-        <div class="segmented-control">
-            <button onclick="mudarModo('hibrida', this)" class="segment-btn active">
-                <i class="fa-solid fa-table-columns text-blue-500"></i> Híbrida
-            </button>
-            <button onclick="mudarModo('tarefas', this)" class="segment-btn">
-                <i class="fa-solid fa-list-check text-slate-400"></i> Tarefas
-            </button>
-            <button onclick="mudarModo('agenda', this)" class="segment-btn">
-                <i class="fa-solid fa-calendar-days text-slate-400"></i> Agenda
-            </button>
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const agendaRef = collection(db, "agenda_eventos");
+
+let dataFoco = new Date();
+let visaoPeriodo = 'semana'; // dia, semana
+let todosEventos = [];
+const PIXELS_POR_HORA = 60;
+
+document.addEventListener("DOMContentLoaded", () => {
+    configurarFormulario();
+    gerarEixosBase();
+    ouvirFirebase();
+    iniciarLinhaDoTempo();
+    // Scroll inicial para as 08:00
+    document.getElementById('calendar-scroll-area').scrollTop = 8 * PIXELS_POR_HORA;
+});
+
+function ouvirFirebase() {
+    const q = query(agendaRef, orderBy("criadoEm", "desc"));
+    onSnapshot(q, (snapshot) => {
+        todosEventos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderizarLayout();
+    });
+}
+
+// 1. GERAR A ESTRUTURA FIXA DA GRADE DE HORAS
+function gerarEixosBase() {
+    const timeAxis = document.getElementById('time-axis');
+    const gridLines = document.getElementById('grid-lines');
+    timeAxis.innerHTML = ''; gridLines.innerHTML = '';
+
+    for(let h = 0; h < 24; h++) {
+        // Eixo de horas
+        const timeBox = document.createElement('div');
+        timeBox.className = "absolute w-full text-right pr-2 text-[10px] font-bold text-slate-400";
+        timeBox.style.top = `${h * PIXELS_POR_HORA - 7}px`;
+        timeBox.innerText = `${h.toString().padStart(2, '0')}:00`;
+        if(h > 0) timeAxis.appendChild(timeBox);
+
+        // Linhas de fundo
+        const line = document.createElement('div');
+        line.className = "absolute w-full border-t border-slate-100";
+        line.style.top = `${h * PIXELS_POR_HORA}px`;
+        gridLines.appendChild(line);
+    }
+}
+
+// 2. LÓGICA DE NAVEGAÇÃO E DATAS
+window.navegarData = (direcao) => {
+    let dias = visaoPeriodo === 'semana' ? 7 : 1;
+    dataFoco.setDate(dataFoco.getDate() + (direcao * dias));
+    renderizarLayout();
+};
+window.irParaHoje = () => { dataFoco = new Date(); renderizarLayout(); };
+window.mudarPeriodo = (periodo, btn) => {
+    visaoPeriodo = periodo;
+    document.querySelectorAll('.segmented-control:last-of-type button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderizarLayout();
+};
+
+function formatarMesAno(data) {
+    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    return `${meses[data.getMonth()]} ${data.getFullYear()}`;
+}
+
+// 3. RENDERIZAÇÃO MATEMÁTICA DA AGENDA
+function renderizarLayout() {
+    document.getElementById('display-periodo').innerText = formatarMesAno(dataFoco);
+    
+    // BACKLOG (Tarefas sem data ou dia inteiro sem hora)
+    const backlogContainer = document.getElementById('lista-tarefas');
+    const tarefasBacklog = todosEventos.filter(e => !e.dataMarcada);
+    document.getElementById('count-tarefas').innerText = tarefasBacklog.length;
+    
+    backlogContainer.innerHTML = tarefasBacklog.map(t => `
+        <div class="p-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-blue-300 transition-all group">
+            <span class="inline-block px-1.5 py-0.5 rounded text-[8px] font-black uppercase mb-1 event-${t.prioridade}">${t.prioridade}</span>
+            <p class="text-xs font-bold text-slate-700">${t.titulo}</p>
+            <button onclick="window.excluirAcao('${t.id}')" class="text-red-400 hover:text-red-600 text-[9px] font-bold uppercase mt-2 opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i> Excluir</button>
         </div>
+    `).join('') || '<div class="text-center p-4 text-slate-400 text-[10px] font-bold uppercase">Backlog limpo</div>';
 
-        <div class="flex items-center gap-4">
-            <div class="flex items-center bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
-                <button onclick="navegarData(-1)" class="px-3 py-1.5 hover:bg-slate-100 transition text-slate-500"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-                <button onclick="irParaHoje()" class="px-4 py-1.5 text-xs font-black uppercase text-slate-600 hover:text-blue-600 transition border-x border-slate-200">Hoje</button>
-                <button onclick="navegarData(1)" class="px-3 py-1.5 hover:bg-slate-100 transition text-slate-500"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+    // RENDERIZAR GRADE (Dia ou Semana)
+    const headers = document.getElementById('calendar-headers');
+    const columnsContainer = document.getElementById('day-columns-container');
+    const diasSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+    
+    headers.innerHTML = ''; columnsContainer.innerHTML = '';
+    
+    let numDias = visaoPeriodo === 'semana' ? 7 : 1;
+    let dataInicio = new Date(dataFoco);
+    if (visaoPeriodo === 'semana') dataInicio.setDate(dataInicio.getDate() - dataInicio.getDay()); // Volta para Domingo
+
+    // Ajusta o CSS Grid (1 coluna ou 7)
+    headers.style.gridTemplateColumns = `repeat(${numDias}, 1fr)`;
+    columnsContainer.style.gridTemplateColumns = `repeat(${numDias}, 1fr)`;
+
+    for (let i = 0; i < numDias; i++) {
+        let diaCorrente = new Date(dataInicio);
+        diaCorrente.setDate(dataInicio.getDate() + i);
+        let diaIso = diaCorrente.toISOString().split('T')[0];
+        let eHoje = new Date().toDateString() === diaCorrente.toDateString();
+
+        // 1. Cria Cabeçalho do Dia
+        headers.innerHTML += `
+            <div class="p-2 text-center border-r border-slate-200 ${eHoje ? 'bg-blue-50/50' : ''}">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">${diasSemana[diaCorrente.getDay()]}</p>
+                <p class="text-lg font-black ${eHoje ? 'text-blue-600' : 'text-slate-700'}">${diaCorrente.getDate()}</p>
             </div>
-            
-            <h2 id="display-periodo" class="text-sm font-black text-slate-700 min-w-[140px] text-center capitalize">Maio 2026</h2>
+        `;
 
-            <div class="segmented-control">
-                <button onclick="mudarPeriodo('dia', this)" class="segment-btn">Dia</button>
-                <button onclick="mudarPeriodo('semana', this)" class="segment-btn active">Semana</button>
-            </div>
-        </div>
-
-        <button onclick="abrirModalNovaTarefa()" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-lg transition-all active:scale-95">
-            <i class="fa-solid fa-plus text-sm"></i> Ação
-        </button>
-    </div>
-
-    <div class="flex-1 flex gap-5 overflow-hidden">
+        // 2. Cria Coluna Vertical na Grade
+        const colDiv = document.createElement('div');
+        colDiv.className = `day-column ${eHoje ? 'today' : ''}`;
         
-        <div id="coluna-tarefas" class="w-1/4 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full transition-all duration-500">
-            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/80 rounded-t-2xl shrink-0">
-                <h3 class="font-black text-[11px] uppercase tracking-widest text-slate-600">Backlog (Sem Hora)</h3>
-                <span id="count-tarefas" class="bg-slate-200 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
-            </div>
-            <div id="lista-tarefas" class="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
-                </div>
-        </div>
+        // CLICK-TO-ADD (Clicar na grade para criar evento na hora exata)
+        colDiv.onclick = (e) => {
+            if(e.target !== colDiv) return; // Evita abrir se clicar num cartão existente
+            const rect = colDiv.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            const hora = Math.floor(y / PIXELS_POR_HORA);
+            const horaStr = `${hora.toString().padStart(2,'0')}:00`;
+            window.abrirModalNovaTarefa(diaIso, horaStr);
+        };
 
-        <div id="coluna-agenda" class="flex-1 flex flex-col h-full bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-500 relative">
-            
-            <div id="calendar-headers-wrapper" class="flex border-b border-slate-200 bg-slate-50/80 shrink-0">
-                <div class="w-12 shrink-0 border-r border-slate-200"></div> <div id="calendar-headers" class="flex-1 calendar-grid">
-                    </div>
-            </div>
-
-            <div id="all-day-wrapper" class="flex border-b border-slate-200 bg-white shrink-0 hidden">
-                <div class="w-12 shrink-0 border-r border-slate-200 flex items-center justify-center text-[9px] font-bold text-slate-400 uppercase">Dia<br>Todo</div>
-                <div id="all-day-grid" class="flex-1 calendar-grid p-1">
-                    </div>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto custom-scrollbar relative bg-white" id="calendar-scroll-area">
-                <div class="flex h-[1440px] relative w-full">
-                    
-                    <div class="w-12 shrink-0 border-r border-slate-200 bg-white relative z-10" id="time-axis">
-                        </div>
-                    
-                    <div class="absolute inset-0 left-12 pointer-events-none z-0" id="grid-lines">
-                        </div>
-                    
-                    <div class="absolute left-12 right-0 h-[2px] bg-red-500 z-20 pointer-events-none hidden shadow-[0_0_8px_rgba(239,68,68,0.8)]" id="current-time-line">
-                        <div class="w-2.5 h-2.5 bg-red-500 rounded-full absolute -left-1.5 -top-[4px]"></div>
-                    </div>
-                    
-                    <div class="flex-1 calendar-grid relative z-10" id="day-columns-container">
-                        </div>
-
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div id="modal-nova-tarefa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-opacity duration-300">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="modal-content">
-            <div class="bg-slate-50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-black text-sm uppercase tracking-wider text-slate-800" id="modal-title">Nova Ação / Reunião</h3>
-                <button onclick="fecharModalNovaTarefa()" class="text-slate-400 hover:text-red-500 transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <form id="form-nova-tarefa" class="p-6 space-y-4">
-                <input type="hidden" id="input-id-edicao"> <div>
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Título do Evento / Loja</label>
-                    <input type="text" id="input-titulo" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-sm text-slate-800" placeholder="Ex: Reunião PetShop Cão Feliz">
-                </div>
-                
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="col-span-3">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Data</label>
-                        <input type="date" id="input-data" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-xs text-slate-700">
-                    </div>
-                    <div class="col-span-1">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 text-center">Início</label>
-                        <input type="time" id="input-hora-inicio" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-xs text-center text-slate-700">
-                    </div>
-                    <div class="col-span-1 flex items-center justify-center pt-5 text-slate-300 font-bold">Até</div>
-                    <div class="col-span-1">
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 text-center">Fim</label>
-                        <input type="time" id="input-hora-fim" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-xs text-center text-slate-700">
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 mt-1">
-                    <input type="checkbox" id="input-dia-inteiro" class="w-4 h-4 accent-blue-600 rounded cursor-pointer" onchange="toggleHoras(this.checked)">
-                    <label for="input-dia-inteiro" class="text-xs font-bold text-slate-500 cursor-pointer">Evento de Dia Inteiro / Sem Hora</label>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 pt-2">
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Prioridade</label>
-                        <select id="input-prioridade" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-xs text-slate-700">
-                            <option value="baixa">🔵 Normal</option>
-                            <option value="media">🟡 Follow-up</option>
-                            <option value="alta">🔴 Fechamento / Urgente</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">WhatsApp</label>
-                        <input type="text" id="input-telefone" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-xs text-slate-700" placeholder="(33) 9...">
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-[0.1em] py-3.5 rounded-xl mt-4 transition shadow-lg shadow-blue-600/30 active:scale-95">
-                    Guardar no Calendário
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <script type="module" src="agenda.js"></script>
-    <script>
-        // Funções de Interface UI
-        window.abrirModalNovaTarefa = (dataIso = '', horaStr = '') => {
-            document.getElementById('form-nova-tarefa').reset();
-            document.getElementById('input-id-edicao').value = '';
-            
-            if (dataIso) document.getElementById('input-data').value = dataIso;
-            if (horaStr) {
-                document.getElementById('input-hora-inicio').value = horaStr;
-                document.getElementById('input-dia-inteiro').checked = false;
-                toggleHoras(false);
-            } else {
-                document.getElementById('input-dia-inteiro').checked = true;
-                toggleHoras(true);
+        // 3. Posicionar Eventos com Hora Fixa neste dia
+        const eventosDia = todosEventos.filter(e => e.dataMarcada === diaIso && e.horaInicio);
+        eventosDia.forEach(ev => {
+            const [hIn, mIn] = ev.horaInicio.split(':').map(Number);
+            let duracao = 60; // Padrão 1 hora
+            if(ev.horaFim) {
+                const [hFim, mFim] = ev.horaFim.split(':').map(Number);
+                duracao = (hFim * 60 + mFim) - (hIn * 60 + mIn);
+                if(duracao < 15) duracao = 60; // Segurança
             }
 
-            const modal = document.getElementById('modal-nova-tarefa');
-            const content = document.getElementById('modal-content');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        };
+            const topPx = (hIn * PIXELS_POR_HORA) + (mIn * (PIXELS_POR_HORA/60));
+            const heightPx = duracao * (PIXELS_POR_HORA/60);
 
-        window.fecharModalNovaTarefa = () => {
-            const content = document.getElementById('modal-content');
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => document.getElementById('modal-nova-tarefa').classList.add('hidden'), 300);
-        };
-        
-        window.toggleHoras = (isDiaInteiro) => {
-            document.getElementById('input-hora-inicio').disabled = isDiaInteiro;
-            document.getElementById('input-hora-fim').disabled = isDiaInteiro;
-            if(isDiaInteiro) {
-                document.getElementById('input-hora-inicio').value = '';
-                document.getElementById('input-hora-fim').value = '';
-                document.getElementById('input-hora-inicio').classList.add('opacity-50');
-                document.getElementById('input-hora-fim').classList.add('opacity-50');
-            } else {
-                document.getElementById('input-hora-inicio').classList.remove('opacity-50');
-                document.getElementById('input-hora-fim').classList.remove('opacity-50');
-            }
-        };
+            const card = document.createElement('div');
+            card.className = `event-block event-${ev.prioridade}`;
+            card.style.top = `${topPx}px`;
+            card.style.height = `${heightPx}px`;
+            card.innerHTML = `
+                <div class="font-black truncate">${ev.titulo}</div>
+                <div class="text-[8px] font-medium opacity-80 mt-0.5">${ev.horaInicio} ${ev.horaFim ? '- '+ev.horaFim : ''}</div>
+            `;
+            
+            // Botão de excluir aparece ao clicar no evento
+            card.onclick = (e) => {
+                e.stopPropagation();
+                window.excluirAcao(ev.id);
+            };
 
-        window.mudarModo = (modo, btn) => {
-            document.querySelectorAll('.segmented-control:first-of-type button').forEach(b => {
-                b.classList.remove('active');
-                b.querySelector('i').classList.replace('text-blue-500', 'text-slate-400');
+            colDiv.appendChild(card);
+        });
+
+        columnsContainer.appendChild(colDiv);
+    }
+
+    atualizarPosicaoLinhaTempo();
+}
+
+// 4. A LINHA VERMELHA (TEMPO REAL)
+function atualizarPosicaoLinhaTempo() {
+    const linha = document.getElementById('current-time-line');
+    const agora = new Date();
+    
+    // Verifica se "Hoje" está visível na tela
+    let inicioSemana = new Date(dataFoco);
+    inicioSemana.setDate(inicioSemana.getDate() - inicioSemana.getDay());
+    let fimSemana = new Date(inicioSemana);
+    fimSemana.setDate(fimSemana.getDate() + 6);
+    
+    const mostrarLinha = (visaoPeriodo === 'dia' && dataFoco.toDateString() === agora.toDateString()) || 
+                         (visaoPeriodo === 'semana' && agora >= inicioSemana && agora <= fimSemana);
+
+    if (mostrarLinha) {
+        linha.classList.remove('hidden');
+        const horas = agora.getHours();
+        const minutos = agora.getMinutes();
+        const topPx = (horas * PIXELS_POR_HORA) + (minutos * (PIXELS_POR_HORA/60));
+        linha.style.top = `${topPx}px`;
+    } else {
+        linha.classList.add('hidden');
+    }
+}
+
+function iniciarLinhaDoTempo() {
+    atualizarPosicaoLinhaTempo();
+    setInterval(atualizarPosicaoLinhaTempo, 60000); // Atualiza a cada 1 minuto
+}
+
+// 5. CRUD FIREBASE
+function configurarFormulario() {
+    const form = document.getElementById('form-nova-tarefa');
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+        btn.disabled = true;
+
+        const isDiaInteiro = document.getElementById('input-dia-inteiro').checked;
+
+        try {
+            await addDoc(agendaRef, {
+                titulo: document.getElementById('input-titulo').value,
+                dataMarcada: document.getElementById('input-data').value,
+                horaInicio: isDiaInteiro ? "" : document.getElementById('input-hora-inicio').value,
+                horaFim: isDiaInteiro ? "" : document.getElementById('input-hora-fim').value,
+                prioridade: document.getElementById('input-prioridade').value,
+                telefone: document.getElementById('input-telefone').value,
+                tipo: 'evento',
+                criadoEm: Date.now()
             });
-            btn.classList.add('active');
-            btn.querySelector('i').classList.replace('text-slate-400', 'text-blue-500');
-
-            const colT = document.getElementById('coluna-tarefas');
-            const colA = document.getElementById('coluna-agenda');
-            if(modo === 'tarefas') { colT.className = 'w-full bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full block'; colA.classList.add('hidden'); }
-            else if(modo === 'agenda') { colT.classList.add('hidden'); colA.classList.remove('hidden'); }
-            else { colT.className = 'w-1/4 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full block'; colA.classList.remove('hidden'); }
+            form.reset();
+            window.fecharModalNovaTarefa();
+        } catch (err) { alert("Erro ao ligar ao Firebase."); console.error(err); }
+        finally { 
+            btn.innerHTML = 'Guardar no Calendário';
+            btn.disabled = false; 
         }
-    </script>
-</body>
-</html>
+    };
+}
+
+window.excluirAcao = async (id) => {
+    if (confirm("Remover definitivamente do calendário?")) await deleteDoc(doc(db, "agenda_eventos", id));
+};
