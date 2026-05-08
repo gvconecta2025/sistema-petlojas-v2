@@ -62,12 +62,15 @@
                 <a onclick="mudarModulo(this, 'crm.html')" class="menu-item" title="CRM Kanban">
                     <i class="fa-solid fa-table-columns min-w-[20px] text-center text-lg"></i> <span class="menu-label">CRM Kanban</span>
                 </a>
+                
                 <a onclick="mudarModulo(this, 'ficha-cadastro/index.html')" class="menu-item" title="Fichas de Cadastro">
                     <i class="fa-solid fa-address-book min-w-[20px] text-center text-lg"></i> <span class="menu-label">Painel de Fichas</span>
                 </a>
+                
                 <a onclick="mudarModulo(this, 'disparadorcrm/index.html')" class="menu-item" title="Disparador WhatsApp">
                     <i class="fa-solid fa-paper-plane min-w-[20px] text-center text-lg text-emerald-400"></i> <span class="menu-label">Disparador CRM</span>
                 </a>
+                
                 <a onclick="mudarModulo(this, 'disparofive/index.html')" class="menu-item" title="Matriz de Variações">
                     <i class="fa-solid fa-rocket min-w-[20px] text-center text-lg text-amber-400"></i> <span class="menu-label">Disparo Five</span>
                 </a>
@@ -75,6 +78,11 @@
                 <a onclick="mudarModulo(this, 'landingpage/index.html')" class="menu-item" title="Nossa Landing Page">
                     <i class="fa-solid fa-pager min-w-[20px] text-center text-lg text-blue-400"></i> <span class="menu-label">Landing Page</span>
                 </a>
+                
+                <a onclick="mudarModulo(this, 'relatorios/index.html')" class="menu-item" title="Radar & Analytics">
+                    <i class="fa-solid fa-chart-line min-w-[20px] text-center text-lg text-rose-400"></i> <span class="menu-label">Radar Analytics</span>
+                </a>
+
                 <a onclick="mudarModulo(this, 'landingpage/checkout_petlojas/index.html')" class="menu-item" title="Checkout Orçamento">
                     <i class="fa-solid fa-cart-shopping min-w-[20px] text-center text-lg text-indigo-400"></i> <span class="menu-label">Checkout</span>
                 </a>
@@ -90,12 +98,12 @@
 
             <div class="p-4 border-t border-slate-800 bg-[#0b1120] shrink-0">
                 <div class="flex items-center">
-                    <div class="w-10 h-10 min-w-[40px] rounded-full bg-blue-600 flex items-center justify-center text-white font-bold border border-slate-700 shadow-inner overflow-hidden">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=2563eb&color=fff" class="w-full h-full">
+                    <div class="w-10 h-10 min-w-[40px] rounded-full bg-slate-700 flex items-center justify-center text-slate-300 font-bold border border-slate-600 shadow-inner overflow-hidden">
+                        <i class="fa-solid fa-user"></i>
                     </div>
                     <div class="flex-1 min-w-0 ml-4 menu-label">
-                        <p class="text-sm font-bold text-white truncate">Giselle</p>
-                        <p class="text-[9px] text-blue-400 font-bold uppercase tracking-widest">Master Admin</p>
+                        <p class="text-sm font-bold text-white truncate">Administrador</p>
+                        <p class="text-[9px] text-blue-400 font-bold uppercase tracking-widest">Sistema Ativo</p>
                     </div>
                 </div>
             </div>
@@ -124,10 +132,10 @@
             <main class="flex-1 relative overflow-hidden bg-gray-50">
                 <div id="welcome-screen" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-0 overflow-y-auto">
                     <div class="w-20 h-20 bg-blue-100 rounded-3xl flex items-center justify-center mb-6 shadow-inner animate-pulse">
-                        <i class="fa-solid fa-bolt text-3xl text-blue-600"></i>
+                        <i class="fa-solid fa-server text-3xl text-blue-600"></i>
                     </div>
-                    <h2 class="text-4xl font-black text-gray-900 mb-3 tracking-tighter">Bem-vinda, Comandante.</h2>
-                    <p class="text-gray-500 max-w-sm mx-auto mb-10 text-sm leading-relaxed font-medium">Seu arsenal tecnológico está pronto. Escolha uma ferramenta no menu lateral para iniciar.</p>
+                    <h2 class="text-4xl font-black text-gray-900 mb-3 tracking-tighter">Sistema Operacional PetLojas</h2>
+                    <p class="text-gray-500 max-w-sm mx-auto mb-10 text-sm leading-relaxed font-medium">Selecione uma ferramenta no menu lateral para iniciar a sua operação.</p>
                 </div>
 
                 <iframe id="app-frame" class="absolute inset-0 w-full h-full border-none z-10 hidden bg-transparent" src=""></iframe>
@@ -161,7 +169,6 @@
         }
 
         function mudarModulo(elemento, url) {
-            // UI Feedback
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
             elemento.classList.add('active');
             
@@ -181,7 +188,6 @@
                 loader.classList.remove('hidden');
                 iframe.classList.remove('hidden');
                 
-                // Força recarregamento limpo (Cache Busting)
                 const uniqueUrl = url + "?v=" + Date.now();
                 iframe.src = uniqueUrl;
                 
