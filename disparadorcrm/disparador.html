@@ -195,7 +195,7 @@
             } catch (error) { console.error(error); }
         }
 
-        // PUXAR DADOS DO FIREBASE
+        // PUXAR DADOS DO FIREBASE (CORRIGIDO PARA IGNORAR UNDEFINED)
         async function importarDoCRM(event) {
             const select = document.getElementById('colunaSelect');
             const colId = select.value;
@@ -212,7 +212,14 @@
                 snap.forEach(doc => {
                     const lead = doc.data();
                     if (lead.phone && lead.phone.trim() !== '') {
-                        extracao.push(`${lead.name || 'Contato'} - ${lead.phone}`);
+                        
+                        // Proteção extrema contra "undefined"
+                        let nomeReal = lead.name || lead.nome || lead.titulo || 'Contato';
+                        if (String(nomeReal).toLowerCase() === 'undefined' || String(nomeReal).toLowerCase() === 'null') {
+                            nomeReal = 'Contato';
+                        }
+                        
+                        extracao.push(`${nomeReal} - ${lead.phone}`);
                     }
                 });
 
@@ -221,6 +228,9 @@
                 } else { 
                     document.getElementById('listaNumeros').value = extracao.join('\n'); 
                 }
+            } catch (error) {
+                console.error(error);
+                alert("Erro ao puxar leads do banco de dados.");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
