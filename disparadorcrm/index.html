@@ -2,45 +2,135 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disparador CRM PRO - PetLojas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap'); body { font-family: 'Inter', sans-serif; }</style>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
 </head>
-<body class="bg-slate-50 p-8">
-    <div class="max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-black text-slate-900 tracking-tighter">DISPARADOR <span class="text-emerald-600">CRM PRO</span></h1>
-            <div id="status-timer" class="hidden bg-emerald-100 text-emerald-700 px-6 py-2 rounded-2xl font-black flex items-center gap-3">
-                <i class="fa-solid fa-clock animate-spin"></i> <span id="timer-countdown">00s</span>
+<body class="p-4 md:p-8 text-slate-800">
+
+    <div class="max-w-7xl mx-auto">
+        
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+            <div>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tighter flex items-center gap-3">
+                    <i class="fa-solid fa-paper-plane text-emerald-500"></i> DISPARADOR <span class="text-emerald-600">PRO</span>
+                </h1>
+                <p class="text-sm text-slate-500 font-medium mt-1">Importação do CRM, Anti-Repetição e Rodízio de Mensagens.</p>
+            </div>
+            
+            <div id="status-timer" class="hidden bg-emerald-100 border border-emerald-200 text-emerald-800 px-6 py-3 rounded-2xl font-black shadow-sm flex items-center gap-3">
+                <i class="fa-solid fa-hourglass-half animate-spin"></i> 
+                <span>Aguarde: <span id="timer-countdown" class="text-xl">00s</span></span>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 space-y-4">
-                <h2 class="text-lg font-bold text-slate-700"><i class="fa-solid fa-layer-group text-blue-500 mr-2"></i> Matriz de Mensagens</h2>
-                <div class="grid grid-cols-1 gap-4">
-                    <textarea id="msg-1" class="w-full border p-3 rounded-xl h-20 text-sm" placeholder="Mensagem 01 - Use {nome}"></textarea>
-                    <textarea id="msg-2" class="w-full border p-3 rounded-xl h-20 text-sm" placeholder="Mensagem 02 - Use {nome}"></textarea>
-                    <textarea id="msg-3" class="w-full border p-3 rounded-xl h-20 text-sm" placeholder="Mensagem 03 - Use {nome}"></textarea>
-                    <textarea id="msg-4" class="w-full border p-3 rounded-xl h-20 text-sm" placeholder="Mensagem 04 - Use {nome}"></textarea>
-                    <textarea id="msg-5" class="w-full border p-3 rounded-xl h-20 text-sm" placeholder="Mensagem 05 - Use {nome}"></textarea>
+            
+            <div class="lg:col-span-2 space-y-6">
+                
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                    <h2 class="text-lg font-black text-slate-800 mb-4 border-b border-slate-100 pb-2">
+                        <i class="fa-solid fa-filter text-blue-500 mr-2"></i> 1. Filtro e Importação
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Aparelho Remetente</label>
+                            <select id="config-aparelho" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="web">💻 Computador (WhatsApp Web/Desktop)</option>
+                                <option value="app">📱 Telemóvel (WhatsApp App)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Coluna do CRM (Kanban)</label>
+                            <div class="flex gap-2">
+                                <select id="config-coluna" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">A carregar colunas...</option>
+                                </select>
+                                <button onclick="importarLeads()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-xl font-bold transition shadow-sm whitespace-nowrap">
+                                    Importar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
+                        <h2 class="text-lg font-black text-slate-800">
+                            <i class="fa-solid fa-layer-group text-indigo-500 mr-2"></i> 2. Matriz de Abordagem
+                        </h2>
+                        <span class="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-2 py-1 rounded uppercase">Rodízio Aleatório</span>
+                    </div>
+                    
+                    <p class="text-xs text-slate-500 mb-4 font-medium">Use <strong class="text-indigo-600">{nome}</strong> para o sistema chamar o cliente pelo nome.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Variação 01</label>
+                            <textarea id="msg-1" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500 h-20 resize-none">Olá {nome}, tudo bem? Vi a sua loja...</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Variação 02</label>
+                            <textarea id="msg-2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500 h-20 resize-none">E aí {nome}, como estão as vendas?</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Variação 03</label>
+                            <textarea id="msg-3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500 h-20 resize-none">Bom dia {nome}, conheci o vosso trabalho e...</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Variação 04</label>
+                            <textarea id="msg-4" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500 h-20 resize-none">Fala {nome}, tenho uma estratégia para partilhar consigo.</textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Variação 05</label>
+                            <textarea id="msg-5" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500 h-20 resize-none">{nome}, rápida pergunta sobre a sua loja...</textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xl">
-                <h3 class="text-xl font-black mb-4">Fila de Prospecção</h3>
-                <div id="lista-contatos" class="space-y-3 max-h-80 overflow-y-auto mb-6 pr-2"></div>
-                <button id="btn-main-action" onclick="processarProximo()" class="w-full bg-emerald-600 text-white font-black py-4 rounded-2xl shadow-lg transition transform active:scale-95">INICIAR DISPAROS</button>
-                <p class="text-[10px] text-slate-400 text-center mt-4 uppercase font-bold">Delay Ativo: 10s a 20s (Segurança)</p>
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xl sticky top-8 flex flex-col h-[85vh]">
+                    
+                    <div class="mb-4 border-b border-slate-100 pb-4">
+                        <h3 class="text-xl font-black text-slate-900 flex items-center justify-between">
+                            <span><i class="fa-solid fa-list-check text-emerald-500 mr-2"></i> Fila Bruta</span>
+                            <span id="contador-fila" class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-lg">0 Leads</span>
+                        </h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase mt-2"><i class="fa-solid fa-shield-halved text-emerald-400"></i> Anti-Repetição Ativado</p>
+                    </div>
+                    
+                    <div id="lista-contatos" class="flex-1 overflow-y-auto mb-4 pr-2 custom-scroll space-y-2">
+                        <div class="text-center text-slate-400 flex flex-col items-center justify-center h-full">
+                            <i class="fa-solid fa-inbox text-4xl mb-2 opacity-20"></i>
+                            <p class="text-sm font-medium">Selecione uma coluna e importe.</p>
+                        </div>
+                    </div>
+
+                    <div class="shrink-0 mt-auto">
+                        <button id="btn-main-action" onclick="processarProximo()" disabled class="w-full bg-slate-300 text-slate-500 font-black py-4 rounded-2xl shadow-sm transition-all flex flex-col items-center justify-center cursor-not-allowed">
+                            <span id="btn-text" class="text-lg">AGUARDANDO IMPORTAÇÃO</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
     <audio id="beep-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyBjuvcJvTWw7lMrIwej5lHbIUXe99lJDN4",
             authDomain: "crmpetshop.firebaseapp.com",
@@ -51,54 +141,223 @@
         };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        let leads = []; let indexAtual = 0; let ultimaMsg = 0;
 
-        async function carregarLeads() {
-            const qs = await getDocs(collection(db, "leads"));
-            leads = []; qs.forEach(doc => leads.push(doc.data()));
-            renderizar();
+        let filaLeads = [];
+        let indexAtual = 0;
+        let ultimaMsgSorteada = 0;
+
+        // 1. CARREGAR COLUNAS DISPONÍVEIS NO KANBAN
+        async function carregarColunasDisponiveis() {
+            try {
+                const qs = await getDocs(collection(db, "leads"));
+                const colunasSet = new Set();
+                
+                qs.forEach(doc => {
+                    const status = doc.data().status_funil;
+                    if(status) colunasSet.add(status);
+                });
+
+                const select = document.getElementById('config-coluna');
+                if(colunasSet.size === 0) {
+                    select.innerHTML = '<option value="">Nenhum lead no CRM</option>';
+                    return;
+                }
+
+                select.innerHTML = '<option value="">-- Selecione uma etapa --</option>';
+                colunasSet.forEach(col => {
+                    select.innerHTML += `<option value="${col}">${col.toUpperCase()}</option>`;
+                });
+            } catch(e) {
+                console.error("Erro ao ler colunas:", e);
+            }
         }
 
-        function renderizar() {
-            document.getElementById('lista-contatos').innerHTML = leads.map((l, i) => `
-                <div class="p-3 rounded-xl border ${i === indexAtual ? 'border-emerald-500 bg-emerald-50' : 'border-slate-100 bg-slate-50'} flex justify-between items-center text-xs">
-                    <div><strong>${l.responsavel || l.nomeLoja}</strong><br>${l.telefone}</div>
-                    ${i < indexAtual ? '✅' : ''}
-                </div>`).join('');
+        // 2. IMPORTAÇÃO COM ANTI-REPETIÇÃO (DEDUPLICAÇÃO)
+        window.importarLeads = async () => {
+            const colunaSelecionada = document.getElementById('config-coluna').value;
+            if(!colunaSelecionada) {
+                alert("Selecione uma coluna do CRM primeiro.");
+                return;
+            }
+
+            const btnImportar = event.target;
+            btnImportar.innerText = "A carregar...";
+            btnImportar.disabled = true;
+
+            try {
+                const q = query(collection(db, "leads"), where("status_funil", "==", colunaSelecionada));
+                const qs = await getDocs(q);
+                
+                let rawLeads = [];
+                qs.forEach(doc => { rawLeads.push({ id: doc.id, ...doc.data() }); });
+
+                // Lógica de Deduplicação Bruta pelo Telefone Limpo
+                const mapTelefones = new Map();
+                rawLeads.forEach(lead => {
+                    if(lead.telefone) {
+                        const telLimpo = lead.telefone.replace(/\D/g, ''); // Remove tudo que não é número
+                        if(telLimpo.length >= 10 && !mapTelefones.has(telLimpo)) {
+                            mapTelefones.set(telLimpo, lead);
+                        }
+                    }
+                });
+
+                filaLeads = Array.from(mapTelefones.values());
+                indexAtual = 0; // Reinicia a fila
+                
+                if(filaLeads.length > 0) {
+                    liberarBotaoDisparo();
+                } else {
+                    document.getElementById('btn-main-action').innerText = "COLUNA VAZIA";
+                }
+
+                renderizarFila();
+
+            } catch(e) {
+                console.error(e);
+                alert("Erro ao importar leads.");
+            } finally {
+                btnImportar.innerText = "Importar";
+                btnImportar.disabled = false;
+            }
+        };
+
+        // 3. RENDERIZAR A FILA
+        function renderizarFila() {
+            const container = document.getElementById('lista-contatos');
+            document.getElementById('contador-fila').innerText = `${filaLeads.length} Únicos`;
+
+            if(filaLeads.length === 0) {
+                container.innerHTML = `<div class="text-center text-slate-400 py-10">Nenhum número válido encontrado.</div>`;
+                return;
+            }
+
+            container.innerHTML = filaLeads.map((lead, i) => {
+                const nome = lead.responsavel || lead.nomeLoja || "Desconhecido";
+                
+                let estiloCard = 'bg-white border-slate-200';
+                let icone = '';
+                
+                if (i < indexAtual) {
+                    estiloCard = 'bg-slate-50 border-slate-200 opacity-60'; // Já enviado
+                    icone = '<i class="fa-solid fa-check-double text-emerald-500"></i>';
+                } else if (i === indexAtual) {
+                    estiloCard = 'bg-emerald-50 border-emerald-500 shadow-md transform scale-[1.02] transition-transform'; // Atual
+                    icone = '<span class="text-[8px] bg-emerald-600 text-white px-2 py-0.5 rounded-full font-black animate-pulse">NA MIRA</span>';
+                }
+
+                return `
+                <div class="p-3 rounded-xl border ${estiloCard} flex justify-between items-center">
+                    <div class="min-w-0">
+                        <p class="text-xs font-black text-slate-800 truncate uppercase">${nome}</p>
+                        <p class="text-[10px] text-slate-500 font-mono">${lead.telefone}</p>
+                    </div>
+                    <div>${icone}</div>
+                </div>
+                `;
+            }).join('');
+            
+            // Fazer scroll automático para o card atual
+            const cardAtual = container.children[indexAtual];
+            if(cardAtual) cardAtual.scrollIntoView({ behavior: "smooth", block: "center" });
         }
 
+        // 4. LÓGICA DE DISPARO
         window.processarProximo = () => {
-            if (indexAtual >= leads.length) return alert("Fim da fila!");
-            let msgIdx; do { msgIdx = Math.floor(Math.random() * 5) + 1; } while(msgIdx === ultimaMsg);
-            ultimaMsg = msgIdx;
-            const msgRaw = document.getElementById(`msg-${msgIdx}`).value;
-            if(!msgRaw) return alert("Campo vazio!");
-            
-            const l = leads[indexAtual];
-            const nome = l.responsavel || l.nomeLoja || "Parceiro(a)";
-            const texto = msgRaw.replace(/{nome}/g, nome);
-            window.open(`https://wa.me/55${l.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(texto)}`, '_blank');
-            
-            indexAtual++; renderizar(); iniciarTimer();
-        }
+            if (indexAtual >= filaLeads.length) {
+                alert("Operação concluída! A fila terminou.");
+                document.getElementById('btn-main-action').innerText = "FILA CONCLUÍDA";
+                document.getElementById('btn-main-action').disabled = true;
+                return;
+            }
 
+            // Sorteio Aleatório da Mensagem (1 a 5), garantindo que não repete a última
+            let msgSorteada;
+            do {
+                msgSorteada = Math.floor(Math.random() * 5) + 1;
+            } while (msgSorteada === ultimaMsgSorteada);
+            
+            ultimaMsgSorteada = msgSorteada;
+            
+            const txtArea = document.getElementById(`msg-${msgSorteada}`).value;
+            if(!txtArea) {
+                alert(`Preencha a Variação 0${msgSorteada} para continuar o rodízio!`);
+                return;
+            }
+
+            // Tratamento do Lead Atual
+            const lead = filaLeads[indexAtual];
+            const nomeTratado = lead.responsavel || lead.nomeLoja || "Parceiro(a)";
+            const telLimpo = lead.telefone.replace(/\D/g, '');
+            
+            const textoFinal = txtArea.replace(/{nome}/g, nomeTratado);
+            const msgCodificada = encodeURIComponent(textoFinal);
+
+            // Aparelho Remetente
+            const aparelho = document.getElementById('config-aparelho').value;
+            let linkAbertura = '';
+            
+            if(aparelho === 'web') {
+                // Link oficial para PC/Web (WhatsApp Desktop ou Navegador)
+                linkAbertura = `https://wa.me/55${telLimpo}?text=${msgCodificada}`;
+            } else {
+                // Protocolo interno para abrir o App direto no telemóvel
+                linkAbertura = `whatsapp://send?phone=55${telLimpo}&text=${msgCodificada}`;
+            }
+
+            window.open(linkAbertura, '_blank');
+
+            indexAtual++;
+            renderizarFila();
+            iniciarTimer(); // Trava de segurança
+        };
+
+        // 5. TIMER ALEATÓRIO (10s a 20s)
         function iniciarTimer() {
             const btn = document.getElementById('btn-main-action');
-            const cd = document.getElementById('timer-countdown');
-            const status = document.getElementById('status-timer');
-            btn.disabled = true; btn.innerText = "AGUARDE...";
-            let tempo = Math.floor(Math.random() * 11) + 10;
-            status.classList.remove('hidden');
-            const interval = setInterval(() => {
-                cd.innerText = `${--tempo}s`;
-                if(tempo <= 0) {
-                    clearInterval(interval); status.classList.add('hidden');
-                    btn.disabled = false; btn.innerText = "PRÓXIMO DISPARO";
-                    document.getElementById('beep-sound').play();
+            const statusDiv = document.getElementById('status-timer');
+            const timerLabel = document.getElementById('timer-countdown');
+            const beep = document.getElementById('beep-sound');
+
+            // Estado de Espera (Botão Cinzento e Trancado)
+            btn.disabled = true;
+            btn.className = "w-full bg-slate-200 text-slate-500 font-black py-4 rounded-2xl shadow-inner cursor-not-allowed flex flex-col items-center justify-center";
+            btn.innerHTML = `<span class="text-sm">AGUARDE O DELAY...</span>`;
+
+            // Sorteia tempo entre 10 e 20 segundos
+            let tempo = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+            
+            statusDiv.classList.remove('hidden');
+            timerLabel.innerText = `${tempo}s`;
+
+            const intervalo = setInterval(() => {
+                tempo--;
+                timerLabel.innerText = `${tempo}s`;
+
+                if (tempo <= 0) {
+                    clearInterval(intervalo);
+                    statusDiv.classList.add('hidden');
+                    liberarBotaoDisparo();
+                    
+                    // Aviso Sonoro para o Utilizador voltar à tela
+                    beep.play().catch(e => console.log("O navegador bloqueou o áudio automático."));
                 }
             }, 1000);
         }
-        carregarLeads();
+
+        function liberarBotaoDisparo() {
+            const btn = document.getElementById('btn-main-action');
+            btn.disabled = false;
+            btn.className = "w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-emerald-600/30 transition-all transform active:scale-95 flex flex-col items-center justify-center cursor-pointer";
+            btn.innerHTML = `
+                <span class="text-xl">DISPARAR MENSAGEM</span>
+                <span class="text-[10px] font-bold text-emerald-200 uppercase tracking-widest mt-1">Rodízio Ativado</span>
+            `;
+        }
+
+        // Auto-Start
+        carregarColunasDisponiveis();
+
     </script>
 </body>
 </html>
