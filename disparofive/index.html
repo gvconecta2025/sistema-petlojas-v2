@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DisparoFive - Miolo Integrado</title>
-    
+    <title>DisparoFive - Miolo Produção</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,9 +12,8 @@
     
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
-    <style type="text/tailwindcss">
-        /* Classes personalizadas para as fontes e fundo transparente */
-        body { background-color: transparent; }
+    <style>
+        /* Classes personalizadas para as fontes */
         .font-inter { font-family: 'Inter', sans-serif; }
         .font-poppins { font-family: 'Poppins', sans-serif; }
         .font-roboto { font-family: 'Roboto', sans-serif; }
@@ -24,72 +21,65 @@
         
         .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-4 md:p-6 font-inter transition-all duration-500 fade-in">
+<body class="bg-gradient-to-br from-slate-100 via-white to-slate-100 min-h-screen flex flex-col items-center p-3 md:p-6 font-sans transition-all duration-500 fade-in">
 
     <div id="app-container" class="w-full flex-col items-center flex h-full">
 
-        <header class="w-full max-w-[1600px] flex flex-col md:flex-row justify-between items-center gap-4 mb-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-200 shrink-0">
+        <header class="w-full max-w-[1600px] flex flex-col md:flex-row justify-between items-center gap-4 mb-4 bg-white p-3 rounded-xl shadow-sm border border-slate-200/60">
             <div class="flex items-center gap-3 w-full md:w-auto">
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-500 rounded-l-2xl hidden md:block"></div>
-                <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 shadow-sm shrink-0 border border-indigo-100">
-                    <i class="fa-solid fa-layer-group text-lg"></i>
+                <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white shadow-md shadow-green-200 shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 </div>
                 <div>
-                    <h1 class="text-lg font-black text-slate-800 leading-none">Matriz de Variações</h1>
-                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">DisparoFive Pro</p>
+                    <h1 class="text-sm font-black text-slate-800 leading-none">DisparoFive</h1>
+                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Painel de Controlo Multi-Projetos</p>
                 </div>
             </div>
             
-            <div class="flex flex-wrap items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-between md:justify-end">
                 
-                <div class="flex items-center bg-slate-50 p-1.5 rounded-xl border border-slate-200 flex-1 md:flex-none shadow-inner">
-                    <select id="project-selector" onchange="changeProject(this.value)" class="bg-transparent font-bold text-sm text-slate-700 outline-none cursor-pointer flex-1 w-32 truncate pl-2">
-                        <option>A carregar projetos...</option>
-                    </select>
-                    
-                    <div class="flex items-center border-l border-slate-200 pl-2 ml-2 gap-1.5">
-                        <button onclick="renameProject()" class="text-slate-400 hover:text-amber-500 transition-colors p-1.5 rounded hover:bg-amber-50" title="Renomear Projeto Atual">
-                            <i class="fa-solid fa-pen text-xs"></i>
+                <div class="flex items-center bg-slate-50 p-1.5 rounded-lg border border-slate-100 flex-1 md:flex-none">
+                    <select id="project-selector" onchange="changeProject(this.value)" class="bg-transparent font-bold text-xs text-slate-700 outline-none cursor-pointer flex-1 w-28 truncate pl-1">
+                        </select>
+                    <div class="flex items-center border-l border-slate-200 pl-1.5 ml-1.5 gap-1">
+                        <button onclick="renameProject()" class="text-slate-400 hover:text-amber-500 transition-colors p-1" title="Renomear Projeto Atual">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         </button>
-                        <button onclick="deleteProject()" class="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded hover:bg-red-50" title="Excluir Projeto Atual">
-                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        <button onclick="deleteProject()" class="text-slate-400 hover:text-red-500 transition-colors p-1" title="Excluir Projeto Atual">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
-                        <button onclick="createNewProject()" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors ml-1 border border-indigo-200 shadow-sm">
-                            <i class="fa-solid fa-plus mr-1"></i> Novo
+                        <button onclick="createNewProject()" class="bg-sky-100 text-sky-600 hover:bg-sky-200 px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest transition-colors ml-0.5" title="Criar Novo Projeto">
+                            + Novo
                         </button>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 shrink-0">
-                    <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm" title="Status da Nuvem">
-                        <div id="status-dot" class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></div>
-                        <span id="status-global" class="text-[9px] font-black text-slate-500 uppercase tracking-widest hidden sm:inline">A sincronizar</span>
+                <div class="flex items-center gap-2 shrink-0">
+                    <div class="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100" title="Status da Nuvem">
+                        <div id="status-dot" class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></div>
+                        <span id="status-global" class="text-[8px] font-black text-slate-500 uppercase tracking-widest hidden sm:inline">A ligar...</span>
                     </div>
                     
-                    <button onclick="toggleSettings()" class="w-9 h-9 bg-white text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 border border-slate-200 rounded-full transition-colors flex items-center justify-center shadow-sm" title="Configurações Visuais">
-                        <i class="fa-solid fa-gear"></i>
+                    <button onclick="toggleSettings()" class="p-1.5 bg-slate-50 text-slate-400 hover:text-slate-600 hover:bg-slate-100 border border-slate-100 rounded-full transition-colors" title="Configurações do Projeto">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     </button>
                 </div>
             </div>
         </header>
 
-        <section id="settings-panel" class="hidden w-full max-w-[1600px] mb-4 bg-white p-5 rounded-2xl shadow-lg border border-indigo-100 transition-all">
-            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
-                <h2 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-palette"></i> Personalização do Projeto</h2>
-                <button onclick="toggleSettings()" class="text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 w-6 h-6 rounded-full flex items-center justify-center transition-colors">
-                    <i class="fa-solid fa-xmark"></i>
+        <section id="settings-panel" class="hidden w-full max-w-[1600px] mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200/60 transition-all">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Configurações (Aplicadas apenas a este projeto)</h2>
+                <button onclick="toggleSettings()" class="text-slate-400 hover:text-slate-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
                 <div>
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Fonte Global do App:</label>
-                    <select id="font-selector" onchange="changeFont(this.value)" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer shadow-sm">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Fonte do App:</label>
+                    <select id="font-selector" onchange="changeFont(this.value)" class="w-full p-1.5 bg-white border border-slate-200 rounded text-xs text-slate-700 outline-none focus:ring-2 focus:ring-green-400 cursor-pointer">
                         <option value="font-sans">Padrão do Sistema</option>
                         <option value="font-poppins">Poppins (Moderna)</option>
                         <option value="font-inter">Inter (Profissional)</option>
@@ -98,60 +88,79 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Formato dos Botões de Ação:</label>
-                    <select id="btn-shape-selector" onchange="changeBtnShape(this.value)" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer shadow-sm">
-                        <option value="rounded-xl">Arredondado (Padrão)</option>
-                        <option value="rounded-full">Pílula</option>
-                        <option value="rounded-md">Quadrado Suave</option>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tema de Fundo:</label>
+                    <select id="theme-selector" onchange="changeTheme(this.value)" class="w-full p-1.5 bg-white border border-slate-200 rounded text-xs text-slate-700 outline-none focus:ring-2 focus:ring-green-400 cursor-pointer">
+                        <option value="bg-gradient-to-br from-slate-100 via-white to-slate-100">Claro Perolado</option>
+                        <option value="bg-gradient-to-br from-amber-900 to-blue-950">Escuro (Marrom e Marinho)</option>
+                        <option value="bg-gradient-to-br from-amber-900 via-stone-800 to-stone-900">Café Expresso</option>
+                        <option value="bg-gradient-to-br from-blue-600 to-indigo-800">Azul Caneta</option>
+                        <option value="bg-gradient-to-br from-green-500 to-green-800">Verde Bandeira</option>
+                        <option value="bg-gradient-to-br from-slate-800 via-indigo-900 to-slate-900">Noturno Perolado</option>
                     </select>
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Tamanho da Fonte dos Botões:</label>
-                    <select id="btn-size-selector" onchange="changeBtnTextSize(this.value)" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer shadow-sm">
-                        <option value="text-[10px]">Pequeno (10px)</option>
-                        <option value="text-xs">Médio (12px)</option>
-                        <option value="text-sm">Grande (14px)</option>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Fonte dos Botões:</label>
+                    <select id="btn-font-selector" onchange="changeBtnFont(this.value)" class="w-full p-1.5 bg-white border border-slate-200 rounded text-xs text-slate-700 outline-none focus:ring-2 focus:ring-green-400 cursor-pointer">
+                        <option value="font-sans">Padrão do Sistema</option>
+                        <option value="font-poppins">Poppins (Moderna)</option>
+                        <option value="font-inter">Inter (Profissional)</option>
+                        <option value="font-montserrat">Montserrat (Elegante)</option>
+                        <option value="font-roboto">Roboto (Clássica)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Estilo dos Botões:</label>
+                    <select id="btn-shape-selector" onchange="changeBtnShape(this.value)" class="w-full p-1.5 bg-white border border-slate-200 rounded text-xs text-slate-700 outline-none focus:ring-2 focus:ring-green-400 cursor-pointer">
+                        <option value="rounded-lg">Arredondado (Padrão)</option>
+                        <option value="rounded-full">Pílula</option>
+                        <option value="rounded-sm">Quadrado</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tam. da Fonte dos Botões:</label>
+                    <select id="btn-size-selector" onchange="changeBtnTextSize(this.value)" class="w-full p-1.5 bg-white border border-slate-200 rounded text-xs text-slate-700 outline-none focus:ring-2 focus:ring-green-400 cursor-pointer">
+                        <option value="text-[10px]">10px (Padrão)</option>
+                        <option value="text-xs">12px (Médio)</option>
+                        <option value="text-sm">14px (Grande)</option>
+                        <option value="text-base">16px (Extra Grande)</option>
+                        <option value="text-lg">18px (Gigante)</option>
                     </select>
                 </div>
             </div>
         </section>
 
-        <section class="w-full max-w-[1600px] mb-6 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 items-end shrink-0 relative overflow-hidden">
-            <div class="absolute right-0 top-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl -z-10 -translate-y-1/2 translate-x-1/2"></div>
-            
-            <div class="w-full md:w-1/3 z-10">
-                <label class="text-[10px] font-black text-indigo-900 uppercase tracking-widest block mb-2 flex items-center justify-between">
-                    <span><i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Acesso Rápido</span>
-                    <span class="text-[8px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-200 shadow-sm">
-                        <i class="fa-solid fa-eye"></i> IA Lê Prints
+        <section class="w-full max-w-[1600px] mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200/60 flex flex-col md:flex-row gap-3 items-end">
+            <div class="w-full md:w-1/3">
+                <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-1.5 flex items-center justify-between">
+                    <span>Gerador Rápido</span>
+                    <span class="text-[7px] bg-sky-100 text-sky-600 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Lê Prints!
                     </span>
                 </label>
-                <input type="text" id="quick-number" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-mono text-sm font-bold focus:ring-2 focus:ring-indigo-400 outline-none text-slate-800 transition-all placeholder:text-slate-400 shadow-inner" placeholder="Digite ou cole um print aqui (Ctrl+V)">
+                <input type="text" id="quick-number" class="w-full p-2 bg-slate-50 border border-gray-100 rounded-lg font-mono text-xs sm:text-sm focus:ring-2 focus:ring-green-400 outline-none text-slate-700 transition-all placeholder:text-slate-300" placeholder="Digite ou Cole Print (Ctrl+V)">
             </div>
-            
-            <div class="w-full md:w-2/3 flex flex-wrap sm:flex-nowrap gap-3 z-10">
-                <input type="text" id="quick-link" class="flex-1 w-full sm:w-auto p-3 bg-slate-100 border border-slate-200 rounded-xl font-mono text-xs text-slate-400 outline-none cursor-not-allowed shadow-inner" readonly placeholder="https://wa.me/55...">
-                
-                <button id="btn-quick-whatsapp" onclick="openQuickWhatsApp()" class="bg-[#25D366] hover:bg-[#128C7E] text-white font-black px-5 py-3 rounded-xl shadow-md shadow-green-200 transition-all active:scale-95 uppercase text-[10px] tracking-widest whitespace-nowrap flex-1 sm:flex-none flex items-center justify-center gap-2">
-                    <i class="fa-brands fa-whatsapp text-lg"></i> Abrir
+            <div class="w-full md:w-2/3 flex flex-wrap sm:flex-nowrap gap-2">
+                <input type="text" id="quick-link" class="flex-1 w-full sm:w-auto p-2 bg-slate-50 border border-gray-100 rounded-lg font-mono text-xs text-slate-400 outline-none cursor-not-allowed" readonly placeholder="https://wa.me/55...">
+                <button id="btn-quick-whatsapp" onclick="openQuickWhatsApp()" class="bg-[#25D366] hover:bg-[#128C7E] text-white font-black px-3 py-2 rounded-lg shadow-sm transition-all active:scale-95 uppercase text-[9px] tracking-widest whitespace-nowrap flex-1 sm:flex-none leading-none">
+                    WhatsApp
                 </button>
-                
-                <button id="btn-quick-copy" onclick="copyQuickLink()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-5 py-3 rounded-xl shadow-md shadow-indigo-200 transition-all active:scale-95 uppercase text-[10px] tracking-widest whitespace-nowrap flex-1 sm:flex-none flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-copy text-lg"></i> Copiar
+                <button id="btn-quick-copy" onclick="copyQuickLink()" class="bg-sky-500 hover:bg-sky-600 text-white font-black px-3 py-2 rounded-lg shadow-sm transition-all active:scale-95 uppercase text-[9px] tracking-widest whitespace-nowrap flex-1 sm:flex-none leading-none">
+                    Copiar
                 </button>
             </div>
         </section>
 
-        <main id="bricks-container" class="w-full max-w-[1600px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pb-10 flex-1 overflow-y-auto custom-scrollbar pr-2">
+        <main id="bricks-container" class="w-full max-w-[1600px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-12">
             </main>
 
-    </div>
-
-    <script type="module">
+    </div> <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CREDENCIAIS
+        // ========================================================
+        // 1. CONFIG DO FIREBASE (Sem Auth)
+        // ========================================================
         const firebaseConfig = {
             apiKey: "AIzaSyDxZcyaKlxkSSptdRTN8HRyO3P58wbd0jk",
             authDomain: "disparofire-cfbfb.firebaseapp.com",
@@ -160,17 +169,30 @@
             messagingSenderId: "194928300801",
             appId: "1:194928300801:web:906db6180611ab71364100"
         };
+        // ========================================================
 
         const appIdentifier = 'disparofive-prod';
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Como removemos o Auth do módulo, usamos um ID mestre da sua operação para salvar os projetos
-        const adminUserId = "admin_petlojas_v2"; 
+        // Usuário Mestre para salvar dados (Substitui o Login)
+        const currentUserId = "admin_petlojas_v2";
         let unsubscribeSnapshot = null;
+        
+        // Estrutura Global do Workspace
         window.workspace = null; 
 
-        // Componentes UI
+        // Constantes de Tema
+        const ALL_THEMES = [
+            'bg-gradient-to-br', 'from-slate-100', 'via-white', 'to-slate-100',
+            'from-amber-900', 'to-blue-950',
+            'via-stone-800', 'to-stone-900',
+            'from-blue-600', 'to-indigo-800',
+            'from-green-500', 'to-green-800',
+            'from-slate-800', 'via-indigo-900', 'to-slate-900'
+        ];
+
+        // Componentes da UI
         const statusText = document.getElementById('status-global');
         const statusDot = document.getElementById('status-dot');
 
@@ -180,8 +202,8 @@
             
             const toast = document.createElement('div');
             toast.id = 'custom-toast';
-            toast.className = `fixed bottom-6 right-6 px-5 py-3.5 rounded-xl shadow-2xl font-bold text-xs text-white z-[9999] transition-all transform animate-bounce flex items-center gap-2 ${isError ? 'bg-red-500' : 'bg-slate-800'}`;
-            toast.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i> ${msg}`;
+            toast.className = `fixed bottom-6 right-6 px-4 py-3 rounded-lg shadow-2xl font-bold text-xs text-white z-[9999] transition-all transform animate-bounce ${isError ? 'bg-red-500' : 'bg-slate-800'}`;
+            toast.innerText = msg;
             document.body.appendChild(toast);
             
             setTimeout(() => {
@@ -190,31 +212,35 @@
             }, 3000);
         };
 
-        // INICIALIZAÇÃO E SINCRONIZAÇÃO
+        // ========================================================
+        // PROJECT & DATA LOGIC
+        // ========================================================
         const createDefaultProject = (name) => {
             let t = {};
             for(let i = 1; i <= 12; i++) {
-                t[i] = { title: `Variação de Copy ${i}`, msg: "", num: "", ddd: "33" };
+                t[i] = { title: `Modelo ${i}`, msg: "", num: "", ddd: "33" };
             }
             return {
                 name: name,
                 settings: {
-                    font: 'font-inter',
-                    btnShape: 'rounded-xl',
-                    btnTextSize: 'text-[10px]'
+                    font: 'font-sans',
+                    btnFont: 'font-sans',
+                    btnShape: 'rounded-lg',
+                    btnTextSize: 'text-[10px]',
+                    appTheme: 'bg-gradient-to-br from-slate-100 via-white to-slate-100'
                 },
                 templates: t
             };
         };
 
         const setupDataListener = async () => {
-            const docRef = doc(db, 'artifacts', appIdentifier, 'users', adminUserId, 'workspace', 'data');
+            const docRef = doc(db, 'artifacts', appIdentifier, 'users', currentUserId, 'workspace', 'data');
             
             const snap = await getDoc(docRef);
             if (!snap.exists()) {
                 let initialWorkspace = {
                     currentProject: 'proj_default',
-                    projects: { 'proj_default': createDefaultProject("Campanha Padrão") }
+                    projects: { 'proj_default': createDefaultProject("Projeto Padrão") }
                 };
                 await setDoc(docRef, initialWorkspace);
             }
@@ -225,15 +251,15 @@
                     applyWorkspaceToUI();
                 }
                 statusText.innerText = "Sincronizado";
-                statusDot.className = "w-2 h-2 rounded-full bg-emerald-500";
+                statusDot.className = "w-1.5 h-1.5 rounded-full bg-green-500";
             }, (err) => { 
                 console.error(err);
-                statusText.innerText = "Erro ao Ligar"; 
-                statusDot.className = "w-2 h-2 rounded-full bg-red-500 animate-ping";
+                statusText.innerText = "Erro Firestore"; 
+                statusDot.className = "w-1.5 h-1.5 rounded-full bg-red-500";
             });
         };
 
-        // Chama direto sem precisar de login
+        // Inicia a aplicação instantaneamente
         setupDataListener();
 
         window.applyWorkspaceToUI = () => {
@@ -242,6 +268,7 @@
             const curProj = window.workspace.projects[window.workspace.currentProject];
             if(!curProj) return;
 
+            // Preenche o Seletor de Projetos
             const sel = document.getElementById('project-selector');
             sel.innerHTML = '';
             Object.keys(window.workspace.projects).forEach(pid => {
@@ -252,13 +279,29 @@
                 sel.appendChild(opt);
             });
 
+            // Aplica as Configurações do Projeto Atual
             const s = curProj.settings;
             document.body.classList.remove('font-sans', 'font-inter', 'font-poppins', 'font-roboto', 'font-montserrat');
-            document.body.classList.add(s.font || 'font-inter');
+            document.body.classList.add(s.font);
             
-            document.getElementById('font-selector').value = s.font || 'font-inter';
-            document.getElementById('btn-shape-selector').value = s.btnShape || 'rounded-xl';
-            document.getElementById('btn-size-selector').value = s.btnTextSize || 'text-[10px]';
+            ALL_THEMES.forEach(t => document.body.classList.remove(t));
+            document.body.classList.add(...s.appTheme.split(' '));
+
+            document.getElementById('font-selector').value = s.font;
+            
+            let themeFound = false;
+            Array.from(document.getElementById('theme-selector').options).forEach(opt => {
+                if (opt.value === s.appTheme) themeFound = true;
+            });
+            if (themeFound) {
+                document.getElementById('theme-selector').value = s.appTheme;
+            } else {
+                document.getElementById('theme-selector').value = 'bg-gradient-to-br from-slate-100 via-white to-slate-100';
+            }
+            
+            document.getElementById('btn-font-selector').value = s.btnFont;
+            document.getElementById('btn-shape-selector').value = s.btnShape;
+            document.getElementById('btn-size-selector').value = s.btnTextSize;
 
             renderAllBricks();
             window.updateStaticButtons();
@@ -267,144 +310,248 @@
         let saveTimeout;
         window.persistAll = () => {
             if (!window.workspace) return;
-            statusText.innerText = "A gravar...";
-            statusDot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+            statusText.innerText = "A guardar...";
+            statusDot.className = "w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse";
             
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(async () => {
-                const docRef = doc(db, 'artifacts', appIdentifier, 'users', adminUserId, 'workspace', 'data');
+                const docRef = doc(db, 'artifacts', appIdentifier, 'users', currentUserId, 'workspace', 'data');
                 try {
                     await setDoc(docRef, window.workspace, { merge: true });
                     statusText.innerText = "Sincronizado";
-                    statusDot.className = "w-2 h-2 rounded-full bg-emerald-500";
+                    statusDot.className = "w-1.5 h-1.5 rounded-full bg-green-500";
                 } catch (e) { 
+                    console.error(e); 
                     statusText.innerText = "Erro ao guardar";
-                    statusDot.className = "w-2 h-2 rounded-full bg-red-500";
+                    statusDot.className = "w-1.5 h-1.5 rounded-full bg-red-500";
                 }
             }, 800);
         };
 
-        // AÇÕES DE PROJETOS
+        // ========================================================
+        // PROJECT MANAGEMENT ACTIONS
+        // ========================================================
         window.changeProject = (projectId) => {
             window.workspace.currentProject = projectId;
             window.persistAll();
             window.applyWorkspaceToUI();
+            window.showToast("Projeto alterado!");
         };
 
         window.createNewProject = () => {
-            const name = prompt("Nome da nova campanha/projeto:");
+            const name = prompt("Nome do novo projeto:");
             if(!name || name.trim() === "") return;
+            
             const newId = 'proj_' + Date.now();
             window.workspace.projects[newId] = createDefaultProject(name);
             window.workspace.currentProject = newId;
+            
             window.persistAll();
             window.applyWorkspaceToUI();
-            window.showToast("Nova Campanha Criada!");
+            window.showToast("Projeto criado com sucesso!");
         };
 
         window.renameProject = () => {
             const currentProj = window.workspace.projects[window.workspace.currentProject];
-            const newName = prompt("Renomear Campanha:", currentProj.name);
+            const newName = prompt("Renomear Projeto:", currentProj.name);
+            
             if(newName && newName.trim() !== "") {
                 currentProj.name = newName.trim();
                 window.persistAll();
                 window.applyWorkspaceToUI();
+                window.showToast("Projeto renomeado com sucesso!");
             }
         };
 
         window.deleteProject = () => {
             const projectKeys = Object.keys(window.workspace.projects);
-            if(projectKeys.length <= 1) return window.showToast("Não pode excluir o único projeto ativo!", true);
+            if(projectKeys.length <= 1) {
+                return window.showToast("Atenção: Não pode excluir o seu único projeto!", true);
+            }
 
             const currentProj = window.workspace.projects[window.workspace.currentProject];
-            if(confirm(`Tem a certeza que deseja EXCLUIR a campanha "${currentProj.name}" permanentemente?`)) {
+            if(confirm(`Tem a certeza que deseja EXCLUIR o projeto "${currentProj.name}"?\nTodas as 12 mensagens serão perdidas e a ação não pode ser desfeita.`)) {
+                
                 delete window.workspace.projects[window.workspace.currentProject];
                 window.workspace.currentProject = Object.keys(window.workspace.projects)[0];
+                
                 window.persistAll();
                 window.applyWorkspaceToUI();
+                window.showToast("Projeto excluído com sucesso!");
             }
         };
 
-        // UI & SETTINGS
-        window.toggleSettings = () => document.getElementById('settings-panel').classList.toggle('hidden');
+        // ========================================================
+        // SETTINGS & UI ACTIONS (Aplica ao projeto atual)
+        // ========================================================
+        window.toggleSettings = () => {
+            const panel = document.getElementById('settings-panel');
+            panel.classList.toggle('hidden');
+        };
 
-        window.changeFont = (val) => { window.workspace.projects[window.workspace.currentProject].settings.font = val; window.persistAll(); window.applyWorkspaceToUI(); };
-        window.changeBtnShape = (val) => { window.workspace.projects[window.workspace.currentProject].settings.btnShape = val; window.persistAll(); window.applyWorkspaceToUI(); };
-        window.changeBtnTextSize = (val) => { window.workspace.projects[window.workspace.currentProject].settings.btnTextSize = val; window.persistAll(); window.applyWorkspaceToUI(); };
+        window.changeFont = (fontClass) => {
+            window.workspace.projects[window.workspace.currentProject].settings.font = fontClass;
+            window.persistAll(); 
+            window.applyWorkspaceToUI();
+        };
+
+        window.changeTheme = (themeClass) => {
+            window.workspace.projects[window.workspace.currentProject].settings.appTheme = themeClass;
+            window.persistAll();
+            window.applyWorkspaceToUI();
+        };
+
+        window.changeBtnFont = (fontClass) => {
+            window.workspace.projects[window.workspace.currentProject].settings.btnFont = fontClass;
+            window.persistAll();
+            window.applyWorkspaceToUI();
+        };
+
+        window.changeBtnShape = (shapeClass) => {
+            window.workspace.projects[window.workspace.currentProject].settings.btnShape = shapeClass;
+            window.persistAll();
+            window.applyWorkspaceToUI();
+        };
+
+        window.changeBtnTextSize = (sizeClass) => {
+            window.workspace.projects[window.workspace.currentProject].settings.btnTextSize = sizeClass;
+            window.persistAll();
+            window.applyWorkspaceToUI();
+        };
 
         window.updateStaticButtons = () => {
-            if(!window.workspace) return;
+            if(!window.workspace || !window.workspace.currentProject) return;
             const s = window.workspace.projects[window.workspace.currentProject].settings;
-            [document.getElementById('btn-quick-copy'), document.getElementById('btn-quick-whatsapp')].forEach(btn => {
+
+            const quickBtnCopy = document.getElementById('btn-quick-copy');
+            const quickBtnWa = document.getElementById('btn-quick-whatsapp');
+            const staticBtns = [quickBtnCopy, quickBtnWa];
+            
+            staticBtns.forEach(btn => {
                 if (btn) {
-                    btn.className = btn.className.replace(/rounded-xl|rounded-lg|rounded-full|rounded-sm|rounded-md/g, '');
-                    btn.classList.add(s.btnShape || 'rounded-xl');
+                    btn.className = btn.className.replace(/font-sans|font-inter|font-poppins|font-roboto|font-montserrat/g, '');
+                    btn.classList.add(s.btnFont);
+                    
+                    btn.className = btn.className.replace(/rounded-xl|rounded-lg|rounded-full|rounded-sm/g, '');
+                    btn.classList.add(s.btnShape);
+                    
+                    btn.className = btn.className.replace(/text-\[9px\]|text-\[10px\]|text-xs|text-sm|text-base|text-lg/g, '');
+                    btn.classList.add(s.btnTextSize);
                 }
             });
         };
 
-        // FUNÇÕES CENTRAIS
+        // ========================================================
+        // CORE BUSINESS LOGIC (WhatsApp & Copy)
+        // ========================================================
         window.copyMessageText = (id) => {
             const msg = window.workspace.projects[window.workspace.currentProject].templates[id].msg;
             if (!msg) return window.showToast("A mensagem está vazia!", true);
+            
             const textArea = document.createElement("textarea");
-            textArea.value = msg; document.body.appendChild(textArea); textArea.select(); document.execCommand('copy'); document.body.removeChild(textArea);
-            window.showToast("Script copiado!");
+            textArea.value = msg;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            window.showToast("Texto copiado!");
         };
 
         window.syncAllPhones = (newDdd, newNum) => {
             const templates = window.workspace.projects[window.workspace.currentProject].templates;
             Object.keys(templates).forEach(i => {
-                templates[i].ddd = newDdd; templates[i].num = newNum;
-                let dddEl = document.getElementById(`ddd-${i}`); let numEl = document.getElementById(`num-${i}`);
-                if (dddEl) dddEl.value = newDdd; if (numEl) numEl.value = newNum;
+                templates[i].ddd = newDdd;
+                templates[i].num = newNum;
+                let dddEl = document.getElementById(`ddd-${i}`);
+                let numEl = document.getElementById(`num-${i}`);
+                if (dddEl) dddEl.value = newDdd;
+                if (numEl) numEl.value = newNum;
             });
             window.persistAll();
         };
 
-        window.handleDddInput = (id) => { window.syncAllPhones(document.getElementById(`ddd-${id}`).value, window.workspace.projects[window.workspace.currentProject].templates[id].num); };
+        window.handleDddInput = (id) => {
+            let val = document.getElementById(`ddd-${id}`).value;
+            window.syncAllPhones(val, window.workspace.projects[window.workspace.currentProject].templates[id].num);
+        };
 
         window.handlePhoneInput = (id) => {
-            let numEl = document.getElementById(`num-${id}`); let val = numEl.value;
-            if(val === "Lendo print...") return;
+            let numEl = document.getElementById(`num-${id}`);
+            let val = numEl.value;
+            if(val === "A ler imagem com IA...") return;
+
             let digits = val.replace(/\D/g, ''); 
-            if (digits.startsWith('55') && digits.length >= 12) digits = digits.substring(2);
+            if (digits.startsWith('55') && (digits.length === 12 || digits.length === 13)) {
+                digits = digits.substring(2);
+            }
+
             let finalDdd = window.workspace.projects[window.workspace.currentProject].templates[id].ddd;
             let finalNum = digits;
+
             if (digits.length >= 10) {
-                finalDdd = digits.substring(0, 2); let newNum = digits.substring(2);
-                if (newNum.length === 8) finalNum = '9' + newNum; else finalNum = newNum.substring(0, 9);
+                finalDdd = digits.substring(0, 2);
+                let newNum = digits.substring(2);
+                if (newNum.length === 8) finalNum = '9' + newNum; 
+                else if (newNum.length > 9) finalNum = newNum.substring(0, 9);
+                else finalNum = newNum;
             }
             window.syncAllPhones(finalDdd, finalNum);
         };
 
         window.handlePhoneBlur = (id) => {
-            let numEl = document.getElementById(`num-${id}`); let digits = numEl.value.replace(/\D/g, '');
-            let finalDdd = window.workspace.projects[window.workspace.currentProject].templates[id].ddd; let finalNum = digits;
-            if (digits.length === 8) { finalNum = '9' + digits; window.syncAllPhones(finalDdd, finalNum); }
+            let numEl = document.getElementById(`num-${id}`);
+            let digits = numEl.value.replace(/\D/g, '');
+            
+            let finalDdd = window.workspace.projects[window.workspace.currentProject].templates[id].ddd;
+            let finalNum = digits;
+
+            if (digits.length === 8) {
+                finalNum = '9' + digits;
+                window.syncAllPhones(finalDdd, finalNum);
+            }
         };
 
+        // OCR PARA OS BLOCOS
         window.handlePhonePaste = async (e, id) => {
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (let index in items) {
                 const item = items[index];
                 if (item.kind === 'file' && item.type.startsWith('image/')) {
-                    e.preventDefault(); const blob = item.getAsFile();
-                    let numEl = document.getElementById(`num-${id}`); const originalValue = numEl.value;
-                    numEl.value = "Lendo print...";
+                    e.preventDefault(); 
+                    const blob = item.getAsFile();
+                    let numEl = document.getElementById(`num-${id}`);
+                    const originalValue = numEl.value;
+                    numEl.value = "A ler imagem com IA...";
+                    
                     try {
                         const { data: { text } } = await Tesseract.recognize(blob, 'por');
-                        const match = text.match(/(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?\d{4,5}[-\s]*\d{4}/g);
+                        const phoneRegex = /(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?\d{4,5}[-\s]*\d{4}/g;
+                        const match = text.match(phoneRegex);
+                        
                         if (match) {
-                            numEl.value = match[0]; window.handlePhoneInput(id); window.handlePhoneBlur(id); window.showToast("Número capturado da imagem!");
+                            numEl.value = match[0];
+                            window.handlePhoneInput(id);
+                            window.handlePhoneBlur(id);
+                            window.showToast("Número extraído com sucesso!");
                         } else {
                             let digits = text.replace(/\D/g, '');
                             if (digits.startsWith('55') && digits.length >= 12) digits = digits.substring(2);
+                            
                             if (digits.length >= 8 && digits.length <= 11) {
-                                numEl.value = digits; window.handlePhoneInput(id); window.handlePhoneBlur(id); window.showToast("Número capturado da imagem!");
-                            } else { numEl.value = originalValue; window.showToast("Nenhum número encontrado.", true); }
+                                numEl.value = digits;
+                                window.handlePhoneInput(id);
+                                window.handlePhoneBlur(id);
+                                window.showToast("Número extraído com sucesso!");
+                            } else {
+                                numEl.value = originalValue;
+                                window.showToast("Nenhum número claro encontrado.", true);
+                            }
                         }
-                    } catch (err) { numEl.value = originalValue; window.showToast("Erro ao processar imagem.", true); }
+                    } catch (err) {
+                        console.error("Erro OCR:", err);
+                        numEl.value = originalValue;
+                        window.showToast("Erro ao ler a imagem.", true);
+                    }
                     return; 
                 }
             }
@@ -415,84 +562,120 @@
             let cleanNum = data.num ? String(data.num).replace(/\D/g, '') : '';
             if (cleanNum.length === 8) cleanNum = '9' + cleanNum;
             const msgEncoded = encodeURIComponent(data.msg || '');
-            if (!cleanNum) return window.showToast("Cole o número no Bloco " + id, true);
+            
+            if (!cleanNum) return window.showToast("Insira o número no Bloco " + id, true);
 
-            if (type === 'app') window.open(`whatsapp://send?phone=55${data.ddd}${cleanNum}&text=${msgEncoded}`, '_self'); 
-            else window.open(`https://web.whatsapp.com/send?phone=55${data.ddd}${cleanNum}&text=${msgEncoded}`, '_blank');
+            if (type === 'app') {
+                window.open(`whatsapp://send?phone=55${data.ddd}${cleanNum}&text=${msgEncoded}`, '_self'); 
+            } else {
+                window.open(`https://web.whatsapp.com/send?phone=55${data.ddd}${cleanNum}&text=${msgEncoded}`, '_blank');
+            }
         };
 
         window.copiar = (id) => {
             const data = window.workspace.projects[window.workspace.currentProject].templates[id];
             let cleanNum = data.num ? String(data.num).replace(/\D/g, '') : '';
             if (cleanNum.length === 8) cleanNum = '9' + cleanNum;
+            
             const link = `https://wa.me/55${data.ddd}${cleanNum}?text=${encodeURIComponent(data.msg || '')}`;
             
             const textArea = document.createElement("textarea");
-            textArea.value = link; document.body.appendChild(textArea); textArea.select(); document.execCommand('copy'); document.body.removeChild(textArea);
+            textArea.value = link;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
 
             const btn = document.getElementById(`btn-copy-${id}`);
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "<i class='fa-solid fa-check'></i> Copiado!";
-            btn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
-            setTimeout(() => { btn.innerHTML = originalText; btn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600'); }, 2000);
+            const originalText = btn.innerText;
+            btn.innerText = "COPIADO!";
+            btn.classList.add('bg-sky-600', 'text-white', 'border-sky-600');
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.remove('bg-sky-600', 'text-white', 'border-sky-600');
+            }, 2000);
+            
+            window.showToast("Link copiado!");
         };
 
-        // RENDERIZADOR DOS BLOCOS
+        window.getBadgeColor = (id) => {
+            const colors = [
+                'bg-slate-500 text-white border-slate-600', 
+                'bg-red-500 text-white border-red-600',        
+                'bg-blue-500 text-white border-blue-600',      
+                'bg-amber-500 text-white border-amber-600',    
+                'bg-purple-500 text-white border-purple-600',  
+                'bg-emerald-500 text-white border-emerald-600',
+                'bg-pink-500 text-white border-pink-600',      
+                'bg-cyan-500 text-white border-cyan-600',      
+                'bg-orange-500 text-white border-orange-600',  
+                'bg-indigo-500 text-white border-indigo-600',  
+                'bg-lime-500 text-white border-lime-600',      
+                'bg-rose-500 text-white border-rose-600',      
+                'bg-sky-500 text-white border-sky-600'        
+            ];
+            return colors[id] || colors[0];
+        };
+
         const renderAllBricks = () => {
             if(!window.workspace || !window.workspace.currentProject) return;
             const s = window.workspace.projects[window.workspace.currentProject].settings;
             const t = window.workspace.projects[window.workspace.currentProject].templates;
+            
             const container = document.getElementById('bricks-container');
             container.innerHTML = '';
             
             Object.keys(t).forEach(id => {
+                const badgeColorClass = window.getBadgeColor(id);
                 const brick = document.createElement('div');
-                brick.className = "bg-white rounded-2xl shadow-sm border border-slate-200 p-5 transition-all hover:shadow-md flex flex-col h-full";
+                brick.className = "bg-white rounded-xl shadow-sm border border-gray-100 p-4 transition-all hover:shadow-md flex flex-col h-full";
                 brick.innerHTML = `
-                    <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                    <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-3 flex-1">
-                            <span class="bg-indigo-50 text-indigo-600 border border-indigo-100 w-8 h-8 flex items-center justify-center rounded-lg font-black text-sm shrink-0">${id}</span>
+                            <span class="${badgeColorClass} w-10 h-10 border flex items-center justify-center rounded-md font-black text-xl shrink-0 shadow-sm transition-all">${id}</span>
                             <input type="text" value="${t[id].title}" 
                                 oninput="window.workspace.projects[window.workspace.currentProject].templates[${id}].title = this.value; persistAll()"
-                                class="text-sm font-bold text-slate-700 bg-transparent border-none outline-none w-full py-1 focus:text-indigo-600 transition-colors"
-                                placeholder="Nome da Variação ${id}">
+                                class="text-sm font-bold text-gray-700 bg-transparent border-b border-transparent hover:border-gray-200 focus:border-green-500 outline-none w-full py-0.5 transition-colors"
+                                placeholder="Nome do Modelo ${id}">
                         </div>
-                        <button onclick="copyMessageText(${id})" class="ml-2 p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors shrink-0 border border-transparent hover:border-indigo-100" title="Copiar Script">
-                            <i class="fa-solid fa-copy text-sm"></i>
+                        <button onclick="copyMessageText(${id})" class="ml-2 p-1.5 text-slate-400 hover:text-sky-500 hover:bg-sky-50 rounded transition-colors shrink-0" title="Copiar Texto da Mensagem">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 00-2-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </button>
                     </div>
 
                     <textarea id="textarea-${id}"
                         oninput="window.workspace.projects[window.workspace.currentProject].templates[${id}].msg = this.value; persistAll()"
-                        class="w-full h-40 p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none text-slate-700 text-sm leading-relaxed resize-none transition-colors mb-4 shadow-inner font-medium"
-                        placeholder="Escreva a variação da mensagem aqui...">${t[id].msg}</textarea>
+                        class="w-full h-48 p-3 bg-slate-50 border border-gray-100 rounded-lg focus:ring-2 focus:ring-green-400 outline-none text-gray-700 text-xs sm:text-sm leading-relaxed resize-none transition-colors mb-3"
+                        placeholder="Cole o texto aqui...">${t[id].msg}</textarea>
                     
-                    <div class="mt-auto space-y-2 pt-2">
-                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block flex items-center justify-between mb-1">
-                            <span><i class="fa-brands fa-whatsapp text-emerald-500 mr-1"></i> Disparo</span>
-                            <span class="text-[7px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
-                                <i class="fa-solid fa-eye"></i> Lê Prints!
+                    <div class="mt-auto space-y-2 pt-2 border-t border-slate-50">
+                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block flex items-center justify-between mb-1">
+                            <span>WhatsApp</span>
+                            <span class="text-[7px] bg-sky-100 text-sky-600 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                Lê Prints!
                             </span>
                         </label>
                         <div class="flex gap-2">
                             <input type="number" id="ddd-${id}" value="${t[id].ddd}" 
                                 oninput="window.handleDddInput(${id})"
-                                class="w-14 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-center font-bold text-slate-700 text-sm focus:ring-2 focus:ring-indigo-400 outline-none shadow-sm">
+                                class="w-12 p-2 bg-slate-50 border border-gray-100 rounded-lg text-center font-bold text-gray-600 text-sm focus:ring-2 focus:ring-green-400 outline-none transition-colors">
                             <input type="text" id="num-${id}" value="${t[id].num}" 
                                 oninput="window.handlePhoneInput(${id})"
                                 onblur="window.handlePhoneBlur(${id})"
                                 onpaste="window.handlePhonePaste(event, ${id})"
-                                class="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-sm font-bold focus:ring-2 focus:ring-indigo-400 outline-none placeholder:text-slate-300 shadow-sm" 
-                                placeholder="Colar Telefone">
+                                class="flex-1 p-2 bg-slate-50 border border-gray-100 rounded-lg font-mono text-sm focus:ring-2 focus:ring-green-400 outline-none transition-colors placeholder:text-slate-300" 
+                                placeholder="Digite ou Cole">
                         </div>
-                        <div class="flex gap-2 pt-2">
+                        <div class="flex gap-2 pt-1">
                             <button onclick="disparar(${id}, 'app')" 
-                                class="flex-1 bg-[#25D366] hover:bg-[#128C7E] text-white font-black py-3 ${s.btnShape || 'rounded-xl'} shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2 uppercase ${s.btnTextSize || 'text-[10px]'} tracking-widest">
-                                <i class="fa-brands fa-whatsapp text-sm"></i> App
+                                class="flex-1 bg-[#25D366] hover:bg-[#128C7E] text-white font-black py-2.5 ${s.btnShape} ${s.btnFont} shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1.5 uppercase ${s.btnTextSize} tracking-widest leading-none">
+                                Abrir App
                             </button>
                             <button id="btn-copy-${id}" onclick="copiar(${id})" 
-                                class="flex-1 bg-white border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 text-slate-500 font-black py-3 ${s.btnShape || 'rounded-xl'} transition-all active:scale-95 uppercase ${s.btnTextSize || 'text-[10px]'} tracking-widest">
-                                <i class="fa-solid fa-link"></i> Link
+                                class="flex-1 border-2 border-slate-200 hover:border-sky-400 hover:text-sky-600 text-slate-400 font-black py-2 ${s.btnShape} ${s.btnFont} transition-all active:scale-95 uppercase ${s.btnTextSize} tracking-widest leading-none">
+                                Copiar Link
                             </button>
                         </div>
                     </div>
@@ -501,54 +684,80 @@
             });
         };
 
-        // LÓGICA DO GERADOR RÁPIDO
+        // ========================================================
+        // GERADOR RÁPIDO LÓGICA (Mantida)
+        // ========================================================
         const quickNumberInput = document.getElementById('quick-number');
         const quickLinkOutput = document.getElementById('quick-link');
 
         const processQuickNumber = (e) => {
-            let val = e.target.value; if(val === "A ler imagem com IA...") return;
+            let val = e.target.value;
+            if(val === "A ler imagem com IA...") return;
+
             let digits = val.replace(/\D/g, ''); 
-            if (digits.startsWith('55') && digits.length >= 12) digits = digits.substring(2);
+            if (digits.startsWith('55') && (digits.length === 12 || digits.length === 13)) digits = digits.substring(2);
+            
             if (digits.length >= 10) {
-                let ddd = digits.substring(0, 2); let num = digits.substring(2);
-                if (num.length === 8) num = '9' + num; else if (num.length > 9) num = num.substring(0, 9);
+                let ddd = digits.substring(0, 2);
+                let num = digits.substring(2);
+                if (num.length === 8) num = '9' + num;
+                else if (num.length > 9) num = num.substring(0, 9);
                 digits = ddd + num;
             }
-            e.target.value = digits; quickLinkOutput.value = digits.length > 0 ? `https://wa.me/55${digits}` : '';
+            
+            e.target.value = digits;
+            quickLinkOutput.value = digits.length > 0 ? `https://wa.me/55${digits}` : '';
         };
 
-        quickNumberInput.addEventListener('input', processQuickNumber); quickNumberInput.addEventListener('blur', processQuickNumber);
+        quickNumberInput.addEventListener('input', processQuickNumber);
+        quickNumberInput.addEventListener('blur', processQuickNumber);
         
         quickNumberInput.addEventListener('paste', async (e) => {
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (let index in items) {
                 const item = items[index];
                 if (item.kind === 'file' && item.type.startsWith('image/')) {
-                    e.preventDefault(); const blob = item.getAsFile();
-                    quickNumberInput.value = "Lendo print...";
+                    e.preventDefault(); 
+                    const blob = item.getAsFile();
+                    quickNumberInput.value = "A ler imagem com IA...";
                     try {
                         const { data: { text } } = await Tesseract.recognize(blob, 'por');
                         const match = text.match(/(?:\+?55\s*)?(?:\(?\d{2}\)?\s*)?\d{4,5}[-\s]*\d{4}/g);
-                        if (match) { quickNumberInput.value = match[0]; processQuickNumber({ target: quickNumberInput }); window.showToast("Número extraído!"); } 
-                        else {
+                        if (match) {
+                            quickNumberInput.value = match[0];
+                            processQuickNumber({ target: quickNumberInput });
+                        } else {
                             let digits = text.replace(/\D/g, '');
                             if (digits.startsWith('55') && digits.length >= 12) digits = digits.substring(2);
-                            if (digits.length >= 8 && digits.length <= 11) { quickNumberInput.value = digits; processQuickNumber({ target: quickNumberInput }); window.showToast("Número extraído!"); } 
-                            else { quickNumberInput.value = ""; window.showToast("Nenhum número encontrado.", true); }
+                            if (digits.length >= 8 && digits.length <= 11) {
+                                quickNumberInput.value = digits;
+                                processQuickNumber({ target: quickNumberInput });
+                            } else {
+                                quickNumberInput.value = "";
+                            }
                         }
-                    } catch (err) { quickNumberInput.value = ""; } return; 
+                    } catch (err) { quickNumberInput.value = ""; }
+                    return; 
                 }
             }
         });
 
         window.openQuickWhatsApp = () => {
-            const link = quickLinkOutput.value; if (!link) return window.showToast("Insira um número!", true);
+            const link = quickLinkOutput.value;
+            if (!link) return window.showToast("Insira um número!", true);
             window.open(`whatsapp://send?phone=${link.split('wa.me/')[1]}`, '_self');
         };
 
         window.copyQuickLink = () => {
-            const link = quickLinkOutput.value; if (!link) return window.showToast("Insira um número!", true);
-            const textArea = document.createElement("textarea"); textArea.value = link; document.body.appendChild(textArea); textArea.select(); document.execCommand('copy'); document.body.removeChild(textArea); window.showToast("Copiado!");
+            const link = quickLinkOutput.value;
+            if (!link) return window.showToast("Insira um número!", true);
+            const textArea = document.createElement("textarea");
+            textArea.value = link;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            window.showToast("Copiado!");
         };
 
     </script>
