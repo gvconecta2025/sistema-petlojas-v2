@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Disparador WhatsApp - Miolo Integrado</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style type="text/tailwindcss">
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        
+        /* Fundo transparente para herdar do App Shell */
+        body { font-family: 'Inter', sans-serif; background-color: transparent; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        
+        .alerta-piscar { animation: piscar 2s infinite; }
+        @keyframes piscar { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        
+        /* Animação suave de entrada */
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="flex flex-col h-screen relative lg:overflow-hidden fade-in">
+
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <div class="p-4 md:p-6 pb-0 shrink-0">
+            <div class="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center gap-3 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-[#25D366]"></div>
+                <h1 class="text-xl md:text-2xl font-black text-slate-800 flex items-center ml-2">
+                    <i class="fa-solid fa-paper-plane mr-3 text-[#25D366]"></i> Máquina de Disparos
+                </h1>
+                <span class="bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest hidden md:block">
+                    Módulo Ativo
+                </span>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto lg:overflow-y-hidden custom-scrollbar flex flex-col lg:flex-row gap-4 md:gap-6 p-4 md:p-6 pt-3 md:pt-4">
+            
+            <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 w-full lg:w-1/2 flex flex-col lg:h-full lg:overflow-y-auto custom-scrollbar shrink-0 lg:shrink">
+                
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">
+                    <label class="block text-[10px] font-black text-amber-800 uppercase tracking-widest mb-2 flex items-center">
+                        <i class="fa-solid fa-shield-halved mr-1.5"></i> Aparelho Remetente
+                    </label>
+                    <input type="text" id="numeroRemetente" value="(33) 99819-2213" placeholder="Ex: (33) 99999-9999" class="w-full border border-amber-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-slate-700 font-bold shadow-sm" required>
+                </div>
+
+                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-5 flex flex-col gap-2 shadow-inner">
+                    <label class="block text-[10px] font-black text-indigo-800 uppercase tracking-widest flex items-center">
+                        <i class="fa-solid fa-cloud-arrow-down mr-1.5 text-indigo-500"></i> Importar do CRM (Banco de Dados)
+                    </label>
+                    <div class="flex flex-col sm:flex-row gap-2 mt-1">
+                        <select id="colunaSelect" class="flex-1 border border-indigo-200 rounded-lg p-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-slate-700 shadow-sm">
+                            <option value="">A carregar colunas...</option>
+                        </select>
+                        <button onclick="importarDoCRM(event)" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-black transition-colors shadow-md whitespace-nowrap flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-download"></i> Puxar Leads
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col gap-5">
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 flex justify-between items-end">
+                            <span>1. Fila Bruta de Destinatários</span>
+                            <span class="text-emerald-500 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100"><i class="fa-solid fa-filter"></i> Filtro Anti-Repetição</span>
+                        </label>
+                        <textarea id="listaNumeros" rows="4" placeholder="Os números do CRM aparecerão aqui (Nome - Telefone)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-medium custom-scrollbar resize-none shadow-inner"></textarea>
+                    </div>
+
+                    <div class="flex-1 flex flex-col">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">2. Script da Mensagem</label>
+                        
+                        <div class="flex gap-2 mb-2">
+                            <button type="button" onclick="inserirVariavel('[PRIMEIRO_NOME]')" class="text-[10px] font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 px-2 py-1 rounded transition flex items-center gap-1" title="Adiciona apenas o primeiro nome do cliente">
+                                <i class="fa-solid fa-user-tag"></i> + 1º Nome
+                            </button>
+                            <button type="button" onclick="inserirVariavel('[NOME_COMPLETO]')" class="text-[10px] font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 px-2 py-1 rounded transition flex items-center gap-1" title="Adiciona o nome completo registrado">
+                                <i class="fa-solid fa-users"></i> + Nome Completo
+                            </button>
+                        </div>
+                        
+                        <textarea id="mensagemPadrao" rows="5" placeholder="Olá [PRIMEIRO_NOME]! Vi o seu Pet Shop..." class="w-full flex-1 min-h-[120px] bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-medium custom-scrollbar resize-none shadow-inner"></textarea>
+                    </div>
+                </div>
+
+                <button onclick="prepararFila()" class="mt-5 w-full bg-slate-800 hover:bg-slate-900 text-white font-black py-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shrink-0">
+                    <i class="fa-solid fa-gears text-lg"></i> Engatilhar Disparos
+                </button>
+            </div>
+
+            <div id="actionSection" class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 w-full lg:w-1/2 flex flex-col relative opacity-50 pointer-events-none transition-opacity duration-300 lg:h-full shrink-0 lg:shrink mb-8 lg:mb-0">
+                
+                <div class="flex justify-between items-center mb-5 pb-4 border-b border-slate-100">
+                    <h2 class="text-lg font-black text-slate-800 flex items-center">
+                        <i class="fa-solid fa-layer-group mr-2 text-indigo-500"></i> Fila de Execução
+                    </h2>
+                    <div class="flex items-center gap-3">
+                        <span id="contadorFila" class="bg-indigo-50 text-indigo-700 text-xs font-black tracking-widest px-3 py-1 rounded-full border border-indigo-200 shadow-sm">
+                            0 / 0
+                        </span>
+                        <button onclick="resetarTudo()" class="text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors bg-slate-50 w-8 h-8 rounded-full shadow-sm border border-slate-200 flex items-center justify-center" title="Limpar e Recomeçar">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="alertaRemetente" class="hidden bg-amber-50 text-amber-800 border border-amber-300 p-3 rounded-lg text-[11px] md:text-xs mb-5 font-bold text-center alerta-piscar shadow-sm">
+                    <i class="fa-solid fa-triangle-exclamation mr-1 text-amber-600"></i> ATENÇÃO: O WhatsApp Web/Desktop aberto deve ser o número <span id="displayRemetente" class="underline text-amber-900 font-black"></span>
+                </div>
+
+                <div id="listaVisual" class="flex-1 overflow-y-auto custom-scrollbar space-y-2 mb-5 bg-slate-50 border border-slate-200 rounded-xl p-2 shadow-inner min-h-[250px] lg:min-h-0">
+                    <div class="flex flex-col items-center justify-center h-full text-slate-400 text-sm text-center px-4">
+                        <i class="fa-solid fa-inbox text-4xl mb-3 text-slate-300"></i>
+                        <p class="font-medium">Sua fila de alvos aparecerá aqui<br>após clicar em "Engatilhar Disparos".</p>
+                    </div>
+                </div>
+
+                <button id="btnDisparar" onclick="dispararProximo()" class="w-full bg-[#25D366] hover:bg-[#1da851] text-white font-black py-4 md:py-5 rounded-xl transition-all shadow-xl shadow-green-200/60 flex flex-col items-center justify-center transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shrink-0 border border-[#20ba59]">
+                    <span class="flex items-center gap-2 text-base md:text-xl tracking-tight">
+                        <i class="fa-solid fa-paper-plane"></i> INICIAR DISPARO
+                    </span>
+                    <span id="textoBtnAuxiliar" class="text-[10px] md:text-xs font-bold opacity-90 mt-1 uppercase tracking-widest">Aguardando Fila...</span>
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO FIREBASE E VARIÁVEIS (Sem Auth)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjuvcJvTWw7lMrIwej5lHbIUXe99lJDN4",
+            authDomain: "crmpetshop.firebaseapp.com",
+            projectId: "crmpetshop",
+            storageBucket: "crmpetshop.firebasestorage.app",
+            messagingSenderId: "381013124221",
+            appId: "1:381013124221:web:48f398a62ce40b7db6fd14"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Variáveis de Controle
+        let filaDeNumeros = []; 
+        let nomesAssociados = []; 
+        let indiceAtual = 0; 
+        let rawMsgGlobal = ""; // Guarda o template original da mensagem
+
+        const painelAcao = document.getElementById('actionSection'); 
+        const listaVisual = document.getElementById('listaVisual');
+        const btnDisparar = document.getElementById('btnDisparar'); 
+        const contadorFila = document.getElementById('contadorFila');
+        const alertaRemetente = document.getElementById('alertaRemetente'); 
+        const displayRemetente = document.getElementById('displayRemetente');
+
+        // INICIALIZAÇÃO
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarColunasCRM();
+        });
+
+        // INJETOR DE VARIÁVEIS NA MENSAGEM
+        function inserirVariavel(tag) {
+            const textarea = document.getElementById('mensagemPadrao');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            
+            // Insere a tag onde o cursor estiver
+            textarea.value = text.substring(0, start) + tag + text.substring(end);
+            
+            // Devolve o foco e arruma o cursor
+            textarea.focus();
+            textarea.selectionStart = textarea.selectionEnd = start + tag.length;
+        }
+
+        // CARREGA AS COLUNAS DO BANCO (CRM)
+        async function carregarColunasCRM() {
+            try {
+                const snap = await db.collection('columns').orderBy('order').get();
+                const select = document.getElementById('colunaSelect');
+                if (snap.empty) { select.innerHTML = '<option value="">Nenhuma coluna encontrada.</option>'; return; }
+                
+                select.innerHTML = '<option value="">-- Escolha a Fase do Funil --</option>';
+                snap.forEach(doc => { select.innerHTML += `<option value="${doc.data().id}">${doc.data().title}</option>`; });
+            } catch (error) { console.error(error); }
+        }
+
+        // PUXAR DADOS DO FIREBASE
+        async function importarDoCRM(event) {
+            const select = document.getElementById('colunaSelect');
+            const colId = select.value;
+            if (!colId) { alert("Selecione uma fase do funil primeiro!"); return; }
+
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+            
+            try {
+                const snap = await db.collection('leads').where('columnId', '==', colId).get();
+                let extracao = [];
+                snap.forEach(doc => {
+                    const lead = doc.data();
+                    if (lead.phone && lead.phone.trim() !== '') {
+                        extracao.push(`${lead.name || 'Contato'} - ${lead.phone}`);
+                    }
+                });
+
+                if (extracao.length === 0) { 
+                    alert(`Não há nenhum cliente com número de telefone cadastrado nesta fase.`); 
+                } else { 
+                    document.getElementById('listaNumeros').value = extracao.join('\n'); 
+                }
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // PROCESSAR A LISTA E ABRIR O PAINEL DE AÇÃO
+        function prepararFila() {
+            const remetente = document.getElementById('numeroRemetente').value.trim();
+            const rawText = document.getElementById('listaNumeros').value;
+            rawMsgGlobal = document.getElementById('mensagemPadrao').value; // Salva o template com as tags [NOME]
+
+            if (!remetente) { alert("Informe o seu número remetente por segurança."); return; }
+            if (!rawText.trim()) { alert("Importe ou cole a lista de números primeiro."); return; }
+            if (!rawMsgGlobal.trim()) { alert("A mensagem não pode estar vazia."); return; }
+
+            const linhas = rawText.split('\n');
+            filaDeNumeros = []; 
+            nomesAssociados = [];
+            let numerosVistos = new Set(); 
+            let duplicatasRemovidas = 0;
+
+            linhas.forEach(linha => {
+                let apenasNumeros = linha.replace(/\D/g, '');
+                if (apenasNumeros.length >= 10) {
+                    if (!apenasNumeros.startsWith('55')) apenasNumeros = '55' + apenasNumeros;
+                    if (!numerosVistos.has(apenasNumeros)) {
+                        numerosVistos.add(apenasNumeros); 
+                        let nome = linha.includes('-') ? linha.split('-')[0].trim() : "Contato";
+                        filaDeNumeros.push(apenasNumeros); 
+                        nomesAssociados.push(nome);
+                    } else { 
+                        duplicatasRemovidas++; 
+                    }
+                }
+            });
+
+            if (filaDeNumeros.length === 0) { alert("Nenhum número válido foi encontrado na lista."); return; }
+            if (duplicatasRemovidas > 0) alert(`🛡️ FILTRO ATIVADO: Foram removidos ${duplicatasRemovidas} contatos repetidos.`);
+
+            indiceAtual = 0;
+            painelAcao.classList.remove('opacity-50', 'pointer-events-none'); 
+            alertaRemetente.classList.remove('hidden');
+            displayRemetente.innerText = remetente;
+
+            desenharListaVisual(); 
+            atualizarBotoes();
+            
+            // Rola para a área de ação no mobile
+            if(window.innerWidth < 1024) painelAcao.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // MOSTRAR A LISTA NA TELA
+        function desenharListaVisual() {
+            listaVisual.innerHTML = '';
+            filaDeNumeros.forEach((num, idx) => {
+                const div = document.createElement('div'); div.id = `item-${idx}`;
+                div.className = "flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200 text-sm transition-colors shadow-sm";
+                div.innerHTML = `
+                    <div id="icon-${idx}" class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-500 font-black shrink-0 border border-slate-200">${idx + 1}</div>
+                    <div class="flex-1 truncate">
+                        <p class="font-black text-slate-800 truncate text-xs uppercase tracking-tight">${nomesAssociados[idx]}</p>
+                        <p class="font-mono text-[11px] font-medium text-slate-500 mt-0.5">+${num}</p>
+                    </div>
+                    <span id="status-${idx}" class="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-100 px-2 py-1 rounded">Pendente</span>
+                `;
+                listaVisual.appendChild(div);
+            });
+        }
+
+        // CONTROLE DO BOTÃO DE DISPARO
+        function atualizarBotoes() {
+            contadorFila.innerText = `${indiceAtual} / ${filaDeNumeros.length}`;
+            if (indiceAtual < filaDeNumeros.length) {
+                btnDisparar.disabled = false; 
+                btnDisparar.classList.replace('bg-slate-800', 'bg-[#25D366]');
+                btnDisparar.classList.remove('border-transparent');
+                btnDisparar.classList.add('border-[#20ba59]');
+                
+                const nomeDisplay = nomesAssociados[indiceAtual].length > 15 ? nomesAssociados[indiceAtual].substring(0, 15) + '...' : nomesAssociados[indiceAtual];
+                
+                btnDisparar.innerHTML = `
+                    <span class="flex items-center gap-2 text-base md:text-xl tracking-tight"><i class="fa-brands fa-whatsapp"></i> ENVIAR: ${nomeDisplay}</span>
+                    <span class="text-[10px] md:text-xs font-bold opacity-90 mt-1 uppercase tracking-widest">+${filaDeNumeros[indiceAtual]}</span>
+                `;
+                
+                const itemAtual = document.getElementById(`item-${indiceAtual}`);
+                if(itemAtual) itemAtual.classList.replace('bg-white', 'bg-indigo-50');
+            } else {
+                btnDisparar.disabled = true; 
+                btnDisparar.classList.replace('bg-[#25D366]', 'bg-slate-800');
+                btnDisparar.classList.replace('border-[#20ba59]', 'border-transparent');
+                
+                btnDisparar.innerHTML = `
+                    <span class="flex items-center gap-2 text-base md:text-xl tracking-tight"><i class="fa-solid fa-check-double"></i> OPERAÇÃO CONCLUÍDA</span>
+                    <span class="text-[10px] md:text-xs font-bold opacity-90 mt-1 uppercase tracking-widest">Todos os leads processados.</span>
+                `;
+                alertaRemetente.classList.add('hidden'); 
+            }
+        }
+
+        // A MÁGICA: DISPARO + VARIÁVEIS DINÂMICAS
+        function dispararProximo() {
+            if (indiceAtual >= filaDeNumeros.length) return;
+            
+            const numeroAlvo = filaDeNumeros[indiceAtual];
+            const nomeCompleto = nomesAssociados[indiceAtual];
+            const primeiroNome = nomeCompleto.split(' ')[0] || ""; // Pega apenas a primeira palavra
+            
+            // Injeta as variáveis dinâmicas no template global
+            let msgPersonalizada = rawMsgGlobal;
+            msgPersonalizada = msgPersonalizada.replace(/\[NOME_COMPLETO\]/g, nomeCompleto);
+            msgPersonalizada = msgPersonalizada.replace(/\[PRIMEIRO_NOME\]/g, primeiroNome);
+
+            // Codifica a mensagem final pronta e processada
+            const mensagemCodificadaFinal = encodeURIComponent(msgPersonalizada);
+
+            // Abre o WhatsApp
+            window.open(`https://api.whatsapp.com/send?phone=${numeroAlvo}&text=${mensagemCodificadaFinal}`, '_blank');
+            
+            // Atualiza UI da Fila
+            const itemLista = document.getElementById(`item-${indiceAtual}`); 
+            const icone = document.getElementById(`icon-${indiceAtual}`); 
+            const status = document.getElementById(`status-${indiceAtual}`);
+            
+            if (itemLista) {
+                itemLista.classList.replace('bg-indigo-50', 'bg-emerald-50'); 
+                itemLista.classList.replace('border-slate-200', 'border-emerald-200'); 
+                
+                icone.classList.replace('bg-slate-100', 'bg-emerald-500'); 
+                icone.classList.replace('border-slate-200', 'border-transparent'); 
+                icone.classList.replace('text-slate-500', 'text-white');
+                icone.innerHTML = '<i class="fa-solid fa-check"></i>'; 
+                
+                status.innerText = "Enviado"; 
+                status.classList.replace('text-slate-400', 'text-emerald-700');
+                status.classList.replace('bg-slate-100', 'bg-emerald-100');
+            }
+            
+            indiceAtual++;
+            
+            // Rola a lista suavemente para o próximo pendente
+            const proximoItem = document.getElementById(`item-${indiceAtual}`);
+            if(proximoItem) proximoItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            atualizarBotoes();
+        }
+
+        // LIMPAR TUDO
+        function resetarTudo() {
+            if(confirm("🚨 Tem a certeza que deseja limpar tudo e recomeçar do zero?")) {
+                document.getElementById('listaNumeros').value = ""; 
+                document.getElementById('colunaSelect').value = ""; 
+                alertaRemetente.classList.add('hidden');
+                
+                filaDeNumeros = []; 
+                nomesAssociados = []; 
+                indiceAtual = 0; 
+                rawMsgGlobal = "";
+                
+                painelAcao.classList.add('opacity-50', 'pointer-events-none');
+                
+                listaVisual.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-slate-400 text-sm text-center px-4">
+                        <i class="fa-solid fa-inbox text-4xl mb-3 text-slate-300"></i>
+                        <p class="font-medium">Sua fila de alvos aparecerá aqui<br>após clicar em "Engatilhar Disparos".</p>
+                    </div>`;
+                
+                contadorFila.innerText = "0 / 0"; 
+                
+                btnDisparar.disabled = true;
+                btnDisparar.classList.replace('bg-[#25D366]', 'bg-slate-800');
+                btnDisparar.classList.replace('border-[#20ba59]', 'border-transparent');
+                btnDisparar.innerHTML = `
+                    <span class="flex items-center gap-2 text-base md:text-xl tracking-tight"><i class="fa-solid fa-paper-plane"></i> INICIAR DISPARO</span>
+                    <span class="text-[10px] md:text-xs font-bold opacity-90 mt-1 uppercase tracking-widest">Aguardando Fila...</span>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
