@@ -1,406 +1,415 @@
 <!DOCTYPE html>
-<html lang="pt-PT" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetLojas | A Sua Pet Shop na Era Digital</title>
+    <title>PetLojas - O Endereço Oficial do Seu Pet Shop na Internet</title>
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style type="text/tailwindcss">
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; @apply bg-slate-50 text-slate-800; overflow-x: hidden; }
-        
-        .hero-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
-        .glass-card { @apply bg-white/10 backdrop-blur-lg border border-white/20; }
-        
-        .fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            DEFAULT: '#3B5B85', 
+                            dark: '#264060',
+                            orange: '#F29C5A', 
+                            lightbg: '#F9FAFB'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Arial', sans-serif; line-height: 1.8; color: #333333; }
+        p { margin-bottom: 1.5rem; font-size: 1.125rem; }
+        .pricing-card:hover { transform: translateY(-5px); transition: all 0.3s ease; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
     </style>
+    <script>
+        // Forçar a página a abrir sempre no topo ao recarregar
+        if (history.scrollRestoration) { history.scrollRestoration = 'manual'; }
+        window.addEventListener('load', function() { window.scrollTo(0, 0); });
+    </script>
 </head>
-<body>
+<body class="bg-gray-50 antialiased">
 
-    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
-                    <i class="fa-solid fa-paw text-white text-xl"></i>
-                </div>
-                <span class="text-xl font-black tracking-tight text-slate-900">PetLojas</span>
-            </div>
-            <div class="hidden md:flex gap-8 font-bold text-sm text-slate-600">
-                <a href="#solucao" class="hover:text-blue-600 transition tracking-wide tracking-tracer" data-tracker="Clique Menu: Solução">A Solução</a>
-                <a href="#planos" class="hover:text-blue-600 transition tracking-wide tracking-tracer" data-tracker="Clique Menu: Planos">Planos</a>
-                <a href="#faq" class="hover:text-blue-600 transition tracking-wide tracking-tracer" data-tracker="Clique Menu: FAQ">FAQ</a>
-            </div>
-            <a href="#planos" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-blue-200 transition tracking-tracer btn-conversao" data-tracker="Clique CTA Header">
-                Começar Agora
+    <!-- Barra de Navegação -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-3 flex justify-between items-center">
+            <!-- LOGO NA BARRA DE NAVEGAÇÃO -->
+            <a href="#inicio" class="flex items-center">
+                <img src="petlojas.png" alt="Logo PetLojas" class="h-10 w-auto object-contain" onerror="this.src='https://via.placeholder.com/150x50?text=PetLojas'">
             </a>
+            
+            <div class="hidden md:flex space-x-6 font-medium text-sm text-gray-600">
+                <a href="#inicio" class="hover:text-brand transition">Início</a>
+                <a href="#vantagens" class="hover:text-brand transition">Vantagens</a>
+                <a href="#demonstracao" class="hover:text-brand transition">O Aplicativo</a>
+                <a href="#planos" class="text-brand-orange hover:text-brand transition font-bold">Ver Planos</a>
+                <a href="#faq" class="hover:text-brand transition">FAQ</a>
+            </div>
         </div>
     </nav>
 
-    <section class="hero-gradient pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden" data-section="Hero">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/20 rounded-full blur-[120px] pointer-events-none"></div>
-        
-        <div class="max-w-7xl mx-auto px-6 relative z-10 text-center">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-blue-300 text-xs font-black uppercase tracking-widest mb-8 fade-in-up">
-                <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span> O Fim do Caos no WhatsApp
-            </div>
+    <!-- Cabeçalho (Hero Section) -->
+    <header id="inicio" class="bg-white border-b border-gray-200 scroll-mt-20">
+        <div class="max-w-4xl mx-auto px-6 py-12 text-center">
             
-            <h1 class="text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter leading-tight fade-in-up" style="animation-delay: 0.1s;">
-                Transforme a sua Pet Shop<br>numa <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Máquina de Vendas</span>
+            <!-- LOGO NO CABEÇALHO (BANNER PRINCIPAL) -->
+            <div class="mb-8 flex justify-center">
+                <div class="w-full max-w-[280px] flex items-center justify-center">
+                    <img src="petlojas.png" alt="Logotipo PetLojas" class="w-full h-auto object-contain drop-shadow-sm">
+                </div>
+            </div>
+
+            <h1 class="text-3xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+                Sempre quis que o seu pet shop vendesse mais, <span class="text-brand">atendendo a toda a cidade?</span>
             </h1>
-            
-            <p class="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto font-medium fade-in-up" style="animation-delay: 0.2s;">
-                Tenha o seu próprio aplicativo de vendas e agendamentos. Chega de perder tempo a responder preços e enviar fotografias de produtos manualmente.
+            <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+                Transforme seu negócio local em uma máquina de vendas com o seu aplicativo próprio. Nós cuidamos da tecnologia, você foca em faturar.
             </p>
-            
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 fade-in-up" style="animation-delay: 0.3s;">
-                <a href="checkout_petlojas/index.html?plano=elite" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-blue-900/50 transition transform hover:-translate-y-1 tracking-tracer btn-conversao" data-tracker="Clique CTA Principal (Hero)">
-                    Quero a Minha Loja Digital
-                </a>
-                <a href="#solucao" class="w-full sm:w-auto glass-card hover:bg-white/20 text-white px-8 py-4 rounded-2xl font-bold text-lg transition tracking-tracer" data-tracker="Clique Vídeo/Demo (Hero)">
-                    <i class="fa-solid fa-play mr-2"></i> Ver como funciona
-                </a>
-            </div>
+            <a href="https://wa.me/5533999333644?text=Olá%2C%20vim%20pelo%20início%20do%20site%20da%20PetLojas%20e%20quero%20criar%20minha%20loja%20online." target="_blank" class="pixel-track inline-block bg-brand hover:bg-brand-dark text-white font-bold py-4 px-10 rounded text-lg transition duration-300 shadow-md">
+                Criar Minha Loja Agora
+            </a>
         </div>
-    </section>
+    </header>
 
-    <section id="solucao" class="py-24 bg-white" data-section="Solução">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">O seu cliente já está no telemóvel.<br>A sua loja também está?</h2>
-                <p class="text-slate-500 font-medium">Automatizamos o que dá trabalho para si focar no que dá lucro.</p>
+    <main class="max-w-4xl mx-auto px-6 py-16 my-8">
+
+        <!-- Seção Vantagens -->
+        <section id="vantagens" class="mb-16 bg-white p-8 rounded-xl shadow-sm border border-gray-100 scroll-mt-24">
+            <h2 class="text-2xl md:text-3xl font-bold text-brand mb-6">
+                Muito mais que um catálogo. <span class="text-brand-orange">O seu endereço oficial na internet.</span>
+            </h2>
+            <p>
+                Expandir o atendimento para toda a cidade e profissionalizar as suas vendas não precisa ser um processo caro ou complicado. Com a PetLojas, você recebe uma loja online completa, personalizada com a identidade visual da sua empresa.
+            </p>
+            <p>
+                <strong>E o melhor:</strong> Garantimos um endereço de altíssima velocidade na internet gratuitamente através de um subdomínio seguro (tecnologia Vercel). Caso prefira construir ainda mais autoridade, você tem total flexibilidade para adquirir e conectar o seu domínio próprio e exclusivo (ex: <em>www.seupetshop.com.br</em>). A sua marca, as suas regras.
+            </p>
+        </section>
+
+        <!-- SEÇÃO: DEMONSTRAÇÃO DO APP (Estilo Carrossel) -->
+        <section id="demonstracao" class="mb-16 bg-white py-12 border-y border-gray-100 scroll-mt-24">
+            <div class="mb-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-brand">
+                    Veja o aplicativo <span class="text-brand-orange">na prática</span>
+                </h2>
+                <p class="text-gray-600 mt-2 max-w-2xl mx-auto">
+                    Deslize para o lado para ver como os seus clientes vão navegar, escolher produtos e interagir com a sua nova vitrine digital.
+                </p>
+            </div>
+
+            <!-- Contentor do Carrossel com Scroll Horizontal -->
+            <div class="flex overflow-x-auto snap-x snap-mandatory gap-6 px-4 pb-8 max-w-[100vw] hide-scrollbar" style="-ms-overflow-style: none; scrollbar-width: none;">
+
+                <!-- Item 1: TELA 1 -->
+                <div class="snap-center shrink-0 w-[196px] h-[406px] bg-white rounded-[2rem] border-[6px] border-gray-800 shadow-xl overflow-hidden relative ml-4 md:ml-0">
+                    <img src="img1.png" alt="Tela do Aplicativo 1" class="w-full h-full object-cover object-top" onerror="this.src='https://via.placeholder.com/200x400?text=Tela+1'">
+                </div>
+
+                <!-- Item 2: TELA 2 -->
+                <div class="snap-center shrink-0 w-[196px] h-[406px] bg-white rounded-[2rem] border-[6px] border-gray-800 shadow-xl overflow-hidden relative">
+                    <img src="img2.png" alt="Tela do Aplicativo 2" class="w-full h-full object-cover object-top" onerror="this.src='https://via.placeholder.com/200x400?text=Tela+2'">
+                </div>
+
+                <!-- Item 3: TELA 3 -->
+                <div class="snap-center shrink-0 w-[196px] h-[406px] bg-white rounded-[2rem] border-[6px] border-gray-800 shadow-xl overflow-hidden relative mr-4 md:mr-0">
+                    <img src="img3.png" alt="Tela do Aplicativo 3" class="w-full h-full object-cover object-top" onerror="this.src='https://via.placeholder.com/200x400?text=Tela+3'">
+                </div>
+                
             </div>
             
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-shadow cursor-pointer tracking-tracer" data-tracker="Card Solução 1">
-                    <div class="w-14 h-14 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center text-2xl mb-6"><i class="fa-solid fa-phone-slash"></i></div>
-                    <h3 class="text-xl font-black text-slate-900 mb-3">Fim do "Quanto custa?"</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">O seu cliente acede ao seu link, vê todos os produtos, preços e faz o pedido sozinho. Recebe a encomenda fechada no seu WhatsApp.</p>
-                </div>
-                
-                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-shadow cursor-pointer tracking-tracer" data-tracker="Card Solução 2">
-                    <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6"><i class="fa-solid fa-calendar-check"></i></div>
-                    <h3 class="text-xl font-black text-slate-900 mb-3">Agenda Automática</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">Banhos e tosquias organizados. O cliente escolhe o horário livre e o sistema envia lembretes automáticos para evitar faltas.</p>
-                </div>
-                
-                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:shadow-xl transition-shadow cursor-pointer tracking-tracer" data-tracker="Card Solução 3">
-                    <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6"><i class="fa-solid fa-chart-line"></i></div>
-                    <h3 class="text-xl font-black text-slate-900 mb-3">Gestão de Tráfego</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">Não entende de anúncios? No nosso plano premium, um gestor profissional cria campanhas para atrair clientes da sua região.</p>
-                </div>
+            <div class="text-center mt-2 text-sm text-gray-400 flex justify-center items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                Deslize para o lado
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="planos" class="py-24 bg-slate-50" data-section="Planos">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">Planos simples e sem surpresas.</h2>
-                <p class="text-slate-500 font-medium">Cancele quando quiser. Sem taxas escondidas.</p>
-            </div>
+        <!-- Seção Planos -->
+        <section id="planos" class="mb-16 scroll-mt-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-brand mb-10">
+                Escolha o plano ideal para <span class="text-brand-orange">escalar suas vendas</span>
+            </h2>
             
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
                 
-                <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-lg relative tracking-tracer" data-tracker="Visualizou Plano Essencial">
-                    <h3 class="text-2xl font-black text-slate-900 mb-2">Plano Essencial</h3>
-                    <p class="text-slate-500 text-sm mb-6 font-medium">A tecnologia completa nas suas mãos.</p>
-                    <div class="mb-8">
-                        <span class="text-5xl font-black text-slate-900">R$99</span><span class="text-slate-500 font-bold">/mês</span>
+                <!-- Card Plano Essencial -->
+                <div class="pricing-card bg-white border border-gray-200 rounded-2xl shadow-lg p-8 flex flex-col">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Plano Essencial</h3>
+                    <p class="text-gray-500 text-sm mb-6">A porta de entrada ideal para gerenciar sua própria vitrine digital.</p>
+                    <div class="text-4xl font-black text-brand mb-6">
+                        R$ 99<span class="text-lg font-medium text-gray-500">/mês</span>
                     </div>
                     
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-start gap-3 text-sm font-bold text-slate-700"><i class="fa-solid fa-check text-green-500 mt-0.5"></i> App Exclusivo do Pet Shop</li>
-                        <li class="flex items-start gap-3 text-sm font-bold text-slate-700"><i class="fa-solid fa-check text-green-500 mt-0.5"></i> Treinamento Completo de Uso</li>
-                        <li class="flex items-start gap-3 text-sm font-bold text-slate-700"><i class="fa-solid fa-check text-green-500 mt-0.5"></i> Recebimento de Pedidos no WhatsApp</li>
-                        <li class="flex items-start gap-3 text-sm font-bold text-slate-400 line-through"><i class="fa-solid fa-xmark text-slate-300 mt-0.5"></i> Mão de obra para cadastrar produtos</li>
-                        <li class="flex items-start gap-3 text-sm font-bold text-slate-400 line-through"><i class="fa-solid fa-xmark text-slate-300 mt-0.5"></i> Gestor de Tráfego Pago</li>
+                    <ul class="mb-8 space-y-4 flex-grow text-sm text-gray-600">
+                        <li class="flex items-start">✓ Aplicativo de Loja Online Completo</li>
+                        <li class="flex items-start">✓ Subdomínio Grátis ou Domínio Próprio</li>
+                        <li class="flex items-start">✓ Vitrine com Imagens, Vídeos e Notificações</li>
+                        <li class="flex items-start">✓ Treinamento e Suporte Especializado</li>
                     </ul>
                     
-                    <a href="checkout_petlojas/index.html?plano=essencial" class="block w-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-center py-4 rounded-xl font-black transition tracking-tracer btn-conversao" data-tracker="Clique Assinar Plano Essencial">
+                    <a href="https://wa.me/5533999333644?text=Olá%2C%20equipe%20Gv%20Conecta%21%20Quero%20assinar%20o%20PLANO%20ESSENCIAL%20da%20PetLojas." target="_blank" class="pixel-track w-full block text-center bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-lg transition">
                         Assinar Essencial
                     </a>
                 </div>
 
-                <div class="bg-blue-600 rounded-3xl p-8 border border-blue-500 shadow-2xl shadow-blue-900/30 relative transform md:-translate-y-4 tracking-tracer" data-tracker="Visualizou Plano Elite">
-                    <div class="absolute -top-4 inset-x-0 text-center">
-                        <span class="bg-amber-400 text-amber-900 text-[10px] font-black uppercase tracking-widest py-1.5 px-4 rounded-full shadow-sm">Mais Vendido</span>
-                    </div>
-                    <h3 class="text-2xl font-black text-white mb-2 mt-2">Plano Elite (Mão na Massa)</h3>
-                    <p class="text-blue-200 text-sm mb-6 font-medium">Nós operamos a tecnologia para si.</p>
-                    <div class="mb-8">
-                        <span class="text-5xl font-black text-white">R$299</span><span class="text-blue-300 font-bold">/mês</span>
-                    </div>
+                <!-- Card Plano Completo -->
+                <div class="pricing-card bg-white border-2 border-brand-orange rounded-2xl shadow-xl p-8 flex flex-col relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-brand-orange text-white text-xs font-bold px-3 py-1 rounded-bl-lg">MAIS COMPLETO</div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Plano Completo</h3>
+                    <p class="text-gray-500 text-sm mb-6">Para quem deseja escalar resultados sem trabalho manual.</p>
+                    <div class="text-3xl font-black text-brand mb-6 mt-1">Sob Consulta</div>
                     
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-start gap-3 text-sm font-bold text-white"><i class="fa-solid fa-check text-amber-400 mt-0.5"></i> App Exclusivo do Pet Shop</li>
-                        <li class="flex items-start gap-3 text-sm font-bold text-white"><i class="fa-solid fa-check text-amber-400 mt-0.5"></i> Treinamento Estratégico</li>
-                        <li class="flex items-start gap-3 text-sm font-bold text-white"><i class="fa-solid fa-check text-amber-400 mt-0.5"></i> <strong>SDR Cadastrador:</strong> Nós inserimos os seus produtos na loja.</li>
-                        <li class="flex items-start gap-3 text-sm font-bold text-white"><i class="fa-solid fa-check text-amber-400 mt-0.5"></i> <strong>Gestor de Tráfego:</strong> Criação e gestão de anúncios para atrair clientes.</li>
+                    <ul class="mb-8 space-y-4 flex-grow text-sm text-gray-600">
+                        <li class="font-semibold text-brand-orange">Tudo do Plano Essencial, mais:</li>
+                        <li class="flex items-start">✓ <strong>Tráfego Pago:</strong> Mão de obra para anúncios</li>
+                        <li class="flex items-start">✓ <strong>Gestão de Catálogo:</strong> Nós cadastramos tudo</li>
                     </ul>
                     
-                    <a href="checkout_petlojas/index.html?plano=elite" class="block w-full bg-amber-400 hover:bg-amber-300 text-amber-900 text-center py-4 rounded-xl font-black transition shadow-lg tracking-tracer btn-conversao" data-tracker="Clique Assinar Plano Elite">
-                        Assinar Elite
+                    <a href="https://wa.me/5533999333644?text=Olá%2C%20equipe%20Gv%20Conecta%21%20Quero%20saber%20mais%20sobre%20o%20PLANO%20COMPLETO%20da%20PetLojas." target="_blank" class="pixel-track w-full block text-center bg-brand-orange hover:bg-orange-500 text-white font-bold py-3 rounded-lg transition">
+                        Falar com Especialista
                     </a>
                 </div>
-
             </div>
-        </div>
-    </section>
 
-    <section class="py-20 bg-white border-t border-slate-100" data-section="Contato/Duvidas">
-        <div class="max-w-md mx-auto px-6 text-center">
-            <i class="fa-brands fa-whatsapp text-4xl text-green-500 mb-4"></i>
-            <h3 class="text-2xl font-black text-slate-900 mb-2">Ainda tem dúvidas?</h3>
-            <p class="text-slate-500 text-sm mb-6">Deixe o seu número. Um especialista PetLojas entrará em contacto consigo hoje mesmo.</p>
+            <!-- Condições Transparentes -->
+            <div class="mt-8 text-center bg-green-50 text-green-800 py-3 px-4 rounded-lg max-w-3xl mx-auto border border-green-100">
+                <p class="text-sm font-medium">
+                    ✨ <strong>Condições Transparentes:</strong> A taxa de implantação da loja de <strike class="text-gray-500">R$ 50,00</strike> é <strong>totalmente isenta</strong>! Trabalhamos com mensalidades antecipadas e <strong>sem fidelidade</strong> (cancele quando quiser).
+                </p>
+            </div>
+
+            <!-- Box Acelerador -->
+            <div class="mt-8 bg-brand-lightbg border border-gray-200 rounded-lg p-6 max-w-3xl mx-auto text-center">
+                <span class="inline-block bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1 rounded-full mb-3">OPCIONAL</span>
+                <h4 class="font-bold text-gray-800 mb-2">Acelerador de Lançamento: 60 produtos por R$ 100,00 <span class="text-brand-orange">(Pagamento Único)</span></h4>
+                <p class="text-sm text-gray-600 mb-4">Seu tempo é focado em gerenciar o negócio. Se quiser, nossa equipe inaugura a plataforma cadastrando profissionalmente os seus primeiros 60 produtos e serviços.</p>
+                <a href="https://wa.me/5533999333644?text=Olá%21%20Vou%20querer%20a%20PetLojas%20e%20tenho%20interesse%20no%20ACELERADOR%20DE%20LANÇAMENTO." target="_blank" class="pixel-track inline-block bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-6 rounded-md transition text-sm">
+                    Quero incluir o Acelerador
+                </a>
+            </div>
+        </section>
+
+        <!-- SEÇÃO FAQ (Restaurada e em Português do Brasil) -->
+        <section id="faq" class="mb-16 border-t border-gray-200 pt-16 scroll-mt-24">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black text-brand mb-4">
+                    Não fique para trás e <span class="text-brand-orange">venda para toda a cidade!</span>
+                </h2>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center text-brand mb-10">Perguntas Frequentes</h2>
             
-            <div class="relative">
-                <input type="tel" id="radar_zap_input" placeholder="Seu WhatsApp (ex: 33 99999-9999)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-center font-bold outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition mb-3">
-                <button onclick="enviarDuvida()" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-xl transition tracking-tracer btn-conversao" data-tracker="Clique Enviar WhatsApp Dúvida">
-                    Falar com Especialista
-                </button>
+            <div class="max-w-3xl mx-auto space-y-4">
+                
+                <details class="bg-white border border-gray-200 rounded-lg p-5 cursor-pointer group shadow-sm hover:border-brand-orange transition">
+                    <summary class="font-bold text-gray-800 outline-none list-none flex justify-between items-center text-lg">
+                        Preciso entender de tecnologia para usar a loja?
+                        <span class="transition group-open:rotate-180 text-brand"><svg fill="none" height="24" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg></span>
+                    </summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">Absolutamente não. A plataforma foi criada para ser simples e muito intuitiva. Além disso, no Plano Essencial você recebe treinamento completo, e no Plano Completo nós até cadastramos os produtos e serviços para você!</p>
+                </details>
+
+                <details class="bg-white border border-gray-200 rounded-lg p-5 cursor-pointer group shadow-sm hover:border-brand-orange transition">
+                    <summary class="font-bold text-gray-800 outline-none list-none flex justify-between items-center text-lg">
+                        Como recebo o dinheiro das vendas?
+                        <span class="transition group-open:rotate-180 text-brand"><svg fill="none" height="24" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg></span>
+                    </summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">Os pedidos são enviados detalhadamente para o seu WhatsApp. Isso significa que você negocia e recebe o pagamento diretamente do seu cliente (via Pix, cartão, link de pagamento ou no ato da entrega), sem o seu dinheiro ficar retido em plataformas.</p>
+                </details>
+
+                <details class="bg-white border border-gray-200 rounded-lg p-5 cursor-pointer group shadow-sm hover:border-brand-orange transition">
+                    <summary class="font-bold text-gray-800 outline-none list-none flex justify-between items-center text-lg">
+                        Tem alguma taxa sobre as vendas que eu fizer?
+                        <span class="transition group-open:rotate-180 text-brand"><svg fill="none" height="24" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg></span>
+                    </summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">Zero taxas! Diferente de outros aplicativos de entrega conhecidos, nós não cobramos nenhuma comissão ou porcentagem sobre as suas vendas. Todo o lucro gerado na loja é 100% seu.</p>
+                </details>
+
+                <details class="bg-white border border-gray-200 rounded-lg p-5 cursor-pointer group shadow-sm hover:border-brand-orange transition">
+                    <summary class="font-bold text-gray-800 outline-none list-none flex justify-between items-center text-lg">
+                        Consigo vender serviços, como banho e tosa?
+                        <span class="transition group-open:rotate-180 text-brand"><svg fill="none" height="24" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg></span>
+                    </summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">Sim! Você tem total liberdade na sua vitrine para cadastrar tanto produtos físicos (rações, roupinhas, medicamentos) quanto serviços agendáveis (banho, tosa, creche, consultas veterinárias).</p>
+                </details>
+
+                <details class="bg-white border border-gray-200 rounded-lg p-5 cursor-pointer group shadow-sm hover:border-brand-orange transition">
+                    <summary class="font-bold text-gray-800 outline-none list-none flex justify-between items-center text-lg">
+                        Posso usar o domínio próprio do meu pet shop?
+                        <span class="transition group-open:rotate-180 text-brand"><svg fill="none" height="24" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg></span>
+                    </summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">Com certeza. Nós já fornecemos um subdomínio seguro e de alta velocidade gratuitamente, mas se você já tem ou pretende adquirir o seu próprio domínio (ex: www.seupetshop.com.br), basta nos avisar que fazemos a conexão.</p>
+                </details>
+
+                <details class="bg-white border border-gray-200 rounded-lg p-5 cursor-pointer group shadow-sm hover:border-brand-orange transition">
+                    <summary class="font-bold text-gray-800 outline-none list-none flex justify-between items-center text-lg">
+                        Existe algum contrato de fidelidade?
+                        <span class="transition group-open:rotate-180 text-brand"><svg fill="none" height="24" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg></span>
+                    </summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">Não prendemos ninguém por contratos longos. A assinatura é mensal e antecipada. Se algum dia você decidir que não quer mais usar a plataforma, basta cancelar a renovação sem multas ou dores de cabeça.</p>
+                </details>
+
+                <details class="bg-white border border-gray-200 rounded-lg p-5 cursor-pointer group shadow-sm hover:border-brand-orange transition">
+                    <summary class="font-bold text-gray-800 outline-none list-none flex justify-between items-center text-lg">
+                        Como funciona o Acelerador de Lançamento?
+                        <span class="transition group-open:rotate-180 text-brand"><svg fill="none" height="24" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg></span>
+                    </summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">É um serviço opcional de taxa única (R$ 100,00). Em vez de você gastar o seu valioso tempo cadastrando o estoque inicial para inaugurar o site, a nossa equipe insere os 60 produtos e serviços principais da sua loja. O seu site já nasce pronto para vender!</p>
+                </details>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-10 border-t-4 border-brand-orange">
+        <div class="max-w-4xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+            <div>
+                <p class="text-white font-bold text-lg mb-1">PetLojas</p>
+                <p class="text-xs">&copy; 2026 - Todos os direitos reservados.</p>
+            </div>
+            <div class="text-sm mt-4 md:mt-0">
+                <p class="text-gray-500 mb-1">Desenvolvido por:</p>
+                <span class="text-brand-orange font-bold">Gv Conecta</span>
             </div>
         </div>
-    </section>
-
-    <footer class="bg-slate-900 text-slate-500 text-center py-8 text-xs font-bold uppercase tracking-widest">
-        &copy; 2026 PetLojas OS. Todos os direitos reservados.
     </footer>
 
+    <!-- MOTOR DE INTELIGÊNCIA: PIXEL PETLOJAS (RASTREIO COMPORTAMENTAL) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyBjuvcJvTWw7lMrIwej5lHbIUXe99lJDN4",
-            authDomain: "crmpetshop.firebaseapp.com",
-            projectId: "crmpetshop",
-            storageBucket: "crmpetshop.firebasestorage.app",
-            messagingSenderId: "381013124221",
-            appId: "1:381013124221:web:6a1860b4249c2939b6fd14"
+            apiKey: "AIzaSyAb07mX-XJYbC3gqwstrgbo1sM3QNVi8AE",
+            authDomain: "landing-page-83fd1.firebaseapp.com",
+            projectId: "landing-page-83fd1",
+            storageBucket: "landing-page-83fd1.firebasestorage.app",
+            messagingSenderId: "976746769229",
+            appId: "1:976746769229:web:d5d7ed6cca06fb3bb36504",
+            measurementId: "G-1T273LTG29"
         };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // EXTRAÇÃO DE UTMs (Parâmetros da URL)
-        const urlParams = new URLSearchParams(window.location.search);
-        let origemReal = urlParams.get('utm_source') || document.referrer || 'Acesso Direto / Desconhecido';
-        if(urlParams.get('utm_campaign')) {
-            origemReal += ` | Campanha: ${urlParams.get('utm_campaign')}`;
-        }
-
-        const sessionId = 'SESS_' + Math.random().toString(36).substr(2, 9);
-        let visitorId = localStorage.getItem('petlojas_visitor_id');
-        let visitCount = parseInt(localStorage.getItem('petlojas_visit_count') || '0');
-
-        if (!visitorId) {
-            visitorId = 'VIS_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-            visitCount = 1;
-        } else {
-            visitCount++;
-        }
-        localStorage.setItem('petlojas_visitor_id', visitorId);
-        localStorage.setItem('petlojas_visit_count', visitCount);
-
-        const radarData = {
-            visitorId: visitorId,
-            sessionId: sessionId,
-            numeroVisita: visitCount,
-            origem: origemReal,
-            localizacao: "A rastrear...", // Será preenchido via API
-            converteu: false, // O KPI Supremo
-            dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? 'Telemóvel' : 'Desktop',
-            sistema: navigator.platform,
-            inicioSessao: Date.now(),
-            tempoCarregamento: {},
-            profundidadeScroll: 0,
-            linhaDoTempo: [],
-            secoesVistas: [],
-            textosCopiados: [],
-            rageClicks: 0,
-            tentativaFuga: false,
-            dadosFormulario_Abandonado: {}, 
-            ultimoUpdate: serverTimestamp()
+        // 1. Identidade Única (O Crachá)
+        const getVId = () => {
+            let id = localStorage.getItem('ptl_pixel_id_v3');
+            if(!id) {
+                id = 'PTL-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                localStorage.setItem('ptl_pixel_id_v3', id);
+            }
+            return id;
         };
 
+        const visitorId = getVId();
+        const sessionId = 'S-' + Date.now();
+        const sessionRef = doc(db, 'lp_acessos', sessionId);
         const startTime = Date.now();
-        
-        // MATEMÁTICA DO TEMPO ATIVO (Corte de Ociosidade)
-        let activeTimeSeconds = 0;
-        let isIdle = false;
-        let idleTimer;
 
-        function resetIdle() {
-            if(isIdle) {
-                isIdle = false;
-                logTimeline("✅ Voltou à atividade após pausa.");
-            }
-            clearTimeout(idleTimer);
-            idleTimer = setTimeout(() => {
-                isIdle = true;
-                logTimeline("💤 Utilizador inativo (ausente da página).");
-            }, 60000); // 60 segundos sem mexer = Ocioso
+        // Detectar Origem (URL Params)
+        const urlParams = new URLSearchParams(window.location.search);
+        const leadRefFromLink = urlParams.get('lead') || 'Orgânico';
+
+        // 2. Localização (Geolocalização IP)
+        let geoData = { cidade: '...', estado: '...' };
+        async function fetchGeo() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                geoData = { cidade: data.city, estado: data.region };
+            } catch(e) {}
         }
 
-        ['mousemove', 'touchstart', 'scroll', 'keydown', 'click'].forEach(evt => document.addEventListener(evt, resetIdle, {passive: true}));
-        resetIdle(); // Inicia o relógio
-
-        setInterval(() => {
-            if(!isIdle && document.visibilityState === 'visible') {
-                activeTimeSeconds++; // Só conta se estiver ativo e na aba
-            }
-        }, 1000);
-
-        // API GEOLOCALIZAÇÃO
-        fetch('https://ipapi.co/json/')
-            .then(res => res.json())
-            .then(data => {
-                if(data.city) {
-                    radarData.localizacao = `${data.city}, ${data.region} (${data.country_name})`;
-                    logTimeline(`🌍 Localização Mapeada: ${radarData.localizacao}`);
-                    enviarDadosProFirebase();
-                }
-            }).catch(() => { radarData.localizacao = "Bloqueado pelo AdBlocker/VPN"; });
-
-        function logTimeline(acao) {
-            const min = Math.floor(activeTimeSeconds / 60).toString().padStart(2, '0');
-            const sec = (activeTimeSeconds % 60).toString().padStart(2, '0');
-            radarData.linhaDoTempo.push(`[${min}:${sec}] ${acao}`);
+        // 3. Registro Inicial no Firebase
+        async function initPixel() {
+            await fetchGeo();
+            await setDoc(sessionRef, {
+                visitante_id: visitorId,
+                referencia_lead: leadRefFromLink,
+                cidade: geoData.cidade,
+                estado: geoData.estado,
+                dispositivo: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Celular' : 'Desktop',
+                data_entrada: serverTimestamp(),
+                scroll_max: 0,
+                tempo_segundos: 0,
+                secoes_vistas: [],
+                eventos: []
+            });
+            updateWALinks();
         }
 
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const nav = performance.getEntriesByType("navigation")[0];
-                if (nav) {
-                    radarData.tempoCarregamento = {
-                        ttfb: nav.responseStart.toFixed(0) + 'ms (Resposta Servidor)',
-                        domReady: nav.domContentLoadedEventEnd.toFixed(0) + 'ms (Pronto a Ler)',
-                        fullLoad: nav.loadEventEnd.toFixed(0) + 'ms (Carga Total)'
-                    };
-                    logTimeline(`⚡ Carga de página concluída em ${radarData.tempoCarregamento.fullLoad}`);
-                }
-            }, 1000);
-            logTimeline(`🟢 Entrou (Origem: ${origemReal})`);
-        });
-
-        let lastScrollMilestone = 0;
-        window.addEventListener('scroll', () => {
-            const documentHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            if(documentHeight <= 0) return; 
-            
-            const scrolled = (window.scrollY / documentHeight) * 100;
-            if (scrolled > radarData.profundidadeScroll) {
-                radarData.profundidadeScroll = Math.round(scrolled);
-            }
-            
-            const milestone = Math.floor(scrolled / 25) * 25;
-            if (milestone > lastScrollMilestone && milestone > 0) {
-                lastScrollMilestone = milestone;
-                logTimeline(`📜 Fez scroll até ${milestone}%`);
-            }
-        }, { passive: true });
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const sectionName = entry.target.getAttribute('data-section') || entry.target.id || 'Secção Genérica';
-                    if (!radarData.secoesVistas.includes(sectionName)) {
-                        radarData.secoesVistas.push(sectionName);
-                        logTimeline(`👀 Visualizou: ${sectionName}`);
-                    }
+        // 4. Carimbo Reverso nos botões de WhatsApp
+        function updateWALinks() {
+            const links = document.querySelectorAll('a[href*="wa.me"]');
+            links.forEach(l => {
+                let url = new URL(l.href);
+                let txt = url.searchParams.get('text') || '';
+                if(!txt.includes('[Ref:')) {
+                    url.searchParams.set('text', txt + ` [Ref: ${visitorId}]`);
+                    l.href = url.toString();
                 }
             });
-        }, { threshold: 0.5 }); 
-        document.querySelectorAll('section').forEach(sec => observer.observe(sec));
-
-        // RASTREIO DE CONVERSÃO (O Fecho do Funil)
-        document.body.addEventListener('click', (e) => {
-            const target = e.target.closest('a, button'); 
-            if (target) {
-                const text = target.innerText.trim().substring(0, 35) || 'Botão/Link';
-                
-                if(target.classList.contains('btn-conversao') || target.getAttribute('href')?.includes('checkout')) {
-                    radarData.converteu = true; // MARCA A CONVERSÃO MATEMÁTICA!
-                    logTimeline(`🏆 CONVERSÃO! Clicou no botão de Fecho: "${text}"`);
-                } else {
-                    logTimeline(`🖱️ Clicou: "${text}"`);
-                }
-            }
-        });
-
-        document.addEventListener('copy', () => {
-            const textoCopiado = window.getSelection().toString().trim();
-            if (textoCopiado.length > 0) {
-                radarData.textosCopiados.push(textoCopiado.substring(0, 50) + "...");
-                logTimeline(`✂️ Copiou: "${textoCopiado.substring(0, 30)}..."`);
-            }
-        });
-
-        let clickCount = 0; let clickTimer;
-        document.addEventListener('click', () => {
-            clickCount++; clearTimeout(clickTimer);
-            if (clickCount >= 4) {
-                radarData.rageClicks++;
-                logTimeline("😡 RAGE CLICK (Frustração Detetada)");
-                clickCount = 0;
-            }
-            clickTimer = setTimeout(() => { clickCount = 0; }, 600);
-        });
-
-        document.body.addEventListener('blur', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                const valor = e.target.value.trim();
-                const nomeCampo = e.target.name || e.target.id || e.target.type;
-                if (valor.length > 2) {
-                    radarData.dadosFormulario_Abandonado[nomeCampo] = valor;
-                    logTimeline(`⌨️ Digitou no campo [${nomeCampo}]: ${valor}`);
-                    enviarDadosProFirebase(); 
-                }
-            }
-        }, true);
-
-        document.addEventListener('mouseleave', (e) => {
-            if (e.clientY < 0 && !radarData.tentativaFuga) {
-                radarData.tentativaFuga = true;
-                logTimeline("🚪 TENTATIVA DE FUGA (Mouse no X)");
-                enviarDadosProFirebase();
-            }
-        });
-
-        async function enviarDadosProFirebase() {
-            try {
-                const docRef = doc(db, 'lp_acessos', sessionId);
-                await setDoc(docRef, {
-                    ...radarData,
-                    tempoTotalSegundos: activeTimeSeconds, // Agora grava apenas tempo ATIVO
-                    ultimoUpdate: serverTimestamp()
-                }, { merge: true });
-            } catch (err) {}
         }
 
-        setInterval(enviarDadosProFirebase, 10000);
+        // 5. Rastreio de Rolagem e Interações
+        let maxScroll = 0;
+        window.addEventListener('scroll', () => {
+            const pct = Math.round((window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
+            if(pct > maxScroll && pct <= 100) maxScroll = pct;
+        });
 
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') {
-                logTimeline("🙈 Escondeu a página");
-                enviarDadosProFirebase();
-            } else {
-                logTimeline("👁️ Voltou à página");
+        // Observer de Seções (Quais partes ele viu)
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    updateDoc(sessionRef, {
+                        secoes_vistas: arrayUnion(entry.target.id || 'topo')
+                    }).catch(()=>{});
+                }
+            });
+        }, { threshold: 0.5 });
+        document.querySelectorAll('section, header').forEach(s => sectionObserver.observe(s));
+
+        // Cliques e FAQs
+        document.addEventListener('click', (e) => {
+            const el = e.target.closest('a, button, details');
+            if(!el) return;
+
+            let acao = '';
+            if(el.tagName === 'DETAILS' && !el.open) {
+                acao = 'FAQ: ' + el.querySelector('summary').innerText.replace('▼', '').substring(0, 40).trim();
+            } else if(el.innerText) {
+                acao = 'CLIQUE: ' + el.innerText.replace(/\n/g, ' ').substring(0, 30).trim();
+            }
+
+            if(acao) {
+                updateDoc(sessionRef, {
+                    eventos: arrayUnion({ acao, hora: new Date().toLocaleTimeString('pt-BR') })
+                }).catch(()=>{});
             }
         });
-        
-        window.enviarDuvida = () => {
-            const num = document.getElementById('radar_zap_input').value;
-            if(!num) { alert('Por favor, insira o seu WhatsApp com o indicativo.'); return; }
-            radarData.converteu = true; // Botão de dúvida também é conversão
-            logTimeline(`🚀 ENVIOU WHATSAPP: ${num}`);
-            enviarDadosProFirebase();
-            document.getElementById('radar_zap_input').value = "";
-            alert("A nossa equipa foi notificada! Aguarde o nosso contacto.");
-        };
+
+        // Salvar métricas finais ao sair
+        window.addEventListener('visibilitychange', () => {
+            if(document.visibilityState === 'hidden') {
+                updateDoc(sessionRef, {
+                    tempo_segundos: Math.round((Date.now() - startTime)/1000),
+                    scroll_max: maxScroll,
+                    ultima_atualizacao: serverTimestamp()
+                }).catch(()=>{});
+            }
+        });
+
+        initPixel();
     </script>
 </body>
 </html>
