@@ -3,167 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetLojas Action Hub - Agenda de Vendas</title>
+    <title>Action Hub - PetLojas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: transparent; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Estilos das Guias Horizontais */
+        .tab-btn { @apply px-4 py-1.5 text-slate-500 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2; }
+        .tab-btn.active { @apply bg-white text-blue-600 shadow-sm ring-1 ring-slate-200/50; }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden text-slate-800 p-4 md:p-6 gap-4">
+
+    <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-2 rounded-xl border border-slate-200 shadow-sm shrink-0 gap-3">
+        
+        <div class="flex items-center p-1 bg-slate-100 rounded-lg w-full sm:w-auto">
+            <button onclick="mudarVisao('hibrida', this)" class="tab-btn active w-full sm:w-auto justify-center">
+                <i class="fa-solid fa-table-columns"></i> Visão Híbrida
+            </button>
+            <button onclick="mudarVisao('tarefas', this)" class="tab-btn w-full sm:w-auto justify-center">
+                <i class="fa-solid fa-list-check"></i> Só Tarefas
+            </button>
+            <button onclick="mudarVisao('agenda', this)" class="tab-btn w-full sm:w-auto justify-center hidden lg:flex">
+                <i class="fa-regular fa-calendar"></i> Só Agenda
+            </button>
+        </div>
+
+        <button onclick="abrirModalNovaTarefa()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm shadow-blue-600/30 transition-all active:scale-95">
+            <i class="fa-solid fa-plus"></i> Nova Ação
+        </button>
+    </div>
+
+    <div class="flex-1 flex gap-6 overflow-hidden">
+        
+        <div id="coluna-tarefas" class="w-full lg:w-1/3 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full transition-all duration-300">
+            <div class="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-xl shrink-0">
+                <h2 class="font-bold text-sm text-slate-700"><i class="fa-solid fa-bolt text-blue-500 mr-2"></i>Ações e Follow-ups</h2>
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-200/50 px-2 py-0.5 rounded">Tempo Real</span>
+            </div>
+            
+            <div id="lista-tarefas" class="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
+                <div class="p-4 text-center text-slate-400 text-xs font-bold animate-pulse">
+                    <i class="fa-solid fa-circle-notch fa-spin mb-2 text-xl text-slate-300"></i><br>
+                    Sincronizando tarefas...
+                </div>
+            </div>
+        </div>
+
+        <div id="coluna-agenda" class="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 flex-col h-full overflow-hidden hidden lg:flex transition-all duration-300">
+            <div class="p-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-xl shrink-0">
+                <h2 class="font-bold text-sm text-slate-700"><i class="fa-regular fa-calendar-days text-blue-500 mr-2"></i>Agenda Semanal</h2>
+                <div class="flex gap-3 text-[9px] font-black text-slate-500 uppercase tracking-wider">
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Fechamento</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> Follow-up</span>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex items-center justify-center bg-slate-50/50 relative p-4">
+               <div class="text-center">
+                    <div class="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                        <i class="fa-regular fa-calendar-check text-3xl text-slate-300"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-600 mb-1">Módulo de Calendário</h3>
+                    <p class="text-xs text-slate-400 max-w-xs mx-auto font-medium">Os eventos com data marcada aparecerão aqui. Por enquanto, utilize a lista rápida de ações à esquerda para operar.</p>
+               </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="modal-nova-tarefa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="modal-content">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-black text-sm uppercase tracking-wider text-slate-700"><i class="fa-solid fa-bolt text-blue-500 mr-2"></i>Nova Ação</h3>
+                <button onclick="fecharModalNovaTarefa()" class="text-slate-400 hover:text-red-500 transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="form-nova-tarefa" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">O que precisa ser feito?</label>
+                    <input type="text" id="input-titulo" required class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-bold text-sm text-slate-700 transition" placeholder="Ex: Ligar para PetShop X">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Prioridade</label>
+                        <select id="input-prioridade" class="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-bold text-slate-700 transition cursor-pointer">
+                            <option value="alta">🔴 Fechamento</option>
+                            <option value="media">🟡 Follow-up</option>
+                            <option value="baixa">⚪ Pesquisa Fria</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">WhatsApp (Opcional)</label>
+                        <input type="text" id="input-telefone" class="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-bold text-slate-700 transition" placeholder="(33) 9...">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-widest py-3.5 rounded-lg mt-4 transition shadow-lg flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fa-solid fa-check"></i> Salvar Ação
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        petlojas: {
-                            dark: '#0f172a', // Sidebar
-                            primary: '#0ea5e9', // Botões/Destaques
-                            red: '#ef4444', // Fechamento
-                            yellow: '#eab308', // Follow-up
-                            green: '#10b981', // Proposta
-                        }
-                    }
-                }
+        // Lógica das Guias Horizontais (Tabs)
+        function mudarVisao(modo, botao) {
+            // Atualiza botões
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            botao.classList.add('active');
+
+            const colTarefas = document.getElementById('coluna-tarefas');
+            const colAgenda = document.getElementById('coluna-agenda');
+
+            if (modo === 'hibrida') {
+                colTarefas.className = 'w-full lg:w-1/3 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full transition-all duration-300';
+                colTarefas.style.display = 'flex';
+                colAgenda.style.display = window.innerWidth >= 1024 ? 'flex' : 'none'; // lg:flex
+            } else if (modo === 'tarefas') {
+                colTarefas.className = 'w-full bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full transition-all duration-300';
+                colTarefas.style.display = 'flex';
+                colAgenda.style.display = 'none';
+            } else if (modo === 'agenda') {
+                colTarefas.style.display = 'none';
+                colAgenda.style.display = 'flex';
+                colAgenda.classList.remove('hidden', 'lg:flex');
             }
         }
+
+        // Lógica do Modal
+        function abrirModalNovaTarefa() {
+            const modal = document.getElementById('modal-nova-tarefa');
+            const content = document.getElementById('modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function fecharModalNovaTarefa() {
+            const modal = document.getElementById('modal-nova-tarefa');
+            const content = document.getElementById('modal-content');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
     </script>
-</head>
-<body class="bg-slate-100 flex h-screen overflow-hidden text-slate-800 font-sans">
-
-    <aside class="w-16 bg-petlojas-dark flex flex-col items-center py-6 gap-8 text-slate-400">
-        <div class="text-petlojas-primary text-2xl"><i class="fa-solid fa-paw"></i></div>
-        <button class="hover:text-white transition"><i class="fa-solid fa-house"></i></button>
-        <button class="text-white bg-slate-800 p-3 rounded-lg"><i class="fa-solid fa-calendar-days"></i></button>
-        <button class="hover:text-white transition"><i class="fa-solid fa-users"></i></button>
-        <button class="hover:text-white transition"><i class="fa-solid fa-chart-pie"></i></button>
-        <div class="mt-auto hover:text-white transition cursor-pointer"><i class="fa-solid fa-gear"></i></div>
-    </aside>
-
-    <main class="flex-1 flex flex-col h-full overflow-hidden">
-        
-        <header class="bg-white px-8 py-4 flex justify-between items-center border-b border-slate-200">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800">PetLojas Action Hub: Prospecção</h1>
-                <p class="text-sm text-slate-500">Gestão de Tempo e Tarefas B2B</p>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-slate-300 flex items-center justify-center"><i class="fa-solid fa-user"></i></div>
-                    <span class="font-medium text-sm">Equipe de Vendas (Você)</span>
-                </div>
-                <button class="bg-petlojas-primary hover:bg-sky-600 text-white px-4 py-2 rounded-lg font-medium transition shadow-sm flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i> Novo Evento/Tarefa
-                </button>
-            </div>
-        </header>
-
-        <div class="flex-1 flex gap-6 p-6 overflow-hidden">
-            
-            <div class="w-1/3 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full">
-                <div class="p-4 border-b border-slate-100 flex justify-between items-center">
-                    <h2 class="font-bold text-lg"><i class="fa-solid fa-list-check text-slate-400 mr-2"></i>Tarefas de Prospecção</h2>
-                    <button class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-ellipsis"></i></button>
-                </div>
-                
-                <div class="flex-1 overflow-y-auto p-2 space-y-2">
-                    <div class="p-3 hover:bg-slate-50 rounded-lg group border border-transparent hover:border-slate-100 transition flex gap-3">
-                        <input type="checkbox" class="mt-1 w-4 h-4 cursor-pointer accent-petlojas-primary">
-                        <div class="flex-1">
-                            <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded mb-1">Prioridade: Fechamento</span>
-                            <p class="text-sm font-medium text-slate-700">Ligar para Mundo Animal - Fechar Contrato</p>
-                            <p class="text-xs text-slate-400 mt-1">Lead ID: 1001</p>
-                        </div>
-                        <button class="text-slate-300 hover:text-petlojas-primary flex flex-col items-center justify-start text-xs" title="Abrir no CRM">
-                            <i class="fa-solid fa-arrow-up-right-from-square mb-1"></i> CRM
-                        </button>
-                    </div>
-
-                    <div class="p-3 hover:bg-slate-50 rounded-lg group border border-transparent hover:border-slate-100 transition flex gap-3">
-                        <input type="checkbox" class="mt-1 w-4 h-4 cursor-pointer accent-petlojas-primary">
-                        <div class="flex-1">
-                            <span class="inline-block px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded mb-1">Follow-up Inicial</span>
-                            <p class="text-sm font-medium text-slate-700">Enviar WhatsApp de Apresentação p/ Doggy Style</p>
-                            <p class="text-xs text-slate-400 mt-1">Lead ID: 1003</p>
-                        </div>
-                        <button class="text-slate-300 hover:text-green-500 flex flex-col items-center justify-start text-xs" title="Disparar WhatsApp">
-                            <i class="fa-brands fa-whatsapp text-lg mb-1"></i> Zap
-                        </button>
-                    </div>
-
-                    <div class="p-3 hover:bg-slate-50 rounded-lg group border border-transparent hover:border-slate-100 transition flex gap-3">
-                        <input type="checkbox" class="mt-1 w-4 h-4 cursor-pointer accent-petlojas-primary">
-                        <div class="flex-1">
-                            <span class="inline-block px-2 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded mb-1">Pesquisa / Prospecção Fria</span>
-                            <p class="text-sm font-medium text-slate-700">Mapear 10 novas lojas no centro de Governador Valadares</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden">
-                <div class="p-4 border-b border-slate-100 flex justify-between items-center">
-                    <h2 class="font-bold text-lg"><i class="fa-regular fa-calendar text-slate-400 mr-2"></i>Agenda Semanal (Visão Vendas)</h2>
-                    <div class="flex gap-4 text-xs font-medium text-slate-500">
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-petlojas-red"></span> Fechamento</span>
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-petlojas-green"></span> Proposta/Apresentação</span>
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-petlojas-yellow"></span> Follow-up</span>
-                    </div>
-                </div>
-                
-                <div class="flex-1 overflow-auto bg-slate-50 relative p-4">
-                    <div class="grid grid-cols-6 gap-2 min-h-[600px]">
-                        <div class="flex flex-col text-xs text-slate-400 text-right pr-2 space-y-12 mt-8 border-r border-slate-200">
-                            <span>09:00</span>
-                            <span>10:00</span>
-                            <span>11:00</span>
-                            <span>12:00</span>
-                            <span>13:00</span>
-                            <span>14:00</span>
-                            <span>15:00</span>
-                            <span>16:00</span>
-                        </div>
-                        
-                        <div class="col-span-5 grid grid-cols-5 gap-2 relative">
-                            <div class="text-center text-sm font-bold text-slate-600 pb-2 border-b border-slate-200">Segunda</div>
-                            <div class="text-center text-sm font-bold text-slate-600 pb-2 border-b border-slate-200">Terça</div>
-                            <div class="text-center text-sm font-bold text-slate-600 pb-2 border-b border-slate-200 bg-blue-50 rounded-t">Quarta (Hoje)</div>
-                            <div class="text-center text-sm font-bold text-slate-600 pb-2 border-b border-slate-200">Quinta</div>
-                            <div class="text-center text-sm font-bold text-slate-600 pb-2 border-b border-slate-200">Sexta</div>
-
-                            <div class="absolute inset-0 top-8 pointer-events-none opacity-20 flex flex-col">
-                                <div class="flex-1 border-b border-slate-400"></div>
-                                <div class="flex-1 border-b border-slate-400"></div>
-                                <div class="flex-1 border-b border-slate-400"></div>
-                                <div class="flex-1 border-b border-slate-400"></div>
-                                <div class="flex-1 border-b border-slate-400"></div>
-                                <div class="flex-1 border-b border-slate-400"></div>
-                                <div class="flex-1 border-b border-slate-400"></div>
-                            </div>
-
-                            <div class="absolute top-[280px] left-[20%] w-[19%] bg-petlojas-red text-white p-2 rounded shadow-md border-l-4 border-red-800 text-xs z-10 cursor-pointer hover:scale-105 transition">
-                                <p class="font-bold">14:00 - Reunião Fechamento</p>
-                                <p>PetLover Shop (Carla)</p>
-                                <div class="mt-2 bg-slate-800 text-white px-2 py-1 rounded inline-flex items-center gap-1 hover:bg-green-600 transition" title="Disparo Five WhatsApp">
-                                    <i class="fa-brands fa-whatsapp"></i> Link Disparo
-                                </div>
-                            </div>
-
-                            <div class="absolute top-[110px] left-[40%] w-[19%] bg-petlojas-yellow text-slate-800 p-2 rounded shadow border-l-4 border-yellow-600 text-xs z-10 cursor-pointer hover:scale-105 transition">
-                                <p class="font-bold">11:00 - Ligação de Follow-up</p>
-                                <p>Doggy Style (Dúvidas Sistema)</p>
-                                <p class="mt-1 text-[10px] opacity-75"><i class="fa-solid fa-phone"></i> Ligar via CRM</p>
-                            </div>
-
-                            <div class="absolute top-[55px] left-[60%] w-[19%] bg-petlojas-green text-white p-2 rounded shadow border-l-4 border-green-800 text-xs z-10 cursor-pointer hover:scale-105 transition">
-                                <p class="font-bold">10:00 - Apresentação (Demo)</p>
-                                <p>PetHappy Shop</p>
-                                <p class="mt-1 text-[10px] opacity-90"><i class="fa-solid fa-video"></i> Google Meet</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </main>
-<script type="module" src="agenda.js"></script>
-</body>
-</html>
+    
+    <script type="module" src="agenda.js"></script>
 </body>
 </html>
