@@ -195,7 +195,7 @@
             } catch (error) { console.error(error); }
         }
 
-        // PUXAR DADOS DO FIREBASE (CORRIGIDO PARA IGNORAR UNDEFINED)
+        // PUXAR DADOS DO FIREBASE (BLINDAGEM NÍVEL MILITAR)
         async function importarDoCRM(event) {
             const select = document.getElementById('colunaSelect');
             const colId = select.value;
@@ -209,28 +209,39 @@
             try {
                 const snap = await db.collection('leads').where('columnId', '==', colId).get();
                 let extracao = [];
+                
                 snap.forEach(doc => {
                     const lead = doc.data();
-                    if (lead.phone && lead.phone.trim() !== '') {
+                    
+                    // 1. BLINDAGEM DO TELEFONE: Pega qualquer coisa que pareça telefone e força a virar Texto Seguro
+                    let rawPhone = lead.phone || lead.telefone || lead.whatsapp || "";
+                    let phoneStr = String(rawPhone);
+
+                    // Só continua se o telefone de fato existir e não for vazio
+                    if (phoneStr.trim() !== '') {
                         
-                        // Proteção extrema contra "undefined"
-                        let nomeReal = lead.name || lead.nome || lead.titulo || 'Contato';
-                        if (String(nomeReal).toLowerCase() === 'undefined' || String(nomeReal).toLowerCase() === 'null') {
-                            nomeReal = 'Contato';
+                        // 2. BLINDAGEM DO NOME: Pega qualquer coisa que pareça nome e força a virar Texto Seguro
+                        let rawName = lead.name || lead.nome || lead.titulo || "Contato";
+                        let nameStr = String(rawName).trim();
+                        
+                        // 3. CAÇA-FANTASMAS: Se o nome virar as palavras malditas, nós esmagamos
+                        let nomeTest = nameStr.toLowerCase();
+                        if (!nameStr || nomeTest === 'undefined' || nomeTest === 'null') {
+                            nameStr = 'Contato';
                         }
                         
-                        extracao.push(`${nomeReal} - ${lead.phone}`);
+                        extracao.push(`${nameStr} - ${phoneStr}`);
                     }
                 });
 
                 if (extracao.length === 0) { 
-                    alert(`Não há nenhum cliente com número de telefone cadastrado nesta fase.`); 
+                    alert(`O Radar não detectou nenhum cliente com telefone válido nesta fase.`); 
                 } else { 
                     document.getElementById('listaNumeros').value = extracao.join('\n'); 
                 }
             } catch (error) {
-                console.error(error);
-                alert("Erro ao puxar leads do banco de dados.");
+                console.error("Erro na Trincheira (importarDoCRM):", error);
+                alert("Erro ao extrair leads do banco de dados. O sistema travou a operação para não comprometer os dados.");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
