@@ -1,412 +1,318 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radar Analytics PRO - PetLojas</title>
-    
+    <title>Relatórios PetLojas - Inteligência de Negócio</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js para os gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <style type="text/tailwindcss">
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700;900&display=swap');
-        
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .font-math { font-family: 'JetBrains Mono', monospace; } 
-        
-        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .caixa-didatica { @apply bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-xl text-sm text-indigo-900 mt-4 shadow-sm; }
+    <style>
+        :root { --brand-blue: #3B5B85; --brand-coral: #F29C5A; }
+        .bg-brand { background-color: var(--brand-blue); }
+        .text-brand { color: var(--brand-blue); }
+        .border-brand { border-color: var(--brand-blue); }
+        .card-stat { @apply bg-white p-6 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="p-4 md:p-6 text-slate-800 fade-in">
+<body class="bg-slate-50 min-h-screen font-sans pb-20">
 
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <div>
-            <h1 class="text-3xl font-black text-slate-900 flex items-center gap-3">
-                <i class="fa-solid fa-radar text-rose-500 animate-pulse"></i> Central de Inteligência e Dados
-            </h1>
-            <p class="text-sm text-slate-500 font-medium mt-1">Estatísticas Corrigidas, Geometria de Tráfego e Taxas de Conversão.</p>
+    <!-- Barra de Navegação Superior -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-brand p-2 rounded-xl text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                <h1 class="text-xl font-bold text-gray-800">PetLojas <span class="text-brand font-black">DATA HUB</span></h1>
+            </div>
+            <div id="sync-badge" class="flex items-center gap-2 text-sm font-bold text-amber-500 bg-amber-50 px-4 py-2 rounded-full border border-amber-100">
+                <span class="relative flex h-3 w-3">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                </span>
+                Sincronizando...
+            </div>
         </div>
-        <button onclick="carregarDados()" class="bg-slate-900 text-white hover:bg-rose-600 px-6 py-3 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center gap-2">
-            <i class="fa-solid fa-rotate" id="icon-refresh"></i> Recalcular Matriz
-        </button>
-    </div>
+    </nav>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+    <main class="max-w-7xl mx-auto px-6 py-8">
         
-        <div class="bg-indigo-600 p-5 rounded-2xl border border-indigo-700 shadow-xl shadow-indigo-900/20 flex flex-col justify-between transform hover:-translate-y-1 transition text-white">
-            <span class="text-[10px] font-bold text-indigo-200 uppercase tracking-widest"><i class="fa-solid fa-filter-circle-dollar mr-1"></i> Taxa de Conversão ($C_{rate}$)</span>
-            <span class="text-5xl font-black font-math mt-2" id="kpi-conversao">0%</span>
-            <span class="text-[10px] mt-1 text-indigo-300">Total de Assinaturas/Contatos</span>
-        </div>
-
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-users text-blue-500 mr-1"></i> Volume ($n$)</span>
-            <span class="text-4xl font-black text-slate-800 font-math mt-2" id="kpi-sessoes">0</span>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" title="Média de Tempo Ativo (Descontando Ociosidade)"><i class="fa-solid fa-stopwatch text-emerald-500 mr-1"></i> Tempo Ativo ($\bar{x}$)</span>
-            <span class="text-4xl font-black text-slate-800 font-math mt-2" id="kpi-tempo">0s</span>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" title="Média de Profundidade de Leitura"><i class="fa-solid fa-arrows-up-down text-indigo-500 mr-1"></i> Scroll Máx. ($\bar{x}$)</span>
-            <span class="text-4xl font-black text-slate-800 font-math mt-2" id="kpi-scroll">0%</span>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" title="Visitas Inúteis < 10 Segundos"><i class="fa-solid fa-arrow-right-from-bracket text-amber-500 mr-1"></i> Rejeição (Bounce)</span>
-            <span class="text-4xl font-black text-slate-800 font-math mt-2" id="kpi-bounce">0%</span>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-rose-100 shadow-sm flex flex-col justify-between bg-rose-50/30">
-            <span class="text-[10px] font-bold text-rose-400 uppercase tracking-widest"><i class="fa-solid fa-biohazard text-rose-500 mr-1"></i> Atrito & Fuga</span>
-            <div class="mt-2 text-sm font-bold text-rose-900 font-math">
-                <div class="flex justify-between border-b border-rose-200 pb-1 mb-1"><span>Rage Clicks:</span> <span id="kpi-rage">0</span></div>
-                <div class="flex justify-between"><span>Exit Intent:</span> <span id="kpi-fuga">0</span></div>
+        <!-- KPIs Principais -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="card-stat">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Visitantes Únicos</p>
+                <h2 class="text-3xl font-black text-brand" id="stat-visitors">0</h2>
+                <p class="text-[10px] text-green-500 font-bold mt-1">↑ Tempo Real</p>
             </div>
-        </div>
-    </div>
-
-    <div class="mb-4 mt-8 flex items-center gap-2 border-b border-slate-200 pb-2">
-        <i class="fa-solid fa-chart-pie text-blue-600 text-xl"></i>
-        <h2 class="text-xl font-black text-slate-800">Visualização de Dados</h2>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-        
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col xl:col-span-2">
-            <h3 class="font-black text-slate-800 mb-1">Vetor de Aquisição (Origens e Campanhas)</h3>
-            <div class="relative h-64 w-full mt-2"><canvas id="graficoOrigem"></canvas></div>
-            <div class="caixa-didatica">
-                <strong><i class="fa-solid fa-square-root-variable"></i> Análise de ROI:</strong> Se usou um parâmetro UTM na sua publicidade (Ex: Link do Instagram), a barra vai mostrar exatamente qual anúncio gerou o tráfego. Invista onde o pico é maior.
+            <div class="card-stat">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Tempo Médio</p>
+                <h2 class="text-3xl font-black text-gray-800" id="stat-time">0s</h2>
+                <p class="text-[10px] text-gray-400 font-medium mt-1">Por sessão ativa</p>
+            </div>
+            <div class="card-stat">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Scroll Médio</p>
+                <h2 class="text-3xl font-black text-gray-800" id="stat-scroll">0%</h2>
+                <p class="text-[10px] text-gray-400 font-medium mt-1">Profundidade de leitura</p>
+            </div>
+            <div class="card-stat border-brand border-2">
+                <p class="text-xs font-bold text-brand-blue uppercase tracking-widest mb-1">Taxa de Conversão</p>
+                <h2 class="text-3xl font-black text-[#F29C5A]" id="stat-conversion">0%</h2>
+                <p class="text-[10px] text-gray-400 font-medium mt-1">Cliques no WhatsApp</p>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col xl:col-span-1">
-            <h3 class="font-black text-slate-800 mb-1">Cartografia (Top Cidades)</h3>
-            <div class="relative h-64 w-full mt-2"><canvas id="graficoCidades"></canvas></div>
-            <div class="caixa-didatica text-xs">
-                <strong><i class="fa-solid fa-map-location-dot"></i> O Mapa do Ouro:</strong> Saiba para qual cidade e região você deve direcionar os anúncios de Tráfego Pago amanhã.
-            </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col xl:col-span-1">
-            <h3 class="font-black text-slate-800 mb-1">Distribuição de Hardware</h3>
-            <div class="relative h-64 w-full mt-2 flex justify-center"><canvas id="graficoDispositivos"></canvas></div>
-            <div class="caixa-didatica text-xs">
-                <strong><i class="fa-solid fa-mobile-screen"></i> Interface:</strong> Se a interseção for > 80% Mobile, a experiência do utilizador com os polegares dita as regras.
-            </div>
-        </div>
-
-    </div>
-
-    <div class="mb-4 mt-8 flex items-center gap-2 border-b border-slate-200 pb-2">
-        <i class="fa-solid fa-table text-emerald-600 text-xl"></i>
-        <h2 class="text-xl font-black text-slate-800">Matriz de Dados Brutos (Logs)</h2>
-    </div>
-
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-10">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse whitespace-nowrap">
-                <thead>
-                    <tr class="bg-slate-900 text-[10px] text-slate-300 uppercase tracking-widest border-b border-slate-800">
-                        <th class="p-4 font-black">Localização e Dispositivo</th>
-                        <th class="p-4 font-black">Origem / UTM</th>
-                        <th class="p-4 font-black text-right">Leitura Máx.</th>
-                        <th class="p-4 font-black text-right">Tempo Real ($\Delta t$)</th>
-                        <th class="p-4 font-black text-center">Status</th>
-                        <th class="p-4 font-black text-center">Ação Analítica</th>
-                    </tr>
-                </thead>
-                <tbody id="tabela-radar" class="text-sm divide-y divide-slate-100 font-math">
-                    <tr><td colspan="6" class="p-8 text-center text-slate-400 font-bold">Compilando matriz de dados...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="modal-dossie" onclick="if(event.target === this) fecharModal()" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 cursor-pointer">
-        <div class="bg-white rounded-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col shadow-2xl cursor-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-100 shrink-0">
-                <h2 class="text-xl font-black text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-microchip text-blue-600"></i> Dossiê de Telemetria
-                </h2>
-                <button onclick="fecharModal()" class="w-10 h-10 rounded-xl bg-white text-slate-600 hover:bg-rose-50 hover:text-rose-600 border border-slate-200 transition flex items-center justify-center font-bold text-xl shadow-sm">
-                    &times;
+            <!-- Coluna de Gráficos e Rankings -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- Gráfico de Origem -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-8">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                            Origem dos Leads
+                        </h3>
+                        <span class="text-xs text-gray-400 font-medium">Últimos 30 dias</span>
+                    </div>
+                    <div class="h-[250px] relative">
+                        <canvas id="chartOrigin"></canvas>
+                    </div>
+                </div>
+
+                <!-- Ranking FAQ -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        Interesse por Tópico (Mapa de Dores)
+                    </h3>
+                    <div id="faq-ranking" class="space-y-4">
+                        <!-- Gerado via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Lista Lateral: Visitas Recentes -->
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-fit">
+                <div class="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800">Visitas em Tempo Real</h3>
+                    <span class="bg-brand text-white text-[10px] font-black px-2 py-1 rounded-md">LIVE</span>
+                </div>
+                <div id="visit-list" class="max-h-[800px] overflow-y-auto divide-y divide-gray-50 hide-scrollbar">
+                    <!-- Gerado via JS -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal do Dossiê Detalhado -->
+    <div id="modal-dossie" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-[100]">
+        <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <div>
+                    <h3 class="text-2xl font-black text-gray-800">Dossiê do Visitante</h3>
+                    <p class="text-sm text-gray-500 font-medium" id="modal-subtitle">Carregando...</p>
+                </div>
+                <button onclick="closeModal()" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 hover:bg-gray-50 transition">
+                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-
-            <div class="flex-1 overflow-y-auto p-6 bg-slate-50 custom-scroll">
-                
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-                    <div class="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                            <span class="text-[9px] font-bold text-slate-400 uppercase block mb-1">Cartografia (Geolocalização)</span>
-                            <span class="text-xs font-black text-indigo-600 font-math" id="det-local"></span>
-                        </div>
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                            <span class="text-[9px] font-bold text-slate-400 uppercase block mb-1">Frequência</span>
-                            <span class="text-lg font-black text-slate-800 font-math" id="det-visitas"></span>
-                        </div>
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                            <span class="text-[9px] font-bold text-slate-400 uppercase block mb-1">Sistema/OS</span>
-                            <span class="text-xs font-bold text-slate-700 font-math" id="det-sistema"></span>
-                        </div>
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                            <span class="text-[9px] font-bold text-slate-400 uppercase block mb-1">Selo de Conversão</span>
-                            <span class="text-sm font-black font-math" id="det-converteu"></span>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 text-slate-300 shadow-inner flex flex-col justify-center">
-                        <span class="text-[9px] font-bold text-slate-500 uppercase block mb-2"><i class="fa-solid fa-stopwatch text-rose-500"></i> Velocidade da Conexão (ms)</span>
-                        <div class="text-[10px] font-math space-y-1">
-                            <div class="flex justify-between"><span>Resposta (TTFB):</span><span class="text-emerald-400 font-bold" id="det-ttfb"></span></div>
-                            <div class="flex justify-between"><span>Leitura (DOM):</span><span class="text-blue-400 font-bold" id="det-dom"></span></div>
-                            <div class="flex justify-between border-t border-slate-700 pt-1 mt-1 text-white font-bold"><span>Carga Total:</span><span id="det-full"></span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div class="bg-white border-l-4 border-amber-500 p-4 rounded-xl shadow-sm">
-                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-3"><i class="fa-solid fa-keyboard text-amber-500 mr-1"></i> Keylogger (Formulário Abandonado)</h4>
-                        <div id="det-inputs" class="text-xs font-math text-slate-600 max-h-32 overflow-y-auto custom-scroll p-3 bg-amber-50 rounded-lg border border-amber-100"></div>
-                    </div>
-                    
-                    <div class="bg-white border-l-4 border-blue-500 p-4 rounded-xl shadow-sm">
-                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-3"><i class="fa-solid fa-copy text-blue-500 mr-1"></i> Área de Transferência (Cópias)</h4>
-                        <div id="det-copias" class="text-xs font-math text-slate-600 max-h-32 overflow-y-auto custom-scroll p-3 bg-blue-50 rounded-lg border border-blue-100"></div>
-                    </div>
-                </div>
-
-                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                    <div class="bg-slate-800 px-4 py-3 flex justify-between">
-                        <h4 class="text-xs font-black text-white uppercase tracking-widest"><i class="fa-solid fa-terminal text-emerald-400 mr-2"></i> Console de Eventos Sequenciais (Ativos)</h4>
-                        <span class="text-[10px] text-slate-400">Tempo de Ociosidade Removido Matematicamente</span>
-                    </div>
-                    <div class="p-4 bg-slate-900 h-80 overflow-y-auto custom-scroll">
-                        <ul id="det-timeline" class="space-y-1 font-math text-[11px] text-emerald-400"></ul>
-                    </div>
-                </div>
-
+            <div class="p-8" id="modal-body">
+                <!-- Conteúdo dinâmico -->
             </div>
         </div>
     </div>
 
+    <!-- Scripts de Integração -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // Chaves do Projeto landing-page-83fd1
         const firebaseConfig = {
-            apiKey: "AIzaSyBjuvcJvTWw7lMrIwej5lHbIUXe99lJDN4",
-            authDomain: "crmpetshop.firebaseapp.com",
-            projectId: "crmpetshop",
-            storageBucket: "crmpetshop.firebasestorage.app",
-            messagingSenderId: "381013124221",
-            appId: "1:381013124221:web:6a1860b4249c2939b6fd14"
+            apiKey: "AIzaSyAb07mX-XJYbC3gqwstrgbo1sM3QNVi8AE",
+            authDomain: "landing-page-83fd1.firebaseapp.com",
+            projectId: "landing-page-83fd1",
+            storageBucket: "landing-page-83fd1.firebasestorage.app",
+            messagingSenderId: "976746769229",
+            appId: "1:976746769229:web:d5d7ed6cca06fb3bb36504",
+            measurementId: "G-1T273LTG29"
         };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let sessoesCache = [];
-        let chartOrigemRef = null;
-        let chartDispositivosRef = null;
-        let chartCidadesRef = null;
+        let myChart = null;
 
-        window.carregarDados = async () => {
-            const icon = document.getElementById('icon-refresh');
-            icon.classList.add('fa-spin');
+        function renderDashboard(docs) {
+            const sessions = docs.map(d => ({ id: d.id, ...d.data() }));
             
-            try {
-                const querySnapshot = await getDocs(collection(db, "lp_acessos"));
-                
-                let rawData = [];
-                querySnapshot.forEach((doc) => {
-                    let data = doc.data();
-                    data.inicioSessao = data.inicioSessao || 0;
-                    data.profundidadeScroll = data.profundidadeScroll || 0;
-                    data.tempoTotalSegundos = data.tempoTotalSegundos || 0;
-                    data.rageClicks = data.rageClicks || 0;
-                    data.tentativaFuga = data.tentativaFuga || false;
-                    data.converteu = data.converteu || false;
-                    data.localizacao = data.localizacao || "Desconhecida";
-                    data.dispositivo = String(data.dispositivo || 'Desktop');
-                    data.origem = String(data.origem || 'Acesso Direto');
-                    rawData.push({ id: doc.id, ...data });
-                });
+            // 1. Cálculos de KPIs
+            const totalVisitors = new Set(sessions.map(s => s.visitante_id)).size;
+            document.getElementById('stat-visitors').innerText = totalVisitors;
 
-                // Matemática Decrescente Temporal
-                sessoesCache = rawData.sort((a, b) => b.inicioSessao - a.inicioSessao);
+            const sessionsWithTime = sessions.filter(s => s.tempo_segundos > 0);
+            const avgTime = sessionsWithTime.length > 0 
+                ? Math.round(sessionsWithTime.reduce((a, b) => a + b.tempo_segundos, 0) / sessionsWithTime.length) 
+                : 0;
+            document.getElementById('stat-time').innerText = avgTime + 's';
 
-                // --- ESTATÍSTICAS (A Matemática Central) ---
-                let totalScroll = 0; let totalTempo = 0; let totalRage = 0; 
-                let totalFugas = 0; let bounces = 0; let totalConversoes = 0;
-                let mobile = 0; let desktop = 0;
-                
-                const contagemOrigem = {};
-                const contagemCidades = {};
-                let htmlTabela = '';
+            const avgScroll = sessions.length > 0 
+                ? Math.round(sessions.reduce((a, b) => a + (b.scroll_max || 0), 0) / sessions.length) 
+                : 0;
+            document.getElementById('stat-scroll').innerText = avgScroll + '%';
 
-                sessoesCache.forEach(data => {
-                    totalScroll += data.profundidadeScroll;
-                    totalTempo += data.tempoTotalSegundos;
-                    totalRage += data.rageClicks;
-                    if(data.tentativaFuga) totalFugas++;
-                    if(data.tempoTotalSegundos < 10) bounces++;
-                    if(data.converteu) totalConversoes++;
+            // Taxa de Conversão (cliques em botões de WhatsApp / total de sessões)
+            const conversionEvents = sessions.filter(s => (s.eventos || []).some(e => e.acao.includes('CLIQUE: Assinar') || e.acao.includes('CLIQUE: Falar')));
+            const conversionRate = sessions.length > 0 ? ((conversionEvents.length / sessions.length) * 100).toFixed(1) : 0;
+            document.getElementById('stat-conversion').innerText = conversionRate + '%';
 
-                    if (data.dispositivo.includes('Telemóvel') || data.dispositivo.includes('Celular') || data.dispositivo.includes('Mobile')) mobile++; else desktop++;
-                    
-                    // Tratamento Didático de Origem (Trunca Campanhas Longas)
-                    let orig = data.origem;
-                    if(orig.length > 35) orig = orig.substring(0,35) + '...';
-                    contagemOrigem[orig] = (contagemOrigem[orig] || 0) + 1;
+            // 2. Gráfico de Origem
+            const originData = sessions.reduce((acc, s) => {
+                const type = s.referencia_lead === 'Orgânico' ? 'Orgânico' : 'Ativo (WA)';
+                acc[type] = (acc[type] || 0) + 1;
+                return acc;
+            }, {});
+            updateChart(originData);
 
-                    // Cidades
-                    let cid = data.localizacao.split(',')[0]; // Pega só o primeiro nome
-                    if(cid && cid !== "A rastrear..." && cid !== "Bloqueado pelo AdBlocker/VPN" && cid !== "Desconhecida") {
-                        contagemCidades[cid] = (contagemCidades[cid] || 0) + 1;
+            // 3. Ranking FAQ
+            const faqs = {};
+            sessions.forEach(s => {
+                (s.eventos || []).forEach(e => {
+                    if(e.acao.startsWith('FAQ:')) {
+                        faqs[e.acao] = (faqs[e.acao] || 0) + 1;
                     }
-
-                    // Linha da Tabela
-                    let deviceIcon = data.dispositivo.includes('Telem') || data.dispositivo.includes('Celul') ? '<i class="fa-solid fa-mobile-screen text-blue-500 mr-2"></i>' : '<i class="fa-solid fa-desktop text-slate-500 mr-2"></i>';
-                    let statusSelo = data.converteu ? '<span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[10px] font-black uppercase"><i class="fa-solid fa-check"></i> Converteu</span>' : '<span class="bg-slate-100 text-slate-400 px-2 py-1 rounded text-[10px] font-bold uppercase">Apenas Visitou</span>';
-
-                    htmlTabela += `
-                        <tr class="hover:bg-blue-50 transition border-b border-slate-100">
-                            <td class="p-4 text-xs">
-                                <div class="font-bold text-slate-700">${deviceIcon} ${data.localizacao}</div>
-                                <div class="text-[10px] text-slate-400 mt-1">${new Date(data.inicioSessao).toLocaleString('pt-PT')}</div>
-                            </td>
-                            <td class="p-4 text-[10px] text-slate-500 break-all max-w-[200px] leading-tight">${orig}</td>
-                            <td class="p-4 text-emerald-600 font-bold text-right">${data.profundidadeScroll}%</td>
-                            <td class="p-4 text-blue-600 font-bold text-right">${data.tempoTotalSegundos}s</td>
-                            <td class="p-4 text-center">${statusSelo}</td>
-                            <td class="p-4 text-center">
-                                <button onclick="abrirDossie('${data.id}')" class="bg-slate-900 text-white hover:bg-rose-600 px-4 py-2 rounded-lg font-sans text-[10px] uppercase font-black tracking-widest transition shadow-sm">Abrir Dossiê</button>
-                            </td>
-                        </tr>
-                    `;
                 });
+            });
+            renderFAQRanking(faqs);
 
-                // Injetar KPIs na Tela
-                const n = sessoesCache.length;
-                document.getElementById('kpi-sessoes').innerText = n;
-                document.getElementById('kpi-conversao').innerText = n > 0 ? ((totalConversoes / n) * 100).toFixed(1) + '%' : '0%';
-                document.getElementById('kpi-tempo').innerText = n > 0 ? Math.round(totalTempo / n) + 's' : '0s';
-                document.getElementById('kpi-scroll').innerText = n > 0 ? Math.round(totalScroll / n) + '%' : '0%';
-                document.getElementById('kpi-bounce').innerText = n > 0 ? Math.round((bounces / n) * 100) + '%' : '0%';
-                document.getElementById('kpi-rage').innerText = totalRage;
-                document.getElementById('kpi-fuga').innerText = totalFugas;
+            // 4. Lista de Visitas
+            renderVisitList(sessions.sort((a, b) => (b.data_entrada?.seconds || 0) - (a.data_entrada?.seconds || 0)));
+            window.allSessions = sessions;
+        }
 
-                document.getElementById('tabela-radar').innerHTML = htmlTabela || '<tr><td colspan="6" class="p-8 text-center text-slate-400 font-sans font-bold">Aguardando as primeiras visitas cartográficas...</td></tr>';
-
-                // ==========================
-                // GRÁFICOS (CHART.JS)
-                // ==========================
-                Chart.defaults.font.family = "'JetBrains Mono', monospace";
-                Chart.defaults.color = '#64748b';
-
-                if(chartOrigemRef) chartOrigemRef.destroy();
-                if(chartDispositivosRef) chartDispositivosRef.destroy();
-                if(chartCidadesRef) chartCidadesRef.destroy();
-
-                // Graf 1: Origem
-                const ctxOrigem = document.getElementById('graficoOrigem').getContext('2d');
-                const origemSorted = Object.entries(contagemOrigem).sort((a,b) => b[1] - a[1]);
-                chartOrigemRef = new Chart(ctxOrigem, {
-                    type: 'bar',
-                    data: { labels: origemSorted.map(i => i[0]), datasets: [{ data: origemSorted.map(i => i[1]), backgroundColor: '#6366f1', borderRadius: 4 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, indexAxis: 'x' }
-                });
-
-                // Graf 2: Cidades (Mapa Horizontal)
-                const ctxCid = document.getElementById('graficoCidades').getContext('2d');
-                const cidSorted = Object.entries(contagemCidades).sort((a,b) => b[1] - a[1]).slice(0,5); // Top 5
-                chartCidadesRef = new Chart(ctxCid, {
-                    type: 'bar',
-                    data: { labels: cidSorted.map(i => i[0]), datasets: [{ data: cidSorted.map(i => i[1]), backgroundColor: '#10b981', borderRadius: 4 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, indexAxis: 'y' }
-                });
-
-                // Graf 3: Dispositivos
-                const ctxDisp = document.getElementById('graficoDispositivos').getContext('2d');
-                chartDispositivosRef = new Chart(ctxDisp, {
-                    type: 'doughnut',
-                    data: { labels: ['Mobile', 'Computador'], datasets: [{ data: [mobile, desktop], backgroundColor: ['#3b82f6', '#cbd5e1'], borderWidth: 0 }] },
-                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%' }
-                });
-
-            } catch(e) {
-                console.error(e);
-                document.getElementById('tabela-radar').innerHTML = `<tr><td colspan="6" class="p-8 text-center text-rose-500 font-bold">Erro Cartográfico: ${e.message}</td></tr>`;
-            } finally {
-                icon.classList.remove('fa-spin');
-            }
-        };
-
-        // LÓGICA DO MODAL (DOSSIÊ BRUTO)
-        window.abrirDossie = (id) => {
-            const sessao = sessoesCache.find(s => s.id === id);
-            if(!sessao) return;
-
-            document.getElementById('det-local').innerText = sessao.localizacao || 'Desconhecido';
-            document.getElementById('det-visitas').innerText = sessao.numeroVisita || '1';
-            document.getElementById('det-sistema').innerText = sessao.sistema || 'N/A';
-            
-            const txtSelo = document.getElementById('det-converteu');
-            if(sessao.converteu) {
-                txtSelo.innerHTML = '<span class="text-indigo-600"><i class="fa-solid fa-crown"></i> LEAD CONVERTIDO</span>';
-            } else {
-                txtSelo.innerHTML = '<span class="text-slate-400">Desistente / Pendente</span>';
-            }
-
-            document.getElementById('det-scroll').innerText = (sessao.profundidadeScroll || 0) + '%';
-            document.getElementById('det-ttfb').innerText = sessao.tempoCarregamento?.ttfb || 'N/A';
-            document.getElementById('det-dom').innerText = sessao.tempoCarregamento?.domReady || 'N/A';
-            document.getElementById('det-full').innerText = sessao.tempoCarregamento?.fullLoad || 'N/A';
-
-            const divCopias = document.getElementById('det-copias');
-            if(Array.isArray(sessao.textosCopiados) && sessao.textosCopiados.length > 0) {
-                divCopias.innerHTML = sessao.textosCopiados.map(t => `<div class="mb-2 border-b border-blue-100 pb-1">"${t}"</div>`).join('');
-            } else { divCopias.innerHTML = '<span class="opacity-50">Nada copiado da área de trabalho.</span>'; }
-
-            const divInputs = document.getElementById('det-inputs');
-            if(sessao.dadosFormulario_Abandonado && typeof sessao.dadosFormulario_Abandonado === 'object' && Object.keys(sessao.dadosFormulario_Abandonado).length > 0) {
-                let html = '';
-                for(const [c, v] of Object.entries(sessao.dadosFormulario_Abandonado)) {
-                    html += `<div class="mb-2"><span class="text-[10px] uppercase block">${c}</span><span class="font-bold text-amber-900">${v}</span></div>`;
+        function updateChart(data) {
+            const ctx = document.getElementById('chartOrigin').getContext('2d');
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data),
+                    datasets: [{
+                        data: Object.values(data),
+                        backgroundColor: ['#3B5B85', '#F29C5A'],
+                        borderRadius: 12,
+                        barThickness: 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
                 }
-                divInputs.innerHTML = html;
-            } else { divInputs.innerHTML = '<span class="opacity-50">Nenhum rasto detetado no teclado.</span>'; }
+            });
+        }
 
-            const tl = document.getElementById('det-timeline');
-            if(Array.isArray(sessao.linhaDoTempo) && sessao.linhaDoTempo.length > 0) {
-                tl.innerHTML = sessao.linhaDoTempo.map(ev => {
-                    let color = 'text-emerald-400';
-                    if(ev.includes('😡')) color = 'text-rose-500 font-bold';
-                    if(ev.includes('🚪')) color = 'text-amber-400 font-bold';
-                    if(ev.includes('🏆') || ev.includes('🚀')) color = 'text-indigo-400 font-black text-sm bg-indigo-900/50 p-1 rounded'; // Destaque na Conversão
-                    return `<li><span class="${color}">></span> ${ev}</li>`;
-                }).join('');
-            } else { tl.innerHTML = '<li>> [Nenhum log gravado]</li>'; }
+        function renderFAQRanking(data) {
+            const container = document.getElementById('faq-ranking');
+            const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            if(sorted.length === 0) {
+                container.innerHTML = `<p class="text-sm text-gray-400 italic">Aguardando interações dos usuários...</p>`;
+                return;
+            }
+            container.innerHTML = sorted.map(([label, val]) => `
+                <div class="flex flex-col gap-1">
+                    <div class="flex justify-between text-sm">
+                        <span class="font-bold text-gray-700">${label.replace('FAQ: ', '')}</span>
+                        <span class="font-black text-brand">${val} cliques</span>
+                    </div>
+                    <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                        <div class="bg-brand h-full" style="width: ${Math.min(val * 10, 100)}%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-            document.getElementById('modal-dossie').classList.remove('hidden');
+        function renderVisitList(data) {
+            const list = document.getElementById('visit-list');
+            list.innerHTML = data.slice(0, 20).map(s => `
+                <div class="p-5 hover:bg-slate-50 cursor-pointer transition-all group border-l-4 border-transparent hover:border-brand" onclick="window.openDossie('${s.id}')">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex flex-col">
+                            <span class="font-bold text-gray-800">${s.referencia_lead === 'Orgânico' ? 'Visita Orgânica' : s.referencia_lead}</span>
+                            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${s.dispositivo || 'Dispositivo'} • ${s.id.substring(5, 12)}</span>
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">${new Date(s.data_entrada?.seconds * 1000).toLocaleTimeString('pt-BR')}</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs text-gray-500">
+                        <span class="flex items-center gap-1">📍 ${s.local?.cidade || 'Brasil'}</span>
+                        <span class="flex items-center gap-1">⏱️ ${s.tempo_segundos || 0}s</span>
+                        <span class="flex items-center gap-1">🖱️ ${s.scroll_max || 0}%</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.openDossie = (id) => {
+            const s = window.allSessions.find(item => item.id === id);
+            const modal = document.getElementById('modal-dossie');
+            const body = document.getElementById('modal-body');
+            document.getElementById('modal-subtitle').innerText = `ID Único: ${s.visitante_id} | Origem: ${s.referencia_lead}`;
+
+            body.innerHTML = `
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-blue-50 p-4 rounded-3xl border border-blue-100">
+                        <p class="text-[10px] font-bold text-brand uppercase mb-1">Nível de Interesse</p>
+                        <p class="text-lg font-black text-gray-800">${s.scroll_max}% da página lida</p>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-3xl border border-orange-100">
+                        <p class="text-[10px] font-bold text-[#F29C5A] uppercase mb-1">Tempo de Foco</p>
+                        <p class="text-lg font-black text-gray-800">${s.tempo_segundos} segundos</p>
+                    </div>
+                </div>
+
+                <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Histórico de Passos no Site
+                </h4>
+                <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scroll">
+                    ${(s.eventos || []).length > 0 
+                        ? s.eventos.map(ev => `
+                            <div class="flex justify-between items-center text-sm p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                                <span class="font-medium text-gray-700">${ev.acao}</span>
+                                <span class="text-[10px] font-bold text-gray-400">${ev.hora}</span>
+                            </div>
+                        `).join('')
+                        : '<p class="text-sm text-gray-400 italic py-4">O visitante apenas navegou sem clicar em elementos rastreáveis.</p>'
+                    }
+                </div>
+
+                <div class="mt-8 flex gap-3">
+                    <a href="https://wa.me/${s.referencia_lead}" target="_blank" class="flex-1 bg-brand text-white text-center py-4 rounded-2xl font-bold hover:shadow-lg transition">
+                        Abordar no WhatsApp
+                    </a>
+                </div>
+            `;
+            modal.classList.remove('hidden');
         };
 
-        window.fecharModal = () => {
-            document.getElementById('modal-dossie').classList.add('hidden');
-        };
+        window.closeModal = () => document.getElementById('modal-dossie').classList.add('hidden');
 
-        carregarDados();
+        // Escuta Realtime do Firebase
+        const q = query(collection(db, 'lp_acessos'));
+        onSnapshot(q, (snapshot) => {
+            const badge = document.getElementById('sync-badge');
+            badge.innerText = "✓ Sincronizado";
+            badge.className = "flex items-center gap-2 text-sm font-bold text-green-600 bg-green-50 px-4 py-2 rounded-full border border-green-100";
+            renderDashboard(snapshot.docs);
+        });
+
     </script>
 </body>
 </html>
