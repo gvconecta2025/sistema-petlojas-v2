@@ -1,317 +1,201 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetLojas Intelligence - Hub de Dados</title>
+    <title>Radar Analytics PRO - PetLojas</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root { --brand: #3B5B85; --coral: #F29C5A; }
-        .bg-brand { background-color: var(--brand); }
-        .text-brand { color: var(--brand); }
-        .card-stat { @apply bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 transition-all hover:shadow-md; }
-        .custom-scroll::-webkit-scrollbar { width: 5px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        /* Switch Master */
-        .switch { position: relative; display: inline-block; width: 52px; height: 28px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e2e8f0; transition: .4s; border-radius: 34px; border: 1px solid #e2e8f0; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        input:checked + .slider { background-color: var(--brand); border-color: var(--brand); }
-        input:checked + .slider:before { transform: translateX(24px); }
+    <style type="text/tailwindcss">
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .font-math { font-family: 'JetBrains Mono', monospace; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen font-sans pb-10">
+<body class="p-6">
+    <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <h1 class="text-2xl font-black text-slate-900 flex items-center gap-3">
+            <i class="fa-solid fa-radar text-rose-500 animate-pulse"></i> Telemetria de Tráfego
+        </h1>
+        <button onclick="carregarDados()" class="bg-slate-900 text-white px-6 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
+            <i class="fa-solid fa-rotate" id="icon-refresh"></i> Atualizar Matriz
+        </button>
+    </div>
 
-    <!-- Header Centralizado -->
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="bg-brand p-2.5 rounded-[1.2rem] text-white shadow-xl shadow-blue-100">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-black text-gray-800 tracking-tighter leading-none">PetLojas <span class="text-brand">INSIGHTS</span></h1>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">Engenharia de Comportamento</p>
-                </div>
-            </div>
-            
-            <!-- CHAVE MESTRA: LIGAR/DESLIGAR MEUS DADOS -->
-            <div class="flex items-center gap-4 bg-slate-50 px-5 py-2.5 rounded-[1.5rem] border border-slate-200 shadow-inner">
-                <div class="flex flex-col">
-                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Meus Dados</span>
-                    <span id="master-status" class="text-[10px] font-bold text-brand uppercase">Incluídos</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="master-toggle" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Volume (n)</span>
+            <span class="text-3xl font-black font-math mt-1" id="kpi-sessoes">0</span>
         </div>
-    </nav>
-
-    <main class="max-w-7xl mx-auto px-6 py-8">
-        
-        <!-- KPIs MESTRES (As 20 métricas resumidas) -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-            <div class="card-stat">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Leads Únicos</p>
-                <h2 class="text-4xl font-black text-brand" id="stat-leads">0</h2>
-            </div>
-            <div class="card-stat">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Permanência Média</p>
-                <h2 class="text-4xl font-black text-gray-800" id="stat-time">0s</h2>
-            </div>
-            <div class="card-stat">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Scroll Médio</p>
-                <h2 class="text-4xl font-black text-gray-800" id="stat-scroll">0%</h2>
-            </div>
-            <div class="card-stat border-2 border-[#F29C5A] bg-orange-50/20">
-                <p class="text-[10px] font-black text-[#F29C5A] uppercase tracking-widest mb-1">Taxa de Intenção</p>
-                <h2 class="text-4xl font-black text-[#F29C5A]" id="stat-conv">0%</h2>
-            </div>
+        <div class="bg-indigo-600 p-5 rounded-2xl text-white shadow-lg flex flex-col">
+            <span class="text-[10px] font-bold text-indigo-200 uppercase">Conversão ($C_{rate}$)</span>
+            <span class="text-3xl font-black font-math mt-1" id="kpi-conversao">0%</span>
         </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Gráfico de Performance -->
-                <div class="bg-white p-8 rounded-[3rem] shadow-sm border border-gray-100">
-                    <h3 class="font-black text-gray-700 text-xs uppercase mb-6 tracking-widest flex items-center gap-2">
-                        <svg class="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                        Origem dos Leads (Canais)
-                    </h3>
-                    <div class="h-[280px]"><canvas id="chartOrigin"></canvas></div>
-                </div>
-
-                <!-- Mapa de Dores -->
-                <div class="bg-white p-8 rounded-[3rem] shadow-sm border border-gray-100">
-                    <h3 class="font-black text-gray-700 text-xs uppercase mb-6 tracking-widest flex items-center gap-2">
-                        <svg class="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Termômetro de Objeções (Cliques no FAQ)
-                    </h3>
-                    <div id="faq-ranking" class="space-y-5"></div>
-                </div>
-            </div>
-
-            <!-- DIRETÓRIO DE LEADS -->
-            <div class="bg-white rounded-[3rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col h-[800px]">
-                <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                    <h3 class="font-black text-gray-800 text-[10px] uppercase tracking-widest">Leads em Tempo Real</h3>
-                    <span id="sync-status" class="bg-amber-400 text-white text-[10px] font-black px-3 py-1 rounded-full animate-pulse">SESSÕES ÚNICAS</span>
-                </div>
-                <div id="leads-list" class="flex-1 overflow-y-auto divide-y divide-gray-50 custom-scroll">
-                    <p class="p-10 text-center text-gray-300 italic text-sm">Sincronizando Leads...</p>
-                </div>
-            </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Tempo Ativo ($\bar{x}$)</span>
+            <span class="text-3xl font-black font-math mt-1" id="kpi-tempo">0s</span>
         </div>
-    </main>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Scroll ($\bar{x}$)</span>
+            <span class="text-3xl font-black font-math mt-1" id="kpi-scroll">0%</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-rose-100 flex flex-col bg-rose-50/20">
+            <span class="text-[10px] font-bold text-rose-400 uppercase">Rage Clicks</span>
+            <span class="text-3xl font-black font-math mt-1 text-rose-700" id="kpi-rage">0</span>
+        </div>
+    </div>
 
-    <!-- MODAL DO DOSSIÊ (O CÉREBRO) -->
-    <div id="modal-dossie" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md hidden z-[100] flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-2xl rounded-[3.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-            <div class="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                <div>
-                    <h2 class="text-3xl font-black text-gray-800 tracking-tighter">Dossiê do Lead</h2>
-                    <p id="modal-lead-id" class="text-[10px] font-bold text-brand uppercase mt-1 tracking-widest"></p>
-                </div>
-                <button id="btn-close" class="p-4 bg-white border border-gray-100 rounded-3xl text-gray-400 hover:text-gray-600 transition shadow-sm active:scale-90"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-64"><canvas id="graficoOrigem"></canvas></div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-64 flex justify-center"><canvas id="graficoDispositivos"></canvas></div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-64"><canvas id="graficoCidades"></canvas></div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-slate-900 text-[10px] text-slate-300 uppercase font-black">
+                <tr>
+                    <th class="p-4">Localização & Timestamp</th>
+                    <th class="p-4">Origem / Campanha</th>
+                    <th class="p-4 text-right">Scroll</th>
+                    <th class="p-4 text-right">Tempo</th>
+                    <th class="p-4 text-center">Status</th>
+                    <th class="p-4 text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-radar" class="text-sm font-math divide-y divide-slate-100"></tbody>
+        </table>
+    </div>
+
+    <div id="modal-dossie" onclick="if(event.target === this) fecharModal()" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-100">
+                <h2 class="text-xl font-black text-slate-900"><i class="fa-solid fa-microchip text-blue-600 mr-2"></i> Dossiê de Telemetria</h2>
+                <button onclick="fecharModal()" class="text-2xl font-bold">&times;</button>
             </div>
-            <div class="p-8 max-h-[65vh] overflow-y-auto custom-scroll" id="modal-body"></div>
+            <div class="flex-1 overflow-y-auto p-6 bg-slate-50 custom-scroll">
+                <div id="detalhes-alvo" class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200">
+                        <h4 class="text-xs font-black mb-2 uppercase text-amber-600">Keylogger (Abandonado)</h4>
+                        <div id="det-inputs" class="text-xs font-math bg-amber-50 p-3 rounded-lg border border-amber-100 min-h-[60px]"></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200">
+                        <h4 class="text-xs font-black mb-2 uppercase text-blue-600">Área de Transferência</h4>
+                        <div id="det-copias" class="text-xs font-math bg-blue-50 p-3 rounded-lg border border-blue-100 min-h-[60px]"></div>
+                    </div>
+                </div>
+                <div class="bg-slate-900 rounded-xl overflow-hidden">
+                    <div class="bg-slate-800 px-4 py-2 text-[10px] text-emerald-400 font-black uppercase">Console de Logs</div>
+                    <ul id="det-timeline" class="p-4 font-math text-[11px] text-emerald-400 space-y-1 h-64 overflow-y-auto custom-scroll"></ul>
+                </div>
+            </div>
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         const firebaseConfig = {
-            apiKey: "AIzaSyAb07mX-XJYbC3gqwstrgbo1sM3QNVi8AE",
-            authDomain: "landing-page-83fd1.firebaseapp.com",
-            projectId: "landing-page-83fd1",
-            storageBucket: "landing-page-83fd1.firebasestorage.app",
-            messagingSenderId: "976746769229",
-            appId: "1:976746769229:web:d5d7ed6cca06fb3bb36504",
-            measurementId: "G-1T273LTG29"
+            apiKey: "AIzaSyBjuvcJvTWw7lMrIwej5lHbIUXe99lJDN4",
+            authDomain: "crmpetshop.firebaseapp.com",
+            projectId: "crmpetshop",
+            storageBucket: "crmpetshop.firebasestorage.app",
+            messagingSenderId: "381013124221",
+            appId: "1:381013124221:web:6a1860b4249c2939b6fd14"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        let rawData = [];
-        let uniqueLeads = [];
-        let originChart = null;
+        let sessoesCache = [];
+        let charts = {};
 
-        // SEU ID PARA O FILTRO MESTRE
-        const myId = localStorage.getItem('ptl_pixel_id_br');
+        window.carregarDados = async () => {
+            document.getElementById('icon-refresh').classList.add('fa-spin');
+            try {
+                const querySnapshot = await getDocs(collection(db, "lp_acessos"));
+                let rawData = [];
+                querySnapshot.forEach(doc => rawData.push({ id: doc.id, ...doc.data() }));
+                sessoesCache = rawData.sort((a, b) => (b.inicioSessao || 0) - (a.inicioSessao || 0));
 
-        // Escutador do Toggle Master
-        document.getElementById('master-toggle').onchange = (e) => {
-            document.getElementById('master-status').innerText = e.target.checked ? "Incluídos" : "Excluídos";
-            render();
+                let metrics = { scroll: 0, tempo: 0, rage: 0, fugas: 0, conv: 0, mobile: 0, desktop: 0 };
+                let counts = { origens: {}, cidades: {} };
+                let html = '';
+
+                sessoesCache.forEach(d => {
+                    metrics.scroll += d.profundidadeScroll || 0;
+                    metrics.tempo += d.tempoTotalSegundos || 0;
+                    metrics.rage += d.rageClicks || 0;
+                    if(d.converteu) metrics.conv++;
+                    
+                    let disp = String(d.dispositivo || '');
+                    if (disp.includes('Telem') || disp.includes('Celul')) metrics.mobile++; else metrics.desktop++;
+                    
+                    let orig = String(d.origem || 'Direto').substring(0, 30);
+                    counts.origens[orig] = (counts.origens[orig] || 0) + 1;
+
+                    let city = String(d.localizacao || 'Desconhecida').split(',')[0];
+                    if(city && city !== "A rastrear...") counts.cidades[city] = (counts.cidades[city] || 0) + 1;
+
+                    let status = d.converteu ? '<span class="text-indigo-600 font-black">CONVERTEU</span>' : '<span class="text-slate-400">Visitou</span>';
+                    html += `<tr class="hover:bg-blue-50">
+                        <td class="p-4"><strong>${city}</strong><br><small class="text-slate-400">${new Date(d.inicioSessao).toLocaleString()}</small></td>
+                        <td class="p-4 text-[10px]">${orig}</td>
+                        <td class="p-4 text-right text-emerald-600 font-bold">${d.profundidadeScroll}%</td>
+                        <td class="p-4 text-right text-blue-600 font-bold">${d.tempoTotalSegundos}s</td>
+                        <td class="p-4 text-center text-[10px]">${status}</td>
+                        <td class="p-4 text-center"><button onclick="abrirDossie('${d.id}')" class="bg-slate-900 text-white px-3 py-1 rounded-lg text-[10px] font-black">LOGS</button></td>
+                    </tr>`;
+                });
+
+                const n = sessoesCache.length || 1;
+                document.getElementById('kpi-sessoes').innerText = sessoesCache.length;
+                document.getElementById('kpi-conversao').innerText = ((metrics.conv / n) * 100).toFixed(1) + '%';
+                document.getElementById('kpi-tempo').innerText = Math.round(metrics.tempo / n) + 's';
+                document.getElementById('kpi-scroll').innerText = Math.round(metrics.scroll / n) + '%';
+                document.getElementById('kpi-rage').innerText = metrics.rage;
+                document.getElementById('tabela-radar').innerHTML = html;
+
+                renderCharts(counts, metrics);
+            } catch(e) { console.error(e); }
+            document.getElementById('icon-refresh').classList.remove('fa-spin');
         };
 
-        function render() {
-            const showMe = document.getElementById('master-toggle').checked;
+        function renderCharts(counts, m) {
+            Chart.defaults.color = '#64748b';
+            const cfg = (type, labels, data, color) => ({
+                type, data: { labels, datasets: [{ data, backgroundColor: color, borderRadius: 5 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: type === 'doughnut' } } }
+            });
+
+            if(charts.origem) charts.origem.destroy();
+            charts.origem = new Chart(document.getElementById('graficoOrigem'), cfg('bar', Object.keys(counts.origens), Object.values(counts.origens), '#6366f1'));
             
-            // 1. Filtragem de Dados do Dono
-            const filtered = rawData.filter(s => showMe ? true : s.visitante_id !== myId);
+            if(charts.disp) charts.disp.destroy();
+            charts.disp = new Chart(document.getElementById('graficoDispositivos'), cfg('doughnut', ['Mobile', 'Desktop'], [m.mobile, m.desktop], ['#3b82f6', '#cbd5e1']));
 
-            // 2. Algoritmo de Agrupamento por ID de Dispositivo
-            const leadsMap = new Map();
-            filtered.forEach(s => {
-                const id = s.visitante_id || 'Anon';
-                if (!leadsMap.has(id)) {
-                    leadsMap.set(id, {
-                        id,
-                        origem: s.referencia_lead || 'Orgânico',
-                        local: s.local || { cidade: 'Governador Valadares' },
-                        dispositivo: s.dispositivo || 'PC',
-                        tempo: s.tempo_segundos || 0,
-                        scroll: s.scroll_max || 0,
-                        eventos: s.eventos || [],
-                        secoes: s.secoes_vistas || [],
-                        data: s.data_entrada,
-                        cliques: (s.eventos || []).length,
-                        views: 1
-                    });
-                } else {
-                    const l = leadsMap.get(id);
-                    l.tempo += (s.tempo_segundos || 0);
-                    l.scroll = Math.max(l.scroll, s.scroll_max || 0);
-                    l.eventos = [...l.eventos, ...(s.eventos || [])];
-                    l.secoes = [...new Set([...l.secoes, ...(s.secoes_vistas || [])])];
-                    l.cliques += (s.eventos || []).length;
-                    l.views++;
-                    if (s.data_entrada?.seconds > l.data?.seconds) l.data = s.data_entrada;
-                }
-            });
-
-            uniqueLeads = Array.from(leadsMap.values()).sort((a,b) => (b.data?.seconds || 0) - (a.data?.seconds || 0));
-
-            // 3. Update KPIs
-            document.getElementById('stat-leads').innerText = uniqueLeads.length;
-            document.getElementById('stat-time').innerText = uniqueLeads.length ? Math.round(uniqueLeads.reduce((a,b)=>a+b.tempo,0)/uniqueLeads.length) + 's' : '0s';
-            document.getElementById('stat-scroll').innerText = uniqueLeads.length ? Math.round(uniqueLeads.reduce((a,b)=>a+b.scroll,0)/uniqueLeads.length) + '%' : '0%';
-            const conversions = uniqueLeads.filter(l => l.eventos.some(e => e.acao.includes('CLIQUE'))).length;
-            document.getElementById('stat-conv').innerText = uniqueLeads.length ? Math.round((conversions/uniqueLeads.length)*100) + '%' : '0%';
-
-            // 4. Renderizar Diretório de Leads
-            const container = document.getElementById('leads-list');
-            if (uniqueLeads.length === 0) {
-                container.innerHTML = `<p class="p-12 text-center text-gray-400 font-medium">Nenhum lead detectado com este filtro.</p>`;
-            } else {
-                container.innerHTML = uniqueLeads.map(l => `
-                    <div class="p-6 hover:bg-slate-50 transition-all border-l-4 ${l.id === myId ? 'border-amber-400 bg-amber-50/20' : 'border-transparent hover:border-brand'}">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="flex-1">
-                                <h4 class="font-black text-gray-800 text-lg tracking-tighter uppercase leading-tight">${l.id === myId ? '👑 VOCÊ (TESTE)' : l.origem}</h4>
-                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1">ID: ${l.id}</p>
-                            </div>
-                            <span class="text-[9px] font-black text-gray-400 bg-white border border-gray-100 px-2 py-1 rounded-lg">
-                                ${l.data ? new Date(l.data.seconds * 1000).toLocaleTimeString('pt-BR') : 'Agora'}
-                            </span>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-2 text-[9px] font-black uppercase text-gray-500 mb-4">
-                            <span class="bg-white border px-2 py-1 rounded">📍 ${l.local.cidade}</span>
-                            <span class="bg-white border px-2 py-1 rounded">📱 ${l.dispositivo}</span>
-                            <span class="bg-brand text-white px-2 py-1 rounded">🔄 ${l.views} VISITAS</span>
-                        </div>
-                        <button class="btn-open-dossie w-full bg-brand text-white py-4 rounded-[1.2rem] font-black text-xs shadow-md hover:brightness-110 active:scale-95 transition-all uppercase tracking-widest" data-id="${l.id}">
-                            Analisar Comportamento
-                        </button>
-                    </div>
-                `).join('');
-            }
-
-            updateOriginChart(uniqueLeads);
-            updateFAQRanking(uniqueLeads);
+            if(charts.cid) charts.cid.destroy();
+            charts.cid = new Chart(document.getElementById('graficoCidades'), cfg('bar', Object.keys(counts.cidades), Object.values(counts.cidades), '#10b981'));
         }
 
-        // DELEGAÇÃO DE EVENTO DE CLIQUE (Solução para o botão não clicável)
-        document.addEventListener('click', (e) => {
-            const btn = e.target.closest('.btn-open-dossie');
-            if (btn) {
-                const leadId = btn.getAttribute('data-id');
-                const lead = uniqueLeads.find(x => x.id === leadId);
-                if (lead) showDossie(lead);
-            }
-        });
-
-        function showDossie(l) {
-            document.getElementById('modal-lead-id').innerText = "ID: " + l.id;
-            const body = document.getElementById('modal-body');
-            body.innerHTML = `
-                <div class="grid grid-cols-2 gap-4 mb-8">
-                    <div class="bg-blue-50 p-6 rounded-[2.5rem] border border-blue-100 text-center">
-                        <p class="text-[10px] font-black text-brand uppercase tracking-widest mb-1">Engajamento</p>
-                        <p class="text-3xl font-black text-gray-800">${l.scroll}%</p>
-                    </div>
-                    <div class="bg-slate-50 p-6 rounded-[2.5rem] border border-gray-100 text-center">
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tempo Total</p>
-                        <p class="text-3xl font-black text-gray-800">${l.tempo}s</p>
-                    </div>
-                </div>
-
-                <h4 class="font-black text-gray-800 mb-3 uppercase text-[10px] tracking-widest opacity-40">Navegação por Seção</h4>
-                <div class="flex flex-wrap gap-2 mb-8">
-                    ${l.secoes.map(s => `<span class="bg-gray-50 text-gray-600 px-3 py-1.5 rounded-full text-[9px] font-black border border-gray-100 uppercase tracking-tighter">${s}</span>`).join('')}
-                </div>
-
-                <h4 class="font-black text-gray-800 mb-3 uppercase text-[10px] tracking-widest opacity-40">Histórico de Cliques (Soma de sessões)</h4>
-                <div class="space-y-2 mb-8">
-                    ${l.eventos.map(e => `
-                        <div class="flex justify-between items-center p-4 bg-slate-50/50 rounded-2xl border border-gray-100 text-sm">
-                            <span class="font-bold text-gray-700">${e.acao}</span>
-                            <span class="text-[10px] font-black text-gray-300 uppercase">${e.hora}</span>
-                        </div>
-                    `).join('')}
-                </div>
-                
-                <a href="https://wa.me/${l.origem.replace(/\D/g,'')}" target="_blank" class="block w-full bg-brand text-white py-5 rounded-[1.5rem] text-center font-black shadow-xl hover:scale-[1.02] transition-all uppercase tracking-[0.2em] text-sm">Chamar Lead no WhatsApp</a>
-            `;
+        window.abrirDossie = (id) => {
+            const s = sessoesCache.find(x => x.id === id);
+            if(!s) return;
+            document.getElementById('detalhes-alvo').innerHTML = `
+                <div class="bg-white p-3 rounded-xl border">Local: <strong>${s.localizacao}</strong></div>
+                <div class="bg-white p-3 rounded-xl border">Frequência: <strong>${s.numeroVisita}</strong></div>
+                <div class="bg-white p-3 rounded-xl border">Sistema: <strong>${s.sistema}</strong></div>
+                <div class="bg-white p-3 rounded-xl border">Scroll: <strong>${s.profundidadeScroll}%</strong></div>`;
+            
+            document.getElementById('det-inputs').innerText = JSON.stringify(s.dadosFormulario_Abandonado || {});
+            document.getElementById('det-copias').innerText = (s.textosCopiados || []).join(' | ');
+            document.getElementById('det-timeline').innerHTML = (s.linhaDoTempo || []).map(l => `<li>> ${l}</li>`).join('');
             document.getElementById('modal-dossie').classList.remove('hidden');
-        }
+        };
 
-        document.getElementById('btn-close').onclick = () => document.getElementById('modal-dossie').classList.add('hidden');
-
-        function updateOriginChart(data) {
-            const ctx = document.getElementById('chartOrigin');
-            const counts = data.reduce((acc, l) => {
-                const k = l.origem === 'Orgânico' ? 'Orgânico' : 'Tráfego Ativo';
-                acc[k] = (acc[k] || 0) + 1;
-                return acc;
-            }, {});
-            if(originChart) originChart.destroy();
-            originChart = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts), backgroundColor: ['#3B5B85', '#F29C5A'], borderRadius: 15, barThickness: 60 }] },
-                options: { maintainAspectRatio: false, plugins: { legend: false }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-            });
-        }
-
-        function updateFAQRanking(data) {
-            const counts = {};
-            data.forEach(l => l.eventos.forEach(e => {
-                if(e.acao.startsWith('FAQ:')) counts[e.acao] = (counts[e.acao] || 0) + 1;
-            }));
-            const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
-            document.getElementById('faq-ranking').innerHTML = sorted.map(([k, v]) => `
-                <div class="flex flex-col gap-2">
-                    <div class="flex justify-between text-[10px] font-black uppercase tracking-widest"><span class="text-gray-500">${k.replace('FAQ: ','')}</span><span class="text-brand">${v} Cliques</span></div>
-                    <div class="w-full bg-gray-100 h-3 rounded-full overflow-hidden"><div class="bg-brand h-full transition-all duration-1000" style="width:${Math.min(v*20, 100)}%"></div></div>
-                </div>
-            `).join('');
-        }
-
-        // Conexão em Tempo Real
-        onSnapshot(query(collection(db, "lp_acessos")), (snap) => {
-            const badge = document.getElementById('sync-status');
-            badge.innerText = "Sincronizado";
-            badge.className = "text-[10px] font-black uppercase tracking-widest text-green-600 bg-green-50 px-4 py-2 rounded-full border border-green-100";
-            rawData = snap.docs.map(d => d.data());
-            render();
-        });
+        window.fecharModal = () => document.getElementById('modal-dossie').classList.add('hidden');
+        carregarDados();
     </script>
 </body>
 </html>
