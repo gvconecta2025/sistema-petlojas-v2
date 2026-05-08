@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetLojas - Monte sua Estrutura</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Estilo personalizado para as checkboxes */
+        .checkbox-custom:checked + div {
+            border-color: #10b981; /* Emerald 500 */
+            background-color: #ecfdf5; /* Emerald 50 */
+        }
+        .checkbox-custom:checked + div .check-icon {
+            display: block;
+        }
+        .checkbox-custom:disabled + div {
+            opacity: 0.8;
+            cursor: not-allowed;
+            background-color: #f3f4f6; /* Gray 100 */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased py-10 px-4 sm:px-6 relative">
+
+    <div class="max-w-3xl mx-auto">
+        <!-- Cabeçalho -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mb-4 shadow-sm">
+                <i data-lucide="paw-print" class="w-8 h-8"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Estrutura Digital PetLojas</h1>
+            <p class="text-gray-600 text-lg">Monte o pacote ideal para expandir as vendas do seu Pet Shop pela cidade.</p>
+        </div>
+
+        <!-- Informações de Formulário -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+                <i data-lucide="user" class="w-5 h-5 mr-2 text-emerald-500"></i> Seus Dados e Prazos
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Responsável</label>
+                    <input type="text" id="nome-responsavel" placeholder="Ex: João Silva" 
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Pet Shop</label>
+                    <input type="text" id="nome-petshop" placeholder="Ex: Cão & Gato Pet Shop" 
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Melhor dia para vencimento</label>
+                    <select id="dia-vencimento" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all bg-white">
+                        <option value="" disabled selected>Selecione o dia</option>
+                        <option value="5">Todo dia 05</option>
+                        <option value="10">Todo dia 10</option>
+                        <option value="15">Todo dia 15</option>
+                        <option value="20">Todo dia 20</option>
+                        <option value="25">Todo dia 25</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Data ideal para início</label>
+                    <input type="date" id="data-inicio" 
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
+                </div>
+            </div>
+        </div>
+
+        <!-- Seleção de Serviços -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+                <i data-lucide="layers" class="w-5 h-5 mr-2 text-emerald-500"></i> Selecione os Serviços
+            </h2>
+            
+            <div class="space-y-4">
+                
+                <!-- Item 1: Plataforma (Obrigatório) -->
+                <label class="relative block cursor-not-allowed">
+                    <input type="checkbox" class="sr-only checkbox-custom service-item" 
+                        data-name="Plataforma PetLojas" data-type="mensal" data-price="99.00" checked disabled>
+                    <div class="border-2 border-emerald-500 bg-emerald-50 rounded-xl p-5 transition-all">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center mb-1">
+                                    <h3 class="font-bold text-gray-900 text-lg">Plataforma PetLojas</h3>
+                                    <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                        Obrigatório
+                                    </span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-2">Sua vitrine online funcionando 24h por dia. Um sistema completo onde seu cliente acessa pelo celular, escolhe os produtos, vê os preços e envia o pedido já formatado com endereço direto para o seu WhatsApp. Sem taxas por venda e com link exclusivo do seu Pet Shop.</p>
+                                <span class="font-bold text-emerald-600">R$ 99,00 <span class="text-sm font-normal text-gray-500">/mês</span></span>
+                            </div>
+                            <div class="ml-4 flex-shrink-0 mt-1">
+                                <div class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
+                                    <i data-lucide="lock" class="w-3.5 h-3.5 text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+
+                <!-- Item 2: Acelerador (Opcional - Pago) -->
+                <label class="relative block cursor-pointer group">
+                    <input type="checkbox" class="sr-only checkbox-custom service-item" 
+                        data-name="Pacote Acelerador de Implantação" data-type="unico" data-price="100.00">
+                    <div class="border-2 border-gray-200 rounded-xl p-5 hover:border-emerald-300 transition-all">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 text-lg mb-1 group-hover:text-emerald-700 transition-colors">Pacote Acelerador de Implantação</h3>
+                                <p class="text-gray-600 text-sm mb-2">Para quem não quer perder tempo configurando tudo do zero! Nossa equipe fará o cadastro expresso dos seus 60 produtos ou serviços principais em até 3 dias úteis. Incluímos as fotos, criamos as descrições atrativas e organizamos tudo em categorias. Você só entrega a lista e nós devolvemos a loja pronta para vender.</p>
+                                <span class="font-bold text-gray-900">R$ 100,00 <span class="text-sm font-normal text-gray-500">Taxa Única</span></span>
+                            </div>
+                            <div class="ml-4 flex-shrink-0 mt-1">
+                                <div class="w-6 h-6 rounded border-2 border-gray-300 flex items-center justify-center check-icon hidden bg-emerald-500 border-emerald-500">
+                                    <i data-lucide="check" class="w-4 h-4 text-white"></i>
+                                </div>
+                                <div class="w-6 h-6 rounded border-2 border-gray-300 check-placeholder group-hover:border-emerald-400"></div>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+
+                <!-- Item 3: Suporte de Cadastro (Opcional) -->
+                <label class="relative block cursor-pointer group">
+                    <input type="checkbox" class="sr-only checkbox-custom service-item" 
+                        data-name="Suporte de Cadastro Regular" data-type="mensal" data-price="50.00">
+                    <div class="border-2 border-gray-200 rounded-xl p-5 hover:border-emerald-300 transition-all">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 text-lg mb-1 group-hover:text-emerald-700 transition-colors">Suporte de Cadastro Regular</h3>
+                                <p class="text-gray-600 text-sm mb-2">Terceirize o trabalho operacional. Todo mês, basta mandar um áudio, foto ou lista no nosso WhatsApp com as alterações de preços ou produtos novos, e nossa equipe faz toda a atualização da sua loja virtual. Mantenha seu app sempre com novidades sem precisar tocar no sistema.</p>
+                                <span class="font-bold text-gray-900">R$ 50,00 <span class="text-sm font-normal text-gray-500">/mês</span></span>
+                            </div>
+                            <div class="ml-4 flex-shrink-0 mt-1">
+                                <div class="w-6 h-6 rounded border-2 border-gray-300 flex items-center justify-center check-icon hidden bg-emerald-500 border-emerald-500">
+                                    <i data-lucide="check" class="w-4 h-4 text-white"></i>
+                                </div>
+                                <div class="w-6 h-6 rounded border-2 border-gray-300 check-placeholder group-hover:border-emerald-400"></div>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+
+                <!-- Item 4: Tráfego Pago (Opcional) -->
+                <label class="relative block cursor-pointer group">
+                    <input type="checkbox" class="sr-only checkbox-custom service-item" 
+                        data-name="Tráfego Pago (Panfletagem Digital)" data-type="mensal" data-price="100.00">
+                    <div class="border-2 border-gray-200 rounded-xl p-5 hover:border-emerald-300 transition-all">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 text-lg mb-1 group-hover:text-emerald-700 transition-colors">Tráfego Pago (Anúncios)</h3>
+                                <p class="text-gray-600 text-sm mb-2">Nós criamos e gerenciamos campanhas profissionais de anúncios no Facebook e Instagram para atrair clientes de novos bairros direto para a sua loja. Entregamos os clientes na porta do seu negócio. <br/><span class="text-xs text-gray-500 italic">*Atenção: O valor de R$ 100 refere-se à nossa mão de obra de gestão da campanha. O orçamento investido nas plataformas de anúncios é definido e pago separadamente por você.*</span></p>
+                                <span class="font-bold text-gray-900">R$ 100,00 <span class="text-sm font-normal text-gray-500">/mês</span></span>
+                            </div>
+                            <div class="ml-4 flex-shrink-0 mt-1">
+                                <div class="w-6 h-6 rounded border-2 border-gray-300 flex items-center justify-center check-icon hidden bg-emerald-500 border-emerald-500">
+                                    <i data-lucide="check" class="w-4 h-4 text-white"></i>
+                                </div>
+                                <div class="w-6 h-6 rounded border-2 border-gray-300 check-placeholder group-hover:border-emerald-400"></div>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+
+                <!-- Item 5: Mentoria (Bônus) -->
+                <label class="relative block cursor-not-allowed">
+                    <input type="checkbox" class="sr-only checkbox-custom service-item" 
+                        data-name="Mentoria em Marketing (Em Vídeo)" data-type="unico" data-price="0.00" checked disabled>
+                    <div class="border-2 border-emerald-500 bg-emerald-50 rounded-xl p-5 transition-all">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center mb-1">
+                                    <h3 class="font-bold text-gray-900 text-lg">Mentoria e Estratégia</h3>
+                                    <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500 text-white shadow-sm">
+                                        Bônus Incluído
+                                    </span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-2">Treinamento completo com vídeos gravados disponibilizados diretamente no nosso app. Aprenda táticas avançadas de vendas online, estratégias para atrair e fidelizar clientes para banho e tosa, e descubra como transformar o WhatsApp do seu Pet Shop em uma poderosa máquina de atração de vendas e clientes.</p>
+                                <div class="flex items-center">
+                                    <span class="line-through text-red-400 text-sm mr-2">De R$ 197,00</span>
+                                    <span class="font-bold text-emerald-600">Por R$ 0,00 <span class="text-sm font-normal text-gray-500">Totalmente Gratuito</span></span>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-shrink-0 mt-1">
+                                <div class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
+                                    <i data-lucide="gift" class="w-3.5 h-3.5 text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+
+            </div>
+        </div>
+
+        <!-- Nova Seção: Resumo Financeiro e PIX -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+             <h2 class="text-xl font-semibold mb-6 text-gray-800 flex items-center border-b pb-3 border-gray-100">
+                <i data-lucide="wallet" class="w-6 h-6 mr-2 text-emerald-500"></i> Resumo do Pedido e Pagamento
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Coluna Esquerda: Resumo dos Valores -->
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Investimento</h3>
+                        
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-600">Mensalidade Selecionada:</span>
+                            <span class="font-medium text-gray-900" id="resumo-mensalidade">R$ 99,00</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-600">Taxa de Setup Padrão:</span>
+                            <div class="text-right">
+                                <span class="line-through text-red-400 text-xs mr-1">R$ 100,00</span>
+                                <span class="font-medium text-emerald-600">Isento</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-gray-600">Serviços Extras (Únicos):</span>
+                            <span class="font-medium text-gray-900" id="resumo-unico">R$ 0,00</span>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-4 border-t border-gray-200">
+                            <span class="text-lg font-bold text-gray-900">Total a Pagar Hoje:</span>
+                            <span class="text-2xl font-bold text-emerald-600" id="resumo-total">R$ 99,00</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-start">
+                        <i data-lucide="clock" class="w-5 h-5 text-amber-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <p class="text-sm text-amber-800">
+                            <strong>Atenção:</strong> Este pagamento tem validade de <strong>4 horas</strong> para garantirmos a sua estrutura e o setup imediato da loja.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Coluna Direita: Dados do PIX -->
+                <div class="bg-emerald-50 p-5 rounded-xl border border-emerald-100">
+                    <h3 class="font-bold text-emerald-800 mb-4 flex items-center">
+                        <i data-lucide="qr-code" class="w-5 h-5 mr-2"></i> Pague via PIX
+                    </h3>
+
+                    <div class="space-y-3 mb-4">
+                        <div>
+                            <span class="block text-xs text-emerald-600 font-semibold mb-1">Chave PIX (E-mail):</span>
+                            <div class="flex">
+                                <input type="text" id="chave-pix" value="pixpetlojas@gmail.com" readonly
+                                    class="w-full bg-white border border-emerald-200 rounded-l-lg px-3 py-2 text-sm text-gray-800 outline-none">
+                                <button onclick="copiarPix()" id="btn-copiar"
+                                    class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-r-lg text-sm font-medium transition-colors flex items-center">
+                                    <i data-lucide="copy" class="w-4 h-4 mr-1"></i> Copiar
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="text-sm bg-white p-3 rounded-lg border border-emerald-100">
+                            <p class="mb-1"><span class="text-gray-500">Nome:</span> <strong class="text-gray-800">Giselle Costa Santiago Magalhães</strong></p>
+                            <p><span class="text-gray-500">Banco:</span> <strong class="text-gray-800">Banco Neon</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-emerald-700">
+                        <p class="font-bold mb-1">Passo a Passo Rápido:</p>
+                        <ol class="list-decimal pl-4 space-y-1">
+                            <li>Abra o app do seu banco.</li>
+                            <li>Selecione PIX e use a chave e-mail acima.</li>
+                            <li>Confira os dados de Giselle (Banco Neon) e confirme o valor total.</li>
+                            <li><strong>Envie o comprovante no WhatsApp logo após finalizar o pedido abaixo.</strong></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botão de Finalização (Barra Flutuante) -->
+        <div class="bg-gray-900 rounded-2xl shadow-xl border border-gray-800 p-6 text-white sticky bottom-4 z-10">
+            <h3 class="text-lg font-semibold text-gray-300 mb-4 border-b border-gray-700 pb-2">Resumo do Pedido</h3>
+            
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-400">Mensalidade Recorrente:</span>
+                <span class="text-xl font-bold text-emerald-400" id="total-mensal-sticky">R$ 99,00</span>
+            </div>
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-gray-400">Total a Pagar Hoje (Mensalidade + Extras):</span>
+                <span class="text-xl font-bold text-white" id="total-hoje-sticky">R$ 99,00</span>
+            </div>
+
+            <!-- Caixa de erro -->
+            <div id="error-msg" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-200 text-sm text-center">
+                Por favor, preencha todos os dados de cadastro e aceite os Termos de Uso.
+            </div>
+
+            <!-- Termos de Uso -->
+            <label class="flex items-start mb-6 cursor-pointer group">
+                <div class="flex items-center h-5 mt-0.5">
+                    <input type="checkbox" id="termos-uso" class="w-5 h-5 text-emerald-500 bg-gray-800 border-gray-600 rounded focus:ring-emerald-500 focus:ring-2 accent-emerald-500">
+                </div>
+                <div class="ml-3 text-sm">
+                    <span class="text-gray-400">Eu li, compreendi e aceito os <button type="button" onclick="abrirModal()" class="text-emerald-400 hover:text-emerald-300 underline transition-colors font-medium">Termos de Uso e Condições</button> da parceria com a PetLojas.</span>
+                </div>
+            </label>
+
+            <button onclick="gerarWhatsApp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-6 rounded-xl text-lg flex justify-center items-center transition-all shadow-lg shadow-emerald-500/30">
+                <i data-lucide="check-circle" class="w-5 h-5 mr-2"></i>
+                Finalizar Pedido via WhatsApp
+            </button>
+            <p class="text-center text-xs text-gray-400 mt-3">Você será redirecionado para o nosso WhatsApp oficial para concluir a ativação.</p>
+        </div>
+
+    </div>
+
+    <!-- Modal dos Termos de Uso -->
+    <div id="modal-termos" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-300">
+            <!-- Cabeçalho Modal -->
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center rounded-t-2xl">
+                <h3 class="text-xl font-bold text-gray-900">Termos e Condições de Uso</h3>
+                <button onclick="fecharModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <!-- Corpo Modal (Com Scroll) -->
+            <div class="px-6 py-4 overflow-y-auto flex-1 text-sm text-gray-700 space-y-4">
+                <p>Este documento rege a parceria comercial e a prestação de serviços entre a <strong>PetLojas</strong> (doravante denominada "CONTRATADA") e o Pet Shop assinante (doravante denominado "CONTRATANTE").</p>
+                <p>Ao marcar a caixa de aceite no momento do cadastro e realizar o pagamento inicial, o CONTRATANTE declara ter lido, compreendido e concordado com todos os termos descritos abaixo.</p>
+                
+                <h4 class="font-bold text-gray-900 text-base mt-4">1. DO OBJETO</h4>
+                <p>1.1. O presente termo tem como objeto o licenciamento do uso da plataforma <strong>PetLojas</strong> (catálogo digital e sistema de direcionamento de pedidos via WhatsApp) e a prestação de serviços agregados de marketing e atualização, conforme o plano escolhido pelo CONTRATANTE no formulário de adesão.</p>
+
+                <h4 class="font-bold text-gray-900 text-base mt-4">2. RESPONSABILIDADES DA CONTRATADA (PETLOJAS)</h4>
+                <p>2.1. <strong>Disponibilidade:</strong> Manter a plataforma do CONTRATANTE no ar e operante 24 horas por dia, 7 dias por semana, ressalvadas paradas para manutenção técnica agendada ou instabilidades de servidores de terceiros.</p>
+                <p>2.2. <strong>Suporte e Atualizações (Se contratado):</strong> Caso o CONTRATANTE assine o "Suporte de Cadastro Regular", a CONTRATADA compromete-se a atualizar os preços e produtos mediante solicitação via WhatsApp em até 48 horas úteis.</p>
+                <p>2.3. <strong>Gestão de Tráfego (Se contratado):</strong> Caso aplicável, a CONTRATADA criará e otimizará campanhas de anúncios. A CONTRATADA <strong>não</strong> garante um número fixo de vendas ou faturamento, visto que o tráfego atrai o público, mas o fechamento da venda depende do atendimento no WhatsApp e dos preços praticados pelo CONTRATANTE.</p>
+                <p>2.4. <strong>Mentoria:</strong> Disponibilizar o acesso aos vídeos de treinamento em marketing enquanto a assinatura estiver ativa.</p>
+
+                <h4 class="font-bold text-gray-900 text-base mt-4">3. RESPONSABILIDADES DO CONTRATANTE (PET SHOP)</h4>
+                <p>3.1. <strong>Envio de Materiais:</strong> Fornecer logotipo, tabela de preços e imagens em tempo hábil para a montagem da plataforma. O atraso no envio isenta a CONTRATADA do cumprimento do prazo inicial de entrega.</p>
+                <p>3.2. <strong>Atendimento ao Cliente:</strong> O CONTRATANTE é o único responsável por receber, responder, processar e entregar os pedidos que chegarem no seu WhatsApp. A PetLojas não atua como intermediária financeira nas vendas aos consumidores finais, nem cobra taxas sobre os pedidos.</p>
+                <p>3.3. <strong>Orçamento de Anúncios:</strong> Caso contrate o serviço de "Tráfego Pago", o CONTRATANTE tem ciência de que a mensalidade da PetLojas cobre apenas a <strong>mão de obra</strong> (gestão). O valor a ser investido nas plataformas (Facebook/Instagram Ads) deverá ser pago diretamente pelo CONTRATANTE nas respectivas plataformas.</p>
+                <p>3.4. <strong>Qualidade dos Produtos:</strong> A PetLojas é isenta de qualquer responsabilidade civil ou criminal por danos causados a animais, problemas nos produtos vendidos, prazos de entrega ou insatisfação dos consumidores finais do Pet Shop.</p>
+
+                <h4 class="font-bold text-gray-900 text-base mt-4">4. VALORES, PAGAMENTOS E INADIMPLÊNCIA</h4>
+                <p>4.1. <strong>Cobrança:</strong> O pagamento dos serviços é pré-pago. O primeiro pagamento ocorre na assinatura e os demais a cada ciclo de 30 dias (mensalidade), no dia de vencimento escolhido no cadastro.</p>
+                <p>4.2. <strong>Atrasos e Suspensão:</strong> Em caso de não pagamento da mensalidade até a data de vencimento, o CONTRATANTE será notificado. Após <strong>5 (cinco) dias corridos</strong> de atraso, o acesso ao aplicativo PetLojas do CONTRATANTE será <strong>suspenso temporariamente</strong> (saindo do ar).</p>
+                <p>4.3. <strong>Reativação:</strong> A plataforma será reativada em até 24 horas úteis após a confirmação do pagamento em atraso.</p>
+
+                <h4 class="font-bold text-gray-900 text-base mt-4">5. VIGÊNCIA E CANCELAMENTO</h4>
+                <p>5.1. <strong>Sem Fidelidade:</strong> O presente termo não possui prazo de fidelidade mínima (salvo condições promocionais específicas acordadas por escrito).</p>
+                <p>5.2. <strong>Cancelamento:</strong> O CONTRATANTE pode solicitar o cancelamento a qualquer momento, bastando avisar via WhatsApp com <strong>15 dias de antecedência</strong> do próximo vencimento. Não haverá multa rescisória, tampouco reembolso de valores de mensalidades já pagas ou taxas de implantação (setup).</p>
+
+                <h4 class="font-bold text-gray-900 text-base mt-4">6. DISPOSIÇÕES GERAIS</h4>
+                <p>6.1. O código-fonte, design, layout e a infraestrutura tecnológica do aplicativo PetLojas são de propriedade intelectual exclusiva da CONTRATADA.</p>
+                <p>6.2. A CONTRATADA reserva-se o direito de usar a marca (logotipo) do CONTRATANTE em seu portfólio de clientes, salvo solicitação contrária em expresso.</p>
+            </div>
+            
+            <!-- Rodapé Modal -->
+            <div class="px-6 py-4 border-t border-gray-200 text-right rounded-b-2xl bg-gray-50">
+                <button onclick="fecharModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                    Entendi e Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inicializa os ícones
+        lucide.createIcons();
+
+        // Elementos do DOM
+        const checkboxes = document.querySelectorAll('.service-item');
+        
+        // Elementos do Resumo Detalhado (Caixa Branca)
+        const displayMensal = document.getElementById('resumo-mensalidade');
+        const displayUnico = document.getElementById('resumo-unico');
+        const displayTotal = document.getElementById('resumo-total');
+        
+        // Elementos do Resumo Flutuante (Caixa Preta Sticky)
+        const displayTotalSticky = document.getElementById('total-hoje-sticky');
+        const displayMensalSticky = document.getElementById('total-mensal-sticky');
+        
+        const errorMsg = document.getElementById('error-msg');
+        
+        // Número do WhatsApp atualizado
+        const NUMERO_WHATSAPP = "5533998192213"; 
+
+        // Função para formatar moeda (Reais - BRL)
+        const formatCurrency = (value) => {
+            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        };
+
+        // Função para copiar chave PIX
+        const copiarPix = () => {
+            const input = document.getElementById('chave-pix');
+            const btn = document.getElementById('btn-copiar');
+            
+            // Seleciona e copia
+            input.select();
+            input.setSelectionRange(0, 99999); // Para mobile
+            navigator.clipboard.writeText(input.value).then(() => {
+                // Feedback visual temporário
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 mr-1"></i> Copiado!';
+                btn.classList.replace('bg-emerald-500', 'bg-emerald-700');
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.classList.replace('bg-emerald-700', 'bg-emerald-500');
+                    lucide.createIcons();
+                }, 2000);
+            });
+        };
+
+        // Variáveis globais para armazenar os totais
+        let totalCalculado = 0;
+
+        // Função para recalcular os totais em tempo real
+        const recalcularTotais = () => {
+            let totalMensal = 0;
+            let totalUnico = 0; // Este é o Acelerador (quando selecionado)
+
+            checkboxes.forEach(chk => {
+                if(chk.checked || chk.disabled) { 
+                    const price = parseFloat(chk.getAttribute('data-price'));
+                    if(chk.getAttribute('data-type') === 'mensal') {
+                        totalMensal += price;
+                    } else if (chk.getAttribute('data-type') === 'unico') {
+                        totalUnico += price;
+                    }
+                }
+            });
+            
+            // O total a pagar hoje reflete a soma da mensalidade + extras únicos contratados (ex: Acelerador)
+            totalCalculado = totalMensal + totalUnico;
+
+            // Atualiza Resumo Detalhado (Caixa Branca)
+            if(displayMensal) displayMensal.textContent = formatCurrency(totalMensal);
+            if(displayUnico) displayUnico.textContent = formatCurrency(totalUnico);
+            if(displayTotal) displayTotal.textContent = formatCurrency(totalCalculado);
+            
+            // Atualiza Resumo da Barra Flutuante (Sticky Preta)
+            if(displayMensalSticky) displayMensalSticky.textContent = formatCurrency(totalMensal);
+            if(displayTotalSticky) displayTotalSticky.textContent = formatCurrency(totalCalculado);
+        };
+
+        // Adiciona evento de clique em todas as caixas de seleção
+        checkboxes.forEach(chk => {
+            chk.addEventListener('change', () => {
+                const checkIcon = chk.parentElement.querySelector('.check-icon');
+                const placeholder = chk.parentElement.querySelector('.check-placeholder');
+                
+                if(!chk.disabled) {
+                    if(chk.checked) {
+                        checkIcon.classList.remove('hidden');
+                        placeholder.classList.add('hidden');
+                    } else {
+                        checkIcon.classList.add('hidden');
+                        placeholder.classList.remove('hidden');
+                    }
+                }
+                
+                recalcularTotais();
+            });
+        });
+
+        // Função para gerar o Link do WhatsApp
+        const gerarWhatsApp = () => {
+            const nome = document.getElementById('nome-responsavel').value.trim();
+            const petshop = document.getElementById('nome-petshop').value.trim();
+            const diaVencimento = document.getElementById('dia-vencimento').value;
+            const dataInicio = document.getElementById('data-inicio').value;
+            const termosAceitos = document.getElementById('termos-uso').checked;
+
+            // Validação de segurança
+            if(!nome || !petshop || !diaVencimento || !dataInicio || !termosAceitos) {
+                errorMsg.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
+            errorMsg.classList.add('hidden');
+            
+            // Formatando a data de início (de yyyy-mm-dd para dd/mm/yyyy)
+            const dataParts = dataInicio.split('-');
+            const dataFormatada = `${dataParts[2]}/${dataParts[1]}/${dataParts[0]}`;
+
+            // Prepara a montagem da mensagem
+            let mensagem = `Olá, equipe PetLojas! 🐾\n`;
+            mensagem += `Meu nome é *${nome}* do *${petshop}*.\n`;
+            mensagem += `Analisei os serviços na página e montei a minha estrutura ideal para começarmos:\n\n`;
+
+            let totalMensal = 0;
+            let totalUnico = 0; // Somará o acelerador
+
+            // Corre os itens para montar a lista
+            checkboxes.forEach(chk => {
+                const nomeServico = chk.getAttribute('data-name');
+                const price = parseFloat(chk.getAttribute('data-price'));
+                const isMensal = chk.getAttribute('data-type') === 'mensal';
+                const formatado = price === 0 ? "Bônus Gratuito" : formatCurrency(price);
+                const tagPreco = price === 0 ? formatado : (isMensal ? `${formatado}/mês` : `${formatado} único`);
+
+                if(chk.checked || chk.disabled) {
+                    mensagem += `✅ ${nomeServico} (${tagPreco})\n`;
+                    if(isMensal) totalMensal += price;
+                    else if (chk.getAttribute('data-type') === 'unico') totalUnico += price;
+                } else {
+                    mensagem += `❌ ${nomeServico}\n`;
+                }
+            });
+
+            mensagem += `\n*Datas Alinhadas:*\n`;
+            mensagem += `📅 Início do Projeto: *${dataFormatada}*\n`;
+            mensagem += `💰 Vencimento Mensal: *Todo dia ${diaVencimento}*\n`;
+            mensagem += `✅ Termos de Uso: *Aceitos*\n`;
+
+            mensagem += `\n*Resumo do Investimento Inicial:*\n`;
+            mensagem += `- Mensalidade Selecionada: *${formatCurrency(totalMensal)}*\n`;
+            mensagem += `- Taxa de Setup Padrão: *Isenta (Economizou R$ 100,00)*\n`;
+            if (totalUnico > 0) {
+                mensagem += `- Serviços Opcionais/Extras (Taxa Única): *${formatCurrency(totalUnico)}*\n`;
+            }
+            mensagem += `- Total a Pagar Hoje: *${formatCurrency(totalCalculado)}*\n\n`;
+            
+            // Mensagem automática obrigando o envio do comprovante
+            mensagem += `Aqui está o meu pedido! O comprovante do PIX no valor de *${formatCurrency(totalCalculado)}* será enviado logo abaixo nesta conversa.`;
+
+            // Codifica a mensagem e cria o Link final
+            const textoCodificado = encodeURIComponent(mensagem);
+            const linkWhatsApp = `https://wa.me/${NUMERO_WHATSAPP}?text=${textoCodificado}`;
+
+            // Abre o WhatsApp
+            window.open(linkWhatsApp, '_blank');
+        };
+
+        // --- Funções do Modal de Termos de Uso ---
+        const modal = document.getElementById('modal-termos');
+        const modalInner = modal.querySelector('div > div');
+
+        const abrirModal = () => {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalInner.classList.remove('scale-95');
+            }, 10);
+        };
+
+        const fecharModal = () => {
+            modal.classList.add('opacity-0');
+            modalInner.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        };
+
+        // Fechar modal clicando fora do conteúdo
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) fecharModal();
+        });
+
+        // Inicializa cálculos base
+        recalcularTotais();
+    </script>
+</body>
+</html>
