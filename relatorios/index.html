@@ -1,179 +1,407 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radar Analytics - PetLojas</title>
+    <title>Radar Analytics PRO - PetLojas</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style type="text/tailwindcss">
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: transparent; }
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700;900&display=swap');
         
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .font-math { font-family: 'JetBrains Mono', monospace; } /* Fonte monoespaçada para dados precisos */
+        
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Estilo para as caixas didáticas */
-        .caixa-didatica { @apply bg-blue-50/50 border border-blue-100 p-4 rounded-xl text-sm text-blue-900 leading-relaxed mt-4; }
+        .caixa-didatica { @apply bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-xl text-sm text-indigo-900 mt-4 shadow-sm; }
     </style>
 </head>
 <body class="p-4 md:p-6 text-slate-800 fade-in">
 
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
         <div>
-            <h1 class="text-2xl font-black text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-satellite-dish text-rose-500"></i> Radar Analytics
+            <h1 class="text-3xl font-black text-slate-900 flex items-center gap-3">
+                <i class="fa-solid fa-radar text-rose-500 animate-pulse"></i> Central de Inteligência e Dados
             </h1>
-            <p class="text-sm text-slate-500 font-medium mt-1">Monitoramento Comportamental e Inteligência de Dados</p>
+            <p class="text-sm text-slate-500 font-medium mt-1">Dados Brutos, Estatísticas e Comportamento Analítico.</p>
         </div>
-        <button onclick="carregarDados()" class="bg-white border border-slate-200 text-slate-600 hover:text-rose-600 hover:border-rose-200 px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all flex items-center gap-2">
-            <i class="fa-solid fa-rotate-right" id="icon-refresh"></i> Atualizar Relatório
+        <button onclick="carregarDados()" class="bg-slate-900 text-white hover:bg-rose-600 px-6 py-3 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center gap-2">
+            <i class="fa-solid fa-rotate" id="icon-refresh"></i> Recalcular Matriz
         </button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total de Sessões</span>
-            <div class="flex items-end justify-between mt-auto">
-                <span class="text-3xl font-black text-slate-800" id="kpi-sessoes">0</span>
-                <i class="fa-solid fa-users text-blue-500 text-2xl opacity-50"></i>
-            </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"><i class="fa-solid fa-users text-blue-500 mr-1"></i> Volume Total (n)</span>
+            <span class="text-4xl font-black text-slate-800 font-math mt-2" id="kpi-sessoes">0</span>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Taxa Média de Leitura</span>
-            <div class="flex items-end justify-between mt-auto">
-                <span class="text-3xl font-black text-slate-800" id="kpi-scroll">0%</span>
-                <i class="fa-solid fa-arrows-up-down text-emerald-500 text-2xl opacity-50"></i>
-            </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" title="Média Aritmética do Tempo Online"><i class="fa-solid fa-clock text-emerald-500 mr-1"></i> Tempo Médio (x̄)</span>
+            <span class="text-4xl font-black text-slate-800 font-math mt-2" id="kpi-tempo">0s</span>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Rage Clicks (Frustração)</span>
-            <div class="flex items-end justify-between mt-auto">
-                <span class="text-3xl font-black text-slate-800" id="kpi-rage">0</span>
-                <i class="fa-solid fa-fire text-rose-500 text-2xl opacity-50"></i>
-            </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" title="Média de Profundidade de Leitura"><i class="fa-solid fa-arrows-up-down text-indigo-500 mr-1"></i> Scroll Médio (x̄)</span>
+            <span class="text-4xl font-black text-slate-800 font-math mt-2" id="kpi-scroll">0%</span>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Tentativas de Fuga</span>
-            <div class="flex items-end justify-between mt-auto">
-                <span class="text-3xl font-black text-slate-800" id="kpi-fuga">0</span>
-                <i class="fa-solid fa-person-running text-amber-500 text-2xl opacity-50"></i>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" title="Sessões com menos de 10 segundos"><i class="fa-solid fa-arrow-right-from-bracket text-amber-500 mr-1"></i> Rejeição (Bounce)</span>
+            <span class="text-4xl font-black text-slate-800 font-math mt-2" id="kpi-bounce">0%</span>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-rose-100 shadow-sm flex flex-col justify-between bg-rose-50/30">
+            <span class="text-[10px] font-bold text-rose-400 uppercase tracking-widest"><i class="fa-solid fa-biohazard text-rose-500 mr-1"></i> Eventos Críticos</span>
+            <div class="mt-2 text-sm font-bold text-rose-900 font-math">
+                <div class="flex justify-between border-b border-rose-200 pb-1 mb-1"><span>Rage Clicks:</span> <span id="kpi-rage">0</span></div>
+                <div class="flex justify-between"><span>Fugas (Exit):</span> <span id="kpi-fuga">0</span></div>
             </div>
         </div>
     </div>
 
     <div class="mb-4 mt-8 flex items-center gap-2 border-b border-slate-200 pb-2">
-        <i class="fa-solid fa-chalkboard-user text-indigo-500 text-xl"></i>
-        <h2 class="text-lg font-black text-slate-800">Inteligência Traduzida (Gráficos Educativos)</h2>
+        <i class="fa-solid fa-chart-pie text-blue-600 text-xl"></i>
+        <h2 class="text-xl font-black text-slate-800">Visualização de Dados</h2>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
-            <h3 class="font-black text-slate-800 mb-1">De Onde Vêm Seus Clientes?</h3>
-            <p class="text-xs text-slate-400 mb-4 font-medium">Canais e redes que estão gerando visitas.</p>
-            
-            <div class="relative h-64 w-full">
-                <canvas id="graficoOrigem"></canvas>
-            </div>
-            
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+            <h3 class="font-black text-slate-800 mb-1">Vetor de Aquisição (Origem)</h3>
+            <div class="relative h-48 w-full mt-2"><canvas id="graficoOrigem"></canvas></div>
             <div class="caixa-didatica">
-                <strong><i class="fa-solid fa-lightbulb text-amber-500"></i> Como analisar:</strong> 
-                Se a barra do "Instagram" for a maior, seu esforço de marketing lá está funcionando. Se a barra "Direto" for a maior, significa que as pessoas já conhecem o seu link e estão digitando ele ou clicando pelo WhatsApp. Onde a barra é alta, é onde você deve investir!
+                <strong><i class="fa-solid fa-square-root-variable"></i> Análise:</strong> Define qual canal (Ex: Instagram vs Orgânico) possui a maior amostragem e conversão de tráfego.
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
-            <h3 class="font-black text-slate-800 mb-1">Como Eles Acessam?</h3>
-            <p class="text-xs text-slate-400 mb-4 font-medium">Aparelhos usados para ver sua página.</p>
-            
-            <div class="relative h-64 w-full flex justify-center">
-                <canvas id="graficoDispositivos"></canvas>
-            </div>
-            
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+            <h3 class="font-black text-slate-800 mb-1">Distribuição de Hardware</h3>
+            <div class="relative h-48 w-full mt-2 flex justify-center"><canvas id="graficoDispositivos"></canvas></div>
             <div class="caixa-didatica">
-                <strong><i class="fa-solid fa-lightbulb text-amber-500"></i> Como analisar:</strong> 
-                No varejo moderno, mais de 80% dos clientes acessam pelo Celular. Se a fatia Azul (Celular) dominar seu gráfico, garanta que sua página tenha botões grandes e fáceis de clicar com o dedão, e que o botão do WhatsApp esteja sempre visível!
+                <strong><i class="fa-solid fa-square-root-variable"></i> Análise:</strong> Se a interseção for > 80% Mobile, a interface tátil (botões grandes) dita a regra do jogo.
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col">
-            <h3 class="font-black text-slate-800 mb-1">Funil de Leitura (Mapa de Atenção)</h3>
-            <p class="text-xs text-slate-400 mb-4 font-medium">Quais partes da sua página os clientes realmente estão lendo.</p>
-            
-            <div class="relative h-72 w-full">
-                <canvas id="graficoSecoes"></canvas>
-            </div>
-            
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+            <h3 class="font-black text-slate-800 mb-1">Densidade de Leitura (Seções)</h3>
+            <div class="relative h-48 w-full mt-2"><canvas id="graficoSecoes"></canvas></div>
             <div class="caixa-didatica">
-                <strong><i class="fa-solid fa-lightbulb text-amber-500"></i> Como analisar:</strong> 
-                A primeira barra (Topo da Página) sempre será a maior. Mas observe a barra de "Planos e Preços". Se houver uma queda brusca (ex: 100 pessoas viram o Topo, mas só 10 chegaram nos Preços), significa que o seu texto no meio da página está chato e as pessoas estão desistindo antes de ver a oferta. Nesse caso, encurte a página!
+                <strong><i class="fa-solid fa-square-root-variable"></i> Análise:</strong> Um gráfico decrescente normal é esperado. Quedas abruptas (derivada negativa alta) indicam atrito no texto.
             </div>
         </div>
     </div>
 
     <div class="mb-4 mt-8 flex items-center gap-2 border-b border-slate-200 pb-2">
-        <i class="fa-solid fa-list-ul text-slate-500 text-xl"></i>
-        <h2 class="text-lg font-black text-slate-800">Dossiês Individuais (Tráfego Recente)</h2>
+        <i class="fa-solid fa-table text-emerald-600 text-xl"></i>
+        <h2 class="text-xl font-black text-slate-800">Matriz de Dados Brutos (Logs)</h2>
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-10">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50 text-[10px] text-slate-500 uppercase tracking-widest border-b border-slate-200">
-                        <th class="p-4 font-black">Data / Hora</th>
-                        <th class="p-4 font-black">Dispositivo</th>
-                        <th class="p-4 font-black">Origem</th>
-                        <th class="p-4 font-black">Tempo Online</th>
-                        <th class="p-4 font-black text-center">Ações</th>
+                    <tr class="bg-slate-900 text-[10px] text-slate-300 uppercase tracking-widest border-b border-slate-800">
+                        <th class="p-4 font-black">Timestamp (Início)</th>
+                        <th class="p-4 font-black">Identificador Único</th>
+                        <th class="p-4 font-black">Origem / OS</th>
+                        <th class="p-4 font-black text-right">Scroll Max</th>
+                        <th class="p-4 font-black text-right">Tempo (Δt)</th>
+                        <th class="p-4 font-black text-center">Ação Analítica</th>
                     </tr>
                 </thead>
-                <tbody id="tabela-radar" class="text-sm divide-y divide-slate-100">
-                    <tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium">A analisar frequências...</td></tr>
+                <tbody id="tabela-radar" class="text-sm divide-y divide-slate-100 font-math">
+                    <tr><td colspan="6" class="p-8 text-center text-slate-400 font-bold">Compilando matriz de dados...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div id="modal-dossie" onclick="if(event.target === this) fecharModal()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 cursor-pointer">
-        <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transform transition-transform cursor-auto">
+    <div id="modal-dossie" onclick="if(event.target === this) fecharModal()" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col shadow-2xl">
             
-            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
-                <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-user-secret text-rose-500"></i> Ficha Completa do Visitante
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-100 shrink-0">
+                <h2 class="text-xl font-black text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-microchip text-blue-600"></i> Dossiê de Telemetria
                 </h2>
-                <button onclick="fecharModal()" class="w-8 h-8 rounded-full bg-slate-200 text-slate-500 hover:bg-rose-100 hover:text-rose-600 transition flex items-center justify-center">
-                    <i class="fa-solid fa-xmark"></i>
+                <button onclick="fecharModal()" class="w-10 h-10 rounded-xl bg-white text-slate-600 hover:bg-rose-50 hover:text-rose-600 border border-slate-200 transition flex items-center justify-center font-bold text-xl shadow-sm">
+                    &times;
                 </button>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-6 bg-white custom-scroll">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <div class="md:col-span-2 space-y-4">
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Identidade do Dispositivo</p>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div><span class="text-[10px] text-slate-500 block">ID da Máquina</span><span class="font-mono text-xs font-bold text-slate-800" id="det-sessao">---</span></div>
-                                <div><span class="text-[10px] text-slate-500 block">Vezes que Visitou</span><span class="text-sm font-black text-blue-600" id="det-visitas">---</span></div>
-                                <div><span class="text-[10px] text-slate-500 block">Sistema Utilizado</span><span class="text-sm font-bold text-slate-700" id="det-sistema">---</span></div>
-                                <div><span class="text-[10px] text-slate-500 block">Leu até qual % da página?</span><span class="text-sm font-black text-emerald-600" id="det-scroll">---</span></div>
-                            </div>
+            <div class="flex-1 overflow-y-auto p-6 bg-slate-50 custom-scroll">
+                
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase block mb-1">ID da Sessão</span>
+                            <span class="text-xs font-black text-slate-800 font-math break-all" id="det-sessao"></span>
                         </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase block mb-1">Frequência</span>
+                            <span class="text-lg font-black text-indigo-600 font-math" id="det-visitas"></span>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase block mb-1">Sistema/OS</span>
+                            <span class="text-xs font-bold text-slate-700 font-math" id="det-sistema"></span>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase block mb-1">Scroll Atingido</span>
+                            <span class="text-lg font-black text-emerald-600 font-math" id="det-scroll"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 text-slate-300 shadow-inner flex flex-col justify-center">
+                        <span class="text-[9px] font-bold text-slate-500 uppercase block mb-2"><i class="fa-solid fa-stopwatch text-rose-500"></i> Velocidade (ms)</span>
+                        <div class="text-[10px] font-math space-y-1">
+                            <div class="flex justify-between"><span>TTFB:</span><span class="text-emerald-400 font-bold" id="det-ttfb"></span></div>
+                            <div class="flex justify-between"><span>DOM:</span><span class="text-blue-400 font-bold" id="det-dom"></span></div>
+                            <div class="flex justify-between border-t border-slate-700 pt-1 mt-1 text-white font-bold"><span>Total:</span><span id="det-full"></span></div>
+                        </div>
+                    </div>
+                </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
-                                <p class="text-xs font-bold text-amber-700 uppercase tracking-widest mb-2"><i class="fa-solid fa-keyboard"></i> Formulário Abandonado</p>
-                                <p class="text-[10px] text-amber-600 mb-1 leading-tight">Dados digitados, mas que ele não enviou:</p>
-                                <div id="det-inputs" class="text-xs font-mono text-amber-900 bg-amber-100/50 p-2 rounded max-h-24 overflow-y-auto custom-scroll">Nenhum dado digitado.</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white border-l-4 border-amber-500 p-4 rounded-xl shadow-sm">
+                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-3"><i class="fa-solid fa-keyboard text-amber-500 mr-1"></i> Keylogger (Dados Abandonados)</h4>
+                        <div id="det-inputs" class="text-xs font-math text-slate-600 max-h-32 overflow-y-auto custom-scroll p-3 bg-amber-50 rounded-lg border border-amber-100">
                             </div>
-                            <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl">
-                                <p class="text-xs font
+                    </div>
+                    
+                    <div class="bg-white border-l-4 border-blue-500 p-4 rounded-xl shadow-sm">
+                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-3"><i class="fa-solid fa-copy text-blue-500 mr-1"></i> Área de Transferência (Copiar)</h4>
+                        <div id="det-copias" class="text-xs font-math text-slate-600 max-h-32 overflow-y-auto custom-scroll p-3 bg-blue-50 rounded-lg border border-blue-100">
+                            </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div class="bg-slate-800 px-4 py-3">
+                        <h4 class="text-xs font-black text-white uppercase tracking-widest"><i class="fa-solid fa-terminal text-emerald-400 mr-2"></i> Console de Eventos Sequenciais</h4>
+                    </div>
+                    <div class="p-4 bg-slate-900 h-80 overflow-y-auto custom-scroll">
+                        <ul id="det-timeline" class="space-y-1 font-math text-[11px] text-emerald-400">
+                            </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjuvcJvTWw7lMrIwej5lHbIUXe99lJDN4",
+            authDomain: "crmpetshop.firebaseapp.com",
+            projectId: "crmpetshop",
+            storageBucket: "crmpetshop.firebasestorage.app",
+            messagingSenderId: "381013124221",
+            appId: "1:381013124221:web:6a1860b4249c2939b6fd14"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let sessoesCache = [];
+        let chartOrigemRef = null;
+        let chartDispositivosRef = null;
+        let chartSecoesRef = null;
+
+        window.carregarDados = async () => {
+            const icon = document.getElementById('icon-refresh');
+            icon.classList.add('fa-spin');
+            
+            try {
+                // Removemos o orderBy no Firebase para não esconder dados mal formatados!
+                // Puxamos tudo e o JS (Matemática Pura) faz a ordenação.
+                const querySnapshot = await getDocs(collection(db, "lp_acessos"));
+                
+                let rawData = [];
+                querySnapshot.forEach((doc) => {
+                    let data = doc.data();
+                    // Tratamento seguro de variáveis (Evitando Undefined)
+                    data.inicioSessao = data.inicioSessao || 0;
+                    data.profundidadeScroll = data.profundidadeScroll || 0;
+                    data.tempoTotalSegundos = data.tempoTotalSegundos || 0;
+                    data.rageClicks = data.rageClicks || 0;
+                    data.tentativaFuga = data.tentativaFuga || false;
+                    data.dispositivo = String(data.dispositivo || 'Desktop');
+                    data.origem = String(data.origem || 'Direto');
+                    
+                    rawData.push({ id: doc.id, ...data });
+                });
+
+                // Ordenação Matemática (Decrescente pelo Timestamp Inicial)
+                sessoesCache = rawData.sort((a, b) => b.inicioSessao - a.inicioSessao);
+
+                // --- ESTATÍSTICAS (O Mapa Numérico) ---
+                let totalScroll = 0;
+                let totalTempo = 0;
+                let totalRage = 0;
+                let totalFugas = 0;
+                let bounces = 0; // Visitas < 10 segundos
+                let mobile = 0; let desktop = 0;
+                
+                const contagemOrigem = {};
+                const contagemSecoes = {};
+                let htmlTabela = '';
+
+                sessoesCache.forEach(data => {
+                    totalScroll += data.profundidadeScroll;
+                    totalTempo += data.tempoTotalSegundos;
+                    totalRage += data.rageClicks;
+                    if(data.tentativaFuga) totalFugas++;
+                    if(data.tempoTotalSegundos < 10) bounces++;
+
+                    // Dispositivos
+                    if (data.dispositivo.includes('Telemóvel') || data.dispositivo.includes('Celular') || data.dispositivo.includes('Mobile')) { mobile++; } else { desktop++; }
+                    
+                    // Origem
+                    let orig = data.origem.toLowerCase();
+                    if(orig.includes('instagram')) orig = 'Instagram';
+                    else if(orig.includes('facebook')) orig = 'Facebook';
+                    else if(orig.includes('google')) orig = 'Google';
+                    else if(orig.length > 25) orig = 'Link Externo';
+                    else orig = 'Acesso Direto';
+                    contagemOrigem[orig] = (contagemOrigem[orig] || 0) + 1;
+
+                    // Secoes Seguras
+                    if(Array.isArray(data.secoesVistas)) {
+                        data.secoesVistas.forEach(sec => {
+                            let sName = String(sec).substring(0,20); // Limita tamanho
+                            contagemSecoes[sName] = (contagemSecoes[sName] || 0) + 1;
+                        });
+                    }
+
+                    // Tabela Raw
+                    const dataObj = new Date(data.inicioSessao);
+                    const dh = data.inicioSessao > 0 ? (dataObj.toLocaleDateString('pt-BR') + ' ' + dataObj.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})) : 'N/A';
+                    
+                    let deviceIcon = data.dispositivo.includes('Telem') || data.dispositivo.includes('Celul') ? '<i class="fa-solid fa-mobile-screen"></i>' : '<i class="fa-solid fa-desktop"></i>';
+
+                    htmlTabela += `
+                        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                            <td class="p-4 text-slate-500">${dh}</td>
+                            <td class="p-4 text-[10px] text-slate-400 break-all max-w-[150px]">${data.visitorId || data.sessionId || doc.id}</td>
+                            <td class="p-4 font-bold text-slate-700">${deviceIcon} ${orig}</td>
+                            <td class="p-4 text-emerald-600 font-bold text-right">${data.profundidadeScroll}%</td>
+                            <td class="p-4 text-blue-600 font-bold text-right">${data.tempoTotalSegundos}s</td>
+                            <td class="p-4 text-center">
+                                <button onclick="abrirDossie('${data.id}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white px-4 py-2 rounded font-sans text-xs font-bold transition">Abrir Logs</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                // Atualizar KPIs Topo (Matemática)
+                const n = sessoesCache.length;
+                document.getElementById('kpi-sessoes').innerText = n;
+                document.getElementById('kpi-tempo').innerText = n > 0 ? Math.round(totalTempo / n) + 's' : '0s';
+                document.getElementById('kpi-scroll').innerText = n > 0 ? Math.round(totalScroll / n) + '%' : '0%';
+                document.getElementById('kpi-bounce').innerText = n > 0 ? Math.round((bounces / n) * 100) + '%' : '0%';
+                document.getElementById('kpi-rage').innerText = totalRage;
+                document.getElementById('kpi-fuga').innerText = totalFugas;
+
+                document.getElementById('tabela-radar').innerHTML = htmlTabela || '<tr><td colspan="6" class="p-8 text-center text-slate-400">Nenhuma base de dados encontrada.</td></tr>';
+
+                // ==========================
+                // GRÁFICOS (CHART.JS)
+                // ==========================
+                Chart.defaults.font.family = "'Inter', sans-serif";
+                Chart.defaults.color = '#64748b';
+
+                if(chartOrigemRef) chartOrigemRef.destroy();
+                if(chartDispositivosRef) chartDispositivosRef.destroy();
+                if(chartSecoesRef) chartSecoesRef.destroy();
+
+                // Graf 1: Origem
+                const ctxOrigem = document.getElementById('graficoOrigem').getContext('2d');
+                chartOrigemRef = new Chart(ctxOrigem, {
+                    type: 'bar',
+                    data: { labels: Object.keys(contagemOrigem), datasets: [{ data: Object.values(contagemOrigem), backgroundColor: '#6366f1', borderRadius: 4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+
+                // Graf 2: Dispositivos
+                const ctxDisp = document.getElementById('graficoDispositivos').getContext('2d');
+                chartDispositivosRef = new Chart(ctxDisp, {
+                    type: 'doughnut',
+                    data: { labels: ['Celular', 'Computador'], datasets: [{ data: [mobile, desktop], backgroundColor: ['#3b82f6', '#cbd5e1'], borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+                });
+
+                // Graf 3: Secoes (Horizontal)
+                const secSorted = Object.entries(contagemSecoes).sort((a,b) => b[1] - a[1]);
+                const ctxSecoes = document.getElementById('graficoSecoes').getContext('2d');
+                chartSecoesRef = new Chart(ctxSecoes, {
+                    type: 'bar',
+                    data: { labels: secSorted.map(i => i[0]), datasets: [{ data: secSorted.map(i => i[1]), backgroundColor: '#10b981', borderRadius: 4 }] },
+                    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+
+            } catch(e) {
+                console.error(e);
+                document.getElementById('tabela-radar').innerHTML = `<tr><td colspan="6" class="p-8 text-center text-rose-500 font-bold">Erro de Execução (Console): ${e.message}</td></tr>`;
+            } finally {
+                icon.classList.remove('fa-spin');
+            }
+        };
+
+        // LÓGICA DO MODAL (DOSSIÊ BRUTO)
+        window.abrirDossie = (id) => {
+            const sessao = sessoesCache.find(s => s.id === id);
+            if(!sessao) return;
+
+            document.getElementById('det-sessao').innerText = sessao.sessionId || sessao.id;
+            document.getElementById('det-visitas').innerText = sessao.numeroVisita || '1';
+            document.getElementById('det-sistema').innerText = sessao.sistema || 'N/A';
+            document.getElementById('det-scroll').innerText = (sessao.profundidadeScroll || 0) + '%';
+
+            document.getElementById('det-ttfb').innerText = sessao.tempoCarregamento?.ttfb || 'N/A';
+            document.getElementById('det-dom').innerText = sessao.tempoCarregamento?.domReady || 'N/A';
+            document.getElementById('det-full').innerText = sessao.tempoCarregamento?.fullLoad || 'N/A';
+
+            // Tratamento Seguro Arrays/Objetos
+            const divCopias = document.getElementById('det-copias');
+            if(Array.isArray(sessao.textosCopiados) && sessao.textosCopiados.length > 0) {
+                divCopias.innerHTML = sessao.textosCopiados.map(t => `<div class="mb-2 border-b border-blue-100 pb-1">"${t}"</div>`).join('');
+            } else { divCopias.innerHTML = '<span class="opacity-50">Nada copiado.</span>'; }
+
+            const divInputs = document.getElementById('det-inputs');
+            if(sessao.dadosFormulario_Abandonado && typeof sessao.dadosFormulario_Abandonado === 'object' && Object.keys(sessao.dadosFormulario_Abandonado).length > 0) {
+                let html = '';
+                for(const [c, v] of Object.entries(sessao.dadosFormulario_Abandonado)) {
+                    html += `<div class="mb-2"><span class="text-[10px] uppercase block">${c}</span><span class="font-bold text-amber-900">${v}</span></div>`;
+                }
+                divInputs.innerHTML = html;
+            } else { divInputs.innerHTML = '<span class="opacity-50">Sem dados parciais.</span>'; }
+
+            const tl = document.getElementById('det-timeline');
+            if(Array.isArray(sessao.linhaDoTempo) && sessao.linhaDoTempo.length > 0) {
+                tl.innerHTML = sessao.linhaDoTempo.map(ev => {
+                    let color = 'text-emerald-400';
+                    if(ev.includes('😡')) color = 'text-rose-500 font-bold';
+                    if(ev.includes('🚪')) color = 'text-amber-400 font-bold';
+                    return `<li><span class="${color}">></span> ${ev}</li>`;
+                }).join('');
+            } else { tl.innerHTML = '<li>> [Nenhum log gravado]</li>'; }
+
+            document.getElementById('modal-dossie').classList.remove('hidden');
+        };
+
+        window.fecharModal = () => {
+            document.getElementById('modal-dossie').classList.add('hidden');
+        };
+
+        carregarDados();
+    </script>
+</body>
+</html>
