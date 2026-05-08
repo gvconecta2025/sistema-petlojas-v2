@@ -37,7 +37,7 @@
                 <!-- BOTAO LIMPAR DADOS -->
                 <button onclick="limparDadosTeste()" class="flex items-center gap-2 px-4 py-2 rounded-full border border-red-200 text-red-500 hover:bg-red-50 text-xs font-bold transition-all duration-300">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    LIMPAR TESTES
+                    LIMPAR TUDO
                 </button>
 
                 <!-- BOTÃO MODO MESTRE (Invisibilidade) -->
@@ -64,12 +64,12 @@
             <div class="card-stat">
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Visitantes Únicos</p>
                 <h2 class="text-3xl font-black text-brand" id="stat-visitors">0</h2>
-                <p class="text-[10px] text-green-500 font-bold mt-1">↑ Tempo Real</p>
+                <p class="text-[10px] text-green-500 font-bold mt-1">↑ Dispositivos Distintos</p>
             </div>
             <div class="card-stat">
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Tempo Médio</p>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Tempo Total Médio</p>
                 <h2 class="text-3xl font-black text-gray-800" id="stat-time">0s</h2>
-                <p class="text-[10px] text-gray-400 font-medium mt-1">Por sessão ativa</p>
+                <p class="text-[10px] text-gray-400 font-medium mt-1">Por visitante único</p>
             </div>
             <div class="card-stat">
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Scroll Médio</p>
@@ -95,7 +95,7 @@
                             <svg class="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                             Origem dos Leads
                         </h3>
-                        <span class="text-xs text-gray-400 font-medium">Últimos 30 dias</span>
+                        <span class="text-xs text-gray-400 font-medium">Classificado por Visitante</span>
                     </div>
                     <div class="h-[250px] relative">
                         <canvas id="chartOrigin"></canvas>
@@ -118,8 +118,8 @@
             <!-- Lista Lateral: Visitas Recentes -->
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-fit">
                 <div class="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-                    <h3 class="font-bold text-gray-800">Visitas em Tempo Real</h3>
-                    <span class="bg-brand text-white text-[10px] font-black px-2 py-1 rounded-md">LIVE</span>
+                    <h3 class="font-bold text-gray-800">Diretório de Leads</h3>
+                    <span class="bg-brand text-white text-[10px] font-black px-2 py-1 rounded-md">ÚNICOS</span>
                 </div>
                 <div id="visit-list" class="max-h-[800px] overflow-y-auto divide-y divide-gray-50 hide-scrollbar">
                     <!-- Gerado via JS -->
@@ -139,7 +139,7 @@
                 </div>
                 <div class="flex gap-2">
                     <button onclick="apagarEsteDossie()" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-100 transition">
-                        Excluir Registro
+                        Excluir Lead
                     </button>
                     <button onclick="closeModal()" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 hover:bg-gray-50 transition">
                         <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -178,10 +178,8 @@
             updateMasterUI();
             
             if (!current) {
-                console.log("🛡️ Master Ativado: Você está invisível para os rastreios.");
                 alert("Modo Mestre ATIVADO neste navegador.\nAcesse a Landing Page e seus dados não serão mais captados.");
             } else {
-                console.log("🌐 Modo Público: Seus acessos voltarão a ser gravados.");
                 alert("Modo Público ATIVADO.\nSeus próximos acessos à Landing Page serão gravados.");
             }
         };
@@ -203,7 +201,7 @@
 
         // FUNÇÕES PARA LIMPEZA DE DADOS
         window.limparDadosTeste = async () => {
-            if(confirm("ATENÇÃO: Isto vai apagar TODOS os registros de acessos do Firebase.\n\nComo a página ainda não foi divulgada, você pode limpar seus testes. Deseja continuar?")) {
+            if(confirm("ATENÇÃO: Isto vai apagar TODOS os registros do Firebase.\nDeseja continuar?")) {
                 if(!window.allSessions || window.allSessions.length === 0) {
                     alert("O banco de dados já está vazio.");
                     return;
@@ -214,20 +212,22 @@
                     try {
                         await deleteDoc(doc(db, "lp_acessos", session.id));
                         apagados++;
-                    } catch (e) {
-                        console.error("Erro ao apagar doc", e);
-                    }
+                    } catch (e) {}
                 }
-                alert(`Limpeza concluída! ${apagados} registros de teste foram apagados.`);
+                alert(`Limpeza concluída! ${apagados} sessões apagadas.`);
             }
         };
 
-        window.currentDossierId = null;
+        window.currentVisitorId = null;
         window.apagarEsteDossie = async () => {
-             if(confirm("Deseja excluir definitivamente este registro de acesso?")) {
-                 if(window.currentDossierId) {
+             if(confirm("Deseja excluir TODO o histórico de acessos deste visitante específico?")) {
+                 if(window.currentVisitorId) {
+                     const visitor = window.groupedVisitors.find(v => v.visitante_id === window.currentVisitorId);
                      try {
-                         await deleteDoc(doc(db, "lp_acessos", window.currentDossierId));
+                         // Apaga TODAS as sessões (reloads) vinculadas a este visitante
+                         for(const sId of visitor.ids_sessoes) {
+                             await deleteDoc(doc(db, "lp_acessos", sId));
+                         }
                          closeModal();
                      } catch(e) {
                          alert("Erro ao excluir.");
@@ -240,30 +240,74 @@
 
         function renderDashboard(docs) {
             const sessions = docs.map(d => ({ id: d.id, ...d.data() }));
+            window.allSessions = sessions; // Guardamos o bruto para o botão Limpar Tudo
             
-            // 1. Cálculos de KPIs
-            const totalVisitors = new Set(sessions.map(s => s.visitante_id)).size;
-            document.getElementById('stat-visitors').innerText = totalVisitors;
+            // 🧠 O NOVO CÉREBRO: Agrupando sessões por Visitante Único
+            const visitorsMap = new Map();
+            
+            sessions.forEach(s => {
+                const vId = s.visitante_id || 'Desconhecido';
+                if (!visitorsMap.has(vId)) {
+                    // Primeiro acesso deste visitante
+                    visitorsMap.set(vId, { 
+                        visitante_id: vId,
+                        referencia_lead: s.referencia_lead || 'Orgânico',
+                        local: s.local || { cidade: 'Brasil' },
+                        dispositivo: s.dispositivo || 'Aparelho',
+                        data_entrada: s.data_entrada,
+                        scroll_max: s.scroll_max || 0,
+                        tempo_segundos: s.tempo_segundos || 0,
+                        eventos: s.eventos || [],
+                        total_sessoes: 1,
+                        ids_sessoes: [s.id]
+                    });
+                } else {
+                    // Já existe, vamos fundir/somar os dados
+                    const v = visitorsMap.get(vId);
+                    v.total_sessoes += 1;
+                    v.tempo_segundos += (s.tempo_segundos || 0); // Soma o tempo de todas as visitas
+                    v.scroll_max = Math.max(v.scroll_max, s.scroll_max || 0); // Pega o maior scroll atingido
+                    v.eventos = [...v.eventos, ...(s.eventos || [])]; // Junta todos os cliques
+                    v.ids_sessoes.push(s.id); // Guarda a sessão para exclusão futura
+                    
+                    // Mantém a data do acesso mais recente
+                    if(s.data_entrada && v.data_entrada) {
+                        if(s.data_entrada.seconds > v.data_entrada.seconds) {
+                            v.data_entrada = s.data_entrada;
+                        }
+                    }
+                    
+                    // Se em alguma sessão ele deixou de ser orgânico, atualiza a origem
+                    if(s.referencia_lead && s.referencia_lead !== 'Orgânico') {
+                        v.referencia_lead = s.referencia_lead;
+                    }
+                }
+            });
 
-            const sessionsWithTime = sessions.filter(s => s.tempo_segundos > 0);
-            const avgTime = sessionsWithTime.length > 0 
-                ? Math.round(sessionsWithTime.reduce((a, b) => a + b.tempo_segundos, 0) / sessionsWithTime.length) 
+            const uniqueVisitors = Array.from(visitorsMap.values());
+            window.groupedVisitors = uniqueVisitors; // Guarda agrupado para a interface
+
+            // 1. Cálculos de KPIs baseados nos ÚNICOS
+            document.getElementById('stat-visitors').innerText = uniqueVisitors.length;
+
+            const avgTime = uniqueVisitors.length > 0 
+                ? Math.round(uniqueVisitors.reduce((a, b) => a + b.tempo_segundos, 0) / uniqueVisitors.length) 
                 : 0;
             document.getElementById('stat-time').innerText = avgTime + 's';
 
-            const avgScroll = sessions.length > 0 
-                ? Math.round(sessions.reduce((a, b) => a + (b.scroll_max || 0), 0) / sessions.length) 
+            const avgScroll = uniqueVisitors.length > 0 
+                ? Math.round(uniqueVisitors.reduce((a, b) => a + b.scroll_max, 0) / uniqueVisitors.length) 
                 : 0;
             document.getElementById('stat-scroll').innerText = avgScroll + '%';
 
-            // Taxa de Conversão (cliques em botões de WhatsApp / total de sessões)
-            const conversionEvents = sessions.filter(s => (s.eventos || []).some(e => e.acao.includes('CLIQUE: Assinar') || e.acao.includes('CLIQUE: Falar')));
-            const conversionRate = sessions.length > 0 ? ((conversionEvents.length / sessions.length) * 100).toFixed(1) : 0;
+            // Taxa de Conversão 
+            const conversionEvents = uniqueVisitors.filter(v => v.eventos.some(e => e.acao.includes('CLIQUE: Assinar') || e.acao.includes('CLIQUE: Falar')));
+            const conversionRate = uniqueVisitors.length > 0 ? ((conversionEvents.length / uniqueVisitors.length) * 100).toFixed(1) : 0;
             document.getElementById('stat-conversion').innerText = conversionRate + '%';
 
             // 2. Gráfico de Origem
-            const originData = sessions.reduce((acc, s) => {
-                const type = s.referencia_lead === 'Orgânico' ? 'Orgânico' : 'Ativo (WA)';
+            const originData = uniqueVisitors.reduce((acc, v) => {
+                const type = v.referencia_lead === 'Orgânico' ? 'Orgânico' : 'Ativo (WA)';
                 acc[type] = (acc[type] || 0) + 1;
                 return acc;
             }, {});
@@ -271,8 +315,8 @@
 
             // 3. Ranking FAQ
             const faqs = {};
-            sessions.forEach(s => {
-                (s.eventos || []).forEach(e => {
+            uniqueVisitors.forEach(v => {
+                v.eventos.forEach(e => {
                     if(e.acao.startsWith('FAQ:')) {
                         faqs[e.acao] = (faqs[e.acao] || 0) + 1;
                     }
@@ -280,9 +324,8 @@
             });
             renderFAQRanking(faqs);
 
-            // 4. Lista de Visitas
-            renderVisitList(sessions.sort((a, b) => (b.data_entrada?.seconds || 0) - (a.data_entrada?.seconds || 0)));
-            window.allSessions = sessions;
+            // 4. Lista de Visitas (Ordenada pela data do último acesso)
+            renderVisitList(uniqueVisitors.sort((a, b) => (b.data_entrada?.seconds || 0) - (a.data_entrada?.seconds || 0)));
         }
 
         function updateChart(data) {
@@ -331,64 +374,71 @@
         function renderVisitList(data) {
             const list = document.getElementById('visit-list');
             if(data.length === 0) {
-                list.innerHTML = `<div class="p-8 text-center text-gray-400">Nenhum acesso registrado ainda.</div>`;
+                list.innerHTML = `<div class="p-8 text-center text-gray-400">Nenhum lead detectado ainda.</div>`;
                 return;
             }
-            list.innerHTML = data.slice(0, 20).map(s => `
-                <div class="p-5 hover:bg-slate-50 cursor-pointer transition-all group border-l-4 border-transparent hover:border-brand" onclick="window.openDossie('${s.id}')">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="flex flex-col">
-                            <span class="font-bold text-gray-800">${s.referencia_lead === 'Orgânico' ? 'Visita Orgânica' : s.referencia_lead}</span>
-                            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${s.dispositivo || 'Dispositivo'} • ${s.id.substring(5, 12)}</span>
+            list.innerHTML = data.map(v => `
+                <div class="p-6 hover:bg-slate-50 transition-all border-l-4 border-transparent hover:border-brand flex flex-col md:flex-row justify-between md:items-center gap-4">
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="font-bold text-gray-800 text-lg">${v.referencia_lead === 'Orgânico' ? 'Curioso Anônimo' : v.referencia_lead}</span>
+                            <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">${v.data_entrada ? new Date(v.data_entrada.seconds * 1000).toLocaleString('pt-BR') : 'Agora'}</span>
                         </div>
-                        <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">${s.data_entrada ? new Date(s.data_entrada.seconds * 1000).toLocaleTimeString('pt-BR') : 'Agora'}</span>
+                        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                            <span class="flex items-center gap-1 font-bold text-brand bg-blue-50 px-2 py-1 rounded">🔄 ${v.total_sessoes} views</span>
+                            <span class="flex items-center gap-1">📍 ${v.local?.cidade || 'Brasil'}</span>
+                            <span class="flex items-center gap-1">📱 ${v.dispositivo}</span>
+                            <span class="flex items-center gap-1">⏱️ ${v.tempo_segundos}s total</span>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-3 text-xs text-gray-500">
-                        <span class="flex items-center gap-1">📍 ${s.local?.cidade || 'Brasil'}</span>
-                        <span class="flex items-center gap-1">⏱️ ${s.tempo_segundos || 0}s</span>
-                        <span class="flex items-center gap-1">🖱️ ${s.scroll_max || 0}%</span>
-                    </div>
+                    
+                    <!-- NOVO BOTÃO DE AÇÃO CLARO E CLICÁVEL -->
+                    <button onclick="window.openDossie('${v.visitante_id}')" class="bg-brand text-white px-5 py-3 rounded-xl text-sm font-bold shadow-md hover:bg-brand-dark transition-all whitespace-nowrap">
+                        Abrir Dossiê
+                    </button>
                 </div>
             `).join('');
         }
 
-        window.openDossie = (id) => {
-            window.currentDossierId = id;
-            const s = window.allSessions.find(item => item.id === id);
+        window.openDossie = (vId) => {
+            window.currentVisitorId = vId;
+            const v = window.groupedVisitors.find(item => item.visitante_id === vId);
             const modal = document.getElementById('modal-dossie');
             const body = document.getElementById('modal-body');
-            document.getElementById('modal-subtitle').innerText = `ID Único: ${s.visitante_id} | Origem: ${s.referencia_lead}`;
+            document.getElementById('modal-subtitle').innerText = `ID Único: ${v.visitante_id} | Origem: ${v.referencia_lead}`;
 
             body.innerHTML = `
                 <div class="grid grid-cols-2 gap-4 mb-8">
                     <div class="bg-blue-50 p-4 rounded-3xl border border-blue-100">
-                        <p class="text-[10px] font-bold text-brand uppercase mb-1">Nível de Interesse</p>
-                        <p class="text-lg font-black text-gray-800">${s.scroll_max}% da página lida</p>
+                        <p class="text-[10px] font-bold text-brand uppercase mb-1">Engajamento Total</p>
+                        <p class="text-lg font-black text-gray-800">${v.scroll_max}% da página lida</p>
+                        <p class="text-xs text-gray-500 mt-1">Em ${v.total_sessoes} acessos</p>
                     </div>
                     <div class="bg-orange-50 p-4 rounded-3xl border border-orange-100">
                         <p class="text-[10px] font-bold text-[#F29C5A] uppercase mb-1">Tempo de Foco</p>
-                        <p class="text-lg font-black text-gray-800">${s.tempo_segundos} segundos</p>
+                        <p class="text-lg font-black text-gray-800">${v.tempo_segundos} segundos</p>
+                        <p class="text-xs text-gray-500 mt-1">Acumulado</p>
                     </div>
                 </div>
 
                 <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
                     <svg class="w-5 h-5 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Histórico de Passos no Site
+                    Histórico de Interações (Soma de todos os acessos)
                 </h4>
-                <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scroll">
-                    ${(s.eventos || []).length > 0 
-                        ? s.eventos.map(ev => `
+                <div class="space-y-3 max-h-[250px] overflow-y-auto pr-2 custom-scroll">
+                    ${(v.eventos || []).length > 0 
+                        ? v.eventos.map(ev => `
                             <div class="flex justify-between items-center text-sm p-3 bg-gray-50 rounded-2xl border border-gray-100">
                                 <span class="font-medium text-gray-700">${ev.acao}</span>
                                 <span class="text-[10px] font-bold text-gray-400">${ev.hora}</span>
                             </div>
                         `).join('')
-                        : '<p class="text-sm text-gray-400 italic py-4">O visitante apenas navegou sem clicar em elementos rastreáveis.</p>'
+                        : '<p class="text-sm text-gray-400 italic py-4">O visitante apenas navegou sem clicar em botões ou FAQ.</p>'
                     }
                 </div>
 
                 <div class="mt-8 flex gap-3">
-                    <a href="https://wa.me/${s.referencia_lead}" target="_blank" class="flex-1 bg-brand text-white text-center py-4 rounded-2xl font-bold hover:shadow-lg transition">
+                    <a href="https://wa.me/${v.referencia_lead}" target="_blank" class="flex-1 bg-brand text-white text-center py-4 rounded-2xl font-bold hover:shadow-lg transition">
                         Abordar no WhatsApp
                     </a>
                 </div>
@@ -398,7 +448,7 @@
 
         window.closeModal = () => {
             document.getElementById('modal-dossie').classList.add('hidden');
-            window.currentDossierId = null;
+            window.currentVisitorId = null;
         }
 
         // Escuta Realtime do Firebase
