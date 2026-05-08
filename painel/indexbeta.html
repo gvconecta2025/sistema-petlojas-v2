@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS - Revista Semanal PetLojas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="p-4 md:p-8 text-slate-800">
+
+    <div class="max-w-4xl mx-auto">
+        
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+            <div>
+                <h1 class="text-3xl font-black text-slate-900 flex items-center gap-3">
+                    <i class="fa-solid fa-pen-nib text-purple-600"></i> Estúdio de Criação
+                </h1>
+                <p class="text-sm text-slate-500 font-medium mt-1">Publique artigos na Revista Semanal para atrair lojistas.</p>
+            </div>
+            <button onclick="document.getElementById('form-artigo').reset()" class="bg-slate-100 text-slate-600 hover:bg-slate-200 px-5 py-2.5 rounded-xl text-sm font-bold transition flex items-center gap-2">
+                <i class="fa-solid fa-eraser"></i> Limpar Rascunho
+            </button>
+        </header>
+
+        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl">
+            <form id="form-artigo" onsubmit="publicarArtigo(event)" class="space-y-6">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Público-Alvo (Categoria)</label>
+                        <select id="art-categoria" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="varejo">🛍️ Donos de Pet Shop (Varejo)</option>
+                            <option value="clinica">🩺 Clínicas Veterinárias</option>
+                            <option value="hotel">🏨 Hotelzinho & Creche</option>
+                            <option value="adestrador">🐕 Adestradores</option>
+                            <option value="banho">✂️ Banho e Tosa</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Link da Imagem de Capa</label>
+                        <input type="url" id="art-imagem" required placeholder="https://exemplo.com/imagem.jpg" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Título do Artigo (Chamativo)</label>
+                    <input type="text" id="art-titulo" required placeholder="Ex: Como aumentar o lucro do Banho e Tosa em 30%..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-lg font-black text-slate-900 outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Resumo (Linha Fina)</label>
+                    <textarea id="art-resumo" required placeholder="Um breve parágrafo para gerar curiosidade..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-purple-500 h-20 resize-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 flex justify-between">
+                        <span>Conteúdo Completo (Texto)</span>
+                        <span class="text-[10px] text-purple-500"><i class="fa-solid fa-code"></i> Aceita HTML básico (<b>, <i>, <br>)</span>
+                    </label>
+                    <textarea id="art-conteudo" required placeholder="Escreva o seu artigo de ouro aqui..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-purple-500 h-64"></textarea>
+                </div>
+
+                <button type="submit" id="btn-publicar" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-purple-200 transition-all transform active:scale-95 flex items-center justify-center gap-2 text-lg">
+                    <i class="fa-solid fa-rocket"></i> PUBLICAR NA REVISTA ONLINE
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjuvcJvTWw7lMrIwej5lHbIUXe99lJDN4",
+            authDomain: "crmpetshop.firebaseapp.com",
+            projectId: "crmpetshop",
+            storageBucket: "crmpetshop.firebasestorage.app",
+            messagingSenderId: "381013124221",
+            appId: "1:381013124221:web:6a1860b4249c2939b6fd14"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.publicarArtigo = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-publicar');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> A PUBLICAR...';
+            btn.disabled = true;
+
+            const artigo = {
+                categoria: document.getElementById('art-categoria').value,
+                imagem: document.getElementById('art-imagem').value,
+                titulo: document.getElementById('art-titulo').value,
+                resumo: document.getElementById('art-resumo').value,
+                conteudo: document.getElementById('art-conteudo').value,
+                data_publicacao: serverTimestamp(),
+                status: 'ativo'
+            };
+
+            try {
+                await addDoc(collection(db, "revista_artigos"), artigo);
+                alert("Artigo publicado com sucesso! Já está ao vivo na Revista.");
+                document.getElementById('form-artigo').reset();
+            } catch(erro) {
+                console.error(erro);
+                alert("Erro ao publicar. Verifique o console.");
+            } finally {
+                btn.innerHTML = '<i class="fa-solid fa-rocket"></i> PUBLICAR NA REVISTA ONLINE';
+                btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
