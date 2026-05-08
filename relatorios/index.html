@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,36 +7,39 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style type="text/tailwindcss">
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: transparent; }
         
-        /* Scrollbar customizada para listas longas */
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Estilo para as caixas didáticas */
+        .caixa-didatica { @apply bg-blue-50/50 border border-blue-100 p-4 rounded-xl text-sm text-blue-900 leading-relaxed mt-4; }
     </style>
 </head>
 <body class="p-4 md:p-6 text-slate-800 fade-in">
 
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
             <h1 class="text-2xl font-black text-slate-900 flex items-center gap-2">
                 <i class="fa-solid fa-satellite-dish text-rose-500"></i> Radar Analytics
             </h1>
-            <p class="text-sm text-slate-500 font-medium mt-1">Monitorização Comportamental da Landing Page</p>
+            <p class="text-sm text-slate-500 font-medium mt-1">Monitoramento Comportamental e Inteligência de Dados</p>
         </div>
-        <button onclick="carregarDados()" class="bg-white border border-slate-200 text-slate-600 hover:text-rose-600 hover:border-rose-200 px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all flex items-center gap-2">
-            <i class="fa-solid fa-rotate-right" id="icon-refresh"></i> Atualizar Radar
+        <button onclick="carregarDados()" class="bg-white border border-slate-200 text-slate-600 hover:text-rose-600 hover:border-rose-200 px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all flex items-center gap-2">
+            <i class="fa-solid fa-rotate-right" id="icon-refresh"></i> Atualizar Relatório
         </button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total de Sessões</span>
             <div class="flex items-end justify-between mt-auto">
@@ -45,7 +48,7 @@
             </div>
         </div>
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Taxa Média de Scroll</span>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Taxa Média de Leitura</span>
             <div class="flex items-end justify-between mt-auto">
                 <span class="text-3xl font-black text-slate-800" id="kpi-scroll">0%</span>
                 <i class="fa-solid fa-arrows-up-down text-emerald-500 text-2xl opacity-50"></i>
@@ -67,14 +70,66 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-            <h3 class="font-bold text-slate-700"><i class="fa-solid fa-list-ul text-slate-400 mr-2"></i> Tráfego Recente Capturado</h3>
+    <div class="mb-4 mt-8 flex items-center gap-2 border-b border-slate-200 pb-2">
+        <i class="fa-solid fa-chalkboard-user text-indigo-500 text-xl"></i>
+        <h2 class="text-lg font-black text-slate-800">Inteligência Traduzida (Gráficos Educativos)</h2>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
+            <h3 class="font-black text-slate-800 mb-1">De Onde Vêm Seus Clientes?</h3>
+            <p class="text-xs text-slate-400 mb-4 font-medium">Canais e redes que estão gerando visitas.</p>
+            
+            <div class="relative h-64 w-full">
+                <canvas id="graficoOrigem"></canvas>
+            </div>
+            
+            <div class="caixa-didatica">
+                <strong><i class="fa-solid fa-lightbulb text-amber-500"></i> Como analisar:</strong> 
+                Se a barra do "Instagram" for a maior, seu esforço de marketing lá está funcionando. Se a barra "Direto" for a maior, significa que as pessoas já conhecem o seu link e estão digitando ele ou clicando pelo WhatsApp. Onde a barra é alta, é onde você deve investir!
+            </div>
         </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
+            <h3 class="font-black text-slate-800 mb-1">Como Eles Acessam?</h3>
+            <p class="text-xs text-slate-400 mb-4 font-medium">Aparelhos usados para ver sua página.</p>
+            
+            <div class="relative h-64 w-full flex justify-center">
+                <canvas id="graficoDispositivos"></canvas>
+            </div>
+            
+            <div class="caixa-didatica">
+                <strong><i class="fa-solid fa-lightbulb text-amber-500"></i> Como analisar:</strong> 
+                No varejo moderno, mais de 80% dos clientes acessam pelo Celular. Se a fatia Azul (Celular) dominar seu gráfico, garanta que sua página tenha botões grandes e fáceis de clicar com o dedão, e que o botão do WhatsApp esteja sempre visível!
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col">
+            <h3 class="font-black text-slate-800 mb-1">Funil de Leitura (Mapa de Atenção)</h3>
+            <p class="text-xs text-slate-400 mb-4 font-medium">Quais partes da sua página os clientes realmente estão lendo.</p>
+            
+            <div class="relative h-72 w-full">
+                <canvas id="graficoSecoes"></canvas>
+            </div>
+            
+            <div class="caixa-didatica">
+                <strong><i class="fa-solid fa-lightbulb text-amber-500"></i> Como analisar:</strong> 
+                A primeira barra (Topo da Página) sempre será a maior. Mas observe a barra de "Planos e Preços". Se houver uma queda brusca (ex: 100 pessoas viram o Topo, mas só 10 chegaram nos Preços), significa que o seu texto no meio da página está chato e as pessoas estão desistindo antes de ver a oferta. Nesse caso, encurte a página!
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4 mt-8 flex items-center gap-2 border-b border-slate-200 pb-2">
+        <i class="fa-solid fa-list-ul text-slate-500 text-xl"></i>
+        <h2 class="text-lg font-black text-slate-800">Dossiês Individuais (Tráfego Recente)</h2>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-10">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-white text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                    <tr class="bg-slate-50 text-[10px] text-slate-500 uppercase tracking-widest border-b border-slate-200">
                         <th class="p-4 font-black">Data / Hora</th>
                         <th class="p-4 font-black">Dispositivo</th>
                         <th class="p-4 font-black">Origem</th>
@@ -82,7 +137,7 @@
                         <th class="p-4 font-black text-center">Ações</th>
                     </tr>
                 </thead>
-                <tbody id="tabela-radar" class="text-sm divide-y divide-slate-50">
+                <tbody id="tabela-radar" class="text-sm divide-y divide-slate-100">
                     <tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium">A analisar frequências...</td></tr>
                 </tbody>
             </table>
@@ -94,7 +149,7 @@
             
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
                 <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-user-secret text-rose-500"></i> Dossiê do Visitante
+                    <i class="fa-solid fa-user-secret text-rose-500"></i> Ficha Completa do Visitante
                 </h2>
                 <button onclick="fecharModal()" class="w-8 h-8 rounded-full bg-slate-200 text-slate-500 hover:bg-rose-100 hover:text-rose-600 transition flex items-center justify-center">
                     <i class="fa-solid fa-xmark"></i>
@@ -102,207 +157,23 @@
             </div>
 
             <div class="flex-1 overflow-y-auto p-6 bg-white custom-scroll">
-                
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <div class="md:col-span-2 space-y-4">
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Identidade do Dispositivo</p>
                             <div class="grid grid-cols-2 gap-4">
-                                <div><span class="text-[10px] text-slate-500 block">ID Sessão</span><span class="font-mono text-xs font-bold text-slate-800" id="det-sessao">---</span></div>
-                                <div><span class="text-[10px] text-slate-500 block">Nº de Visitas</span><span class="text-sm font-black text-blue-600" id="det-visitas">---</span></div>
-                                <div><span class="text-[10px] text-slate-500 block">Sistema</span><span class="text-sm font-bold text-slate-700" id="det-sistema">---</span></div>
-                                <div><span class="text-[10px] text-slate-500 block">Scroll Máximo</span><span class="text-sm font-black text-emerald-600" id="det-scroll">---</span></div>
+                                <div><span class="text-[10px] text-slate-500 block">ID da Máquina</span><span class="font-mono text-xs font-bold text-slate-800" id="det-sessao">---</span></div>
+                                <div><span class="text-[10px] text-slate-500 block">Vezes que Visitou</span><span class="text-sm font-black text-blue-600" id="det-visitas">---</span></div>
+                                <div><span class="text-[10px] text-slate-500 block">Sistema Utilizado</span><span class="text-sm font-bold text-slate-700" id="det-sistema">---</span></div>
+                                <div><span class="text-[10px] text-slate-500 block">Leu até qual % da página?</span><span class="text-sm font-black text-emerald-600" id="det-scroll">---</span></div>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
-                                <p class="text-xs font-bold text-amber-700 uppercase tracking-widest mb-2"><i class="fa-solid fa-keyboard"></i> Digitação Abandonada</p>
+                                <p class="text-xs font-bold text-amber-700 uppercase tracking-widest mb-2"><i class="fa-solid fa-keyboard"></i> Formulário Abandonado</p>
+                                <p class="text-[10px] text-amber-600 mb-1 leading-tight">Dados digitados, mas que ele não enviou:</p>
                                 <div id="det-inputs" class="text-xs font-mono text-amber-900 bg-amber-100/50 p-2 rounded max-h-24 overflow-y-auto custom-scroll">Nenhum dado digitado.</div>
                             </div>
                             <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl">
-                                <p class="text-xs font-bold text-blue-700 uppercase tracking-widest mb-2"><i class="fa-solid fa-copy"></i> Textos Copiados</p>
-                                <ul id="det-copias" class="text-xs text-blue-900 space-y-1 max-h-24 overflow-y-auto custom-scroll list-disc pl-4"><li>Nada copiado.</li></ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-900 text-slate-300 p-4 rounded-xl border border-slate-800 shadow-inner">
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4"><i class="fa-solid fa-gauge-high text-rose-500"></i> Performance (Load)</p>
-                        <div class="space-y-3 text-xs font-mono">
-                            <div>
-                                <span class="block text-slate-500">Servidor (TTFB):</span>
-                                <span class="font-bold text-emerald-400" id="det-ttfb">--</span>
-                            </div>
-                            <div>
-                                <span class="block text-slate-500">Pronto a Ler (DOM):</span>
-                                <span class="font-bold text-blue-400" id="det-dom">--</span>
-                            </div>
-                            <div class="pt-2 border-t border-slate-700">
-                                <span class="block text-slate-500 font-sans text-[10px] uppercase">Carregamento Total:</span>
-                                <span class="text-lg font-black text-white" id="det-full">--</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 class="text-sm font-black text-slate-800 mb-4 border-b border-slate-100 pb-2"><i class="fa-solid fa-film text-indigo-500 mr-2"></i> O Filme da Visita (Linha do Tempo)</h3>
-                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 h-64 overflow-y-auto custom-scroll">
-                        <ul id="det-timeline" class="space-y-3 font-mono text-xs text-slate-600">
-                            </ul>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBjuvcJvTWw7lMrIwej5lHbIUXe99lJDN4",
-            authDomain: "crmpetshop.firebaseapp.com",
-            projectId: "crmpetshop",
-            storageBucket: "crmpetshop.firebasestorage.app",
-            messagingSenderId: "381013124221",
-            appId: "1:381013124221:web:6a1860b4249c2939b6fd14"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        let sessoesCache = [];
-
-        window.carregarDados = async () => {
-            const icon = document.getElementById('icon-refresh');
-            icon.classList.add('fa-spin');
-            
-            try {
-                // Puxa as métricas ordenadas pelas mais recentes
-                const q = query(collection(db, "lp_acessos"), orderBy("ultimoUpdate", "desc"));
-                const querySnapshot = await getDocs(q);
-                
-                sessoesCache = [];
-                let totalScroll = 0;
-                let totalRage = 0;
-                let totalFugas = 0;
-                let htmlTabela = '';
-
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    sessoesCache.push({ id: doc.id, ...data });
-
-                    // Agregando KPIs
-                    totalScroll += data.profundidadeScroll || 0;
-                    totalRage += data.rageClicks || 0;
-                    if(data.tentativaFuga) totalFugas++;
-
-                    // Formatar Tempo e Data
-                    const inicio = data.inicioSessao ? new Date(data.inicioSessao) : new Date();
-                    const dataFormatada = inicio.toLocaleDateString('pt-PT') + ' ' + inicio.toLocaleTimeString('pt-PT', {hour:'2-digit', minute:'2-digit'});
-                    
-                    const tempoSegundos = data.tempoTotalSegundos || 0;
-                    const tempoVisual = tempoSegundos > 60 
-                        ? `${Math.floor(tempoSegundos/60)}m ${tempoSegundos%60}s` 
-                        : `${tempoSegundos}s`;
-
-                    let iconeDevice = data.dispositivo === 'Telemóvel' ? '<i class="fa-solid fa-mobile-screen text-slate-400"></i>' : '<i class="fa-solid fa-desktop text-slate-400"></i>';
-
-                    htmlTabela += `
-                        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                            <td class="p-4 text-xs font-bold text-slate-500">${dataFormatada}</td>
-                            <td class="p-4 text-xs font-bold text-slate-700">${iconeDevice} ${data.dispositivo || 'Desconhecido'}</td>
-                            <td class="p-4 text-[10px] font-mono text-slate-500 truncate max-w-[150px]">${data.origem || 'Direto'}</td>
-                            <td class="p-4 text-xs font-bold text-blue-600">${tempoVisual}</td>
-                            <td class="p-4 text-center">
-                                <button onclick="abrirDossie('${doc.id}')" class="bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm">
-                                    Ver Dossiê
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                // Atualizar KPIs
-                const qtdSessoes = sessoesCache.length;
-                document.getElementById('kpi-sessoes').innerText = qtdSessoes;
-                document.getElementById('kpi-scroll').innerText = qtdSessoes > 0 ? Math.round(totalScroll / qtdSessoes) + '%' : '0%';
-                document.getElementById('kpi-rage').innerText = totalRage;
-                document.getElementById('kpi-fuga').innerText = totalFugas;
-
-                document.getElementById('tabela-radar').innerHTML = htmlTabela || '<tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium">Nenhum alvo no radar ainda.</td></tr>';
-
-            } catch(e) {
-                console.error(e);
-                document.getElementById('tabela-radar').innerHTML = `<tr><td colspan="5" class="p-8 text-center text-red-500 font-bold">Erro de conexão com a base de dados.</td></tr>`;
-            } finally {
-                icon.classList.remove('fa-spin');
-            }
-        };
-
-        // LÓGICA DO MODAL (DOSSIÊ)
-        window.abrirDossie = (id) => {
-            const sessao = sessoesCache.find(s => s.id === id);
-            if(!sessao) return;
-
-            // Preenche Informações
-            document.getElementById('det-sessao').innerText = sessao.sessionId || '---';
-            document.getElementById('det-visitas').innerText = sessao.numeroVisita || '1';
-            document.getElementById('det-sistema').innerText = sessao.sistema || '---';
-            document.getElementById('det-scroll').innerText = (sessao.profundidadeScroll || 0) + '%';
-
-            // Performance
-            document.getElementById('det-ttfb').innerText = sessao.tempoCarregamento?.ttfb || '---';
-            document.getElementById('det-dom').innerText = sessao.tempoCarregamento?.domReady || '---';
-            document.getElementById('det-full').innerText = sessao.tempoCarregamento?.fullLoad || '---';
-
-            // Textos Copiados
-            const listCopias = document.getElementById('det-copias');
-            if(sessao.textosCopiados && sessao.textosCopiados.length > 0) {
-                listCopias.innerHTML = sessao.textosCopiados.map(txt => `<li>"${txt}"</li>`).join('');
-            } else {
-                listCopias.innerHTML = '<li class="text-slate-400">Nada copiado.</li>';
-            }
-
-            // Keylogger Formulário
-            const divInputs = document.getElementById('det-inputs');
-            if(sessao.dadosFormulario_Abandonado && Object.keys(sessao.dadosFormulario_Abandonado).length > 0) {
-                let htmlInputs = '';
-                for(const [campo, valor] of Object.entries(sessao.dadosFormulario_Abandonado)) {
-                    htmlInputs += `<div class="mb-1"><span class="text-amber-700/50 block text-[9px]">${campo}</span><span class="font-bold text-amber-900">${valor}</span></div>`;
-                }
-                divInputs.innerHTML = htmlInputs;
-            } else {
-                divInputs.innerHTML = '<span class="text-amber-700/50">Sem dados preenchidos.</span>';
-            }
-
-            // A Mágica: Linha do Tempo
-            const listTimeline = document.getElementById('det-timeline');
-            if(sessao.linhaDoTempo && sessao.linhaDoTempo.length > 0) {
-                listTimeline.innerHTML = sessao.linhaDoTempo.map(evento => {
-                    // Dar destaque a eventos importantes
-                    let bgColor = 'bg-white';
-                    if(evento.includes('😡')) bgColor = 'bg-rose-50 border-rose-200 text-rose-700';
-                    if(evento.includes('🚀')) bgColor = 'bg-emerald-50 border-emerald-200 text-emerald-700';
-                    if(evento.includes('🚪')) bgColor = 'bg-amber-50 border-amber-200 text-amber-700';
-                    
-                    return `<li class="p-2 border border-slate-100 rounded shadow-sm ${bgColor}">${evento}</li>`;
-                }).join('');
-            } else {
-                listTimeline.innerHTML = '<li>Sem eventos registados.</li>';
-            }
-
-            document.getElementById('modal-dossie').classList.remove('hidden');
-        };
-
-        window.fecharModal = () => {
-            document.getElementById('modal-dossie').classList.add('hidden');
-        };
-
-        // Disparo Inicial
-        carregarDados();
-    </script>
-</body>
-</html>
+                                <p class="text-xs font
