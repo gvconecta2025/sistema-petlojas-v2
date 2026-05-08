@@ -34,6 +34,12 @@
             </div>
             
             <div class="flex items-center gap-4">
+                <!-- BOTAO LIMPAR DADOS -->
+                <button onclick="limparDadosTeste()" class="flex items-center gap-2 px-4 py-2 rounded-full border border-red-200 text-red-500 hover:bg-red-50 text-xs font-bold transition-all duration-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    LIMPAR TESTES
+                </button>
+
                 <!-- BOTÃO MODO MESTRE (Invisibilidade) -->
                 <button id="btn-master-toggle" onclick="toggleMasterMode()" class="flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-black transition-all duration-300">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
@@ -131,9 +137,14 @@
                     <h3 class="text-2xl font-black text-gray-800">Dossiê do Visitante</h3>
                     <p class="text-sm text-gray-500 font-medium" id="modal-subtitle">Carregando...</p>
                 </div>
-                <button onclick="closeModal()" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 hover:bg-gray-50 transition">
-                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="apagarEsteDossie()" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-100 transition">
+                        Excluir Registro
+                    </button>
+                    <button onclick="closeModal()" class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 hover:bg-gray-50 transition">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
             </div>
             <div class="p-8" id="modal-body">
                 <!-- Conteúdo dinâmico -->
@@ -144,7 +155,7 @@
     <!-- Scripts de Integração -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, query, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // Chaves do Projeto landing-page-83fd1
         const firebaseConfig = {
@@ -168,8 +179,10 @@
             
             if (!current) {
                 console.log("🛡️ Master Ativado: Você está invisível para os rastreios.");
+                alert("Modo Mestre ATIVADO neste navegador.\nAcesse a Landing Page e seus dados não serão mais captados.");
             } else {
                 console.log("🌐 Modo Público: Seus acessos voltarão a ser gravados.");
+                alert("Modo Público ATIVADO.\nSeus próximos acessos à Landing Page serão gravados.");
             }
         };
 
@@ -187,6 +200,41 @@
             }
         }
         updateMasterUI();
+
+        // FUNÇÕES PARA LIMPEZA DE DADOS
+        window.limparDadosTeste = async () => {
+            if(confirm("ATENÇÃO: Isto vai apagar TODOS os registros de acessos do Firebase.\n\nComo a página ainda não foi divulgada, você pode limpar seus testes. Deseja continuar?")) {
+                if(!window.allSessions || window.allSessions.length === 0) {
+                    alert("O banco de dados já está vazio.");
+                    return;
+                }
+                
+                let apagados = 0;
+                for (const session of window.allSessions) {
+                    try {
+                        await deleteDoc(doc(db, "lp_acessos", session.id));
+                        apagados++;
+                    } catch (e) {
+                        console.error("Erro ao apagar doc", e);
+                    }
+                }
+                alert(`Limpeza concluída! ${apagados} registros de teste foram apagados.`);
+            }
+        };
+
+        window.currentDossierId = null;
+        window.apagarEsteDossie = async () => {
+             if(confirm("Deseja excluir definitivamente este registro de acesso?")) {
+                 if(window.currentDossierId) {
+                     try {
+                         await deleteDoc(doc(db, "lp_acessos", window.currentDossierId));
+                         closeModal();
+                     } catch(e) {
+                         alert("Erro ao excluir.");
+                     }
+                 }
+             }
+        };
 
         let myChart = null;
 
@@ -282,6 +330,10 @@
 
         function renderVisitList(data) {
             const list = document.getElementById('visit-list');
+            if(data.length === 0) {
+                list.innerHTML = `<div class="p-8 text-center text-gray-400">Nenhum acesso registrado ainda.</div>`;
+                return;
+            }
             list.innerHTML = data.slice(0, 20).map(s => `
                 <div class="p-5 hover:bg-slate-50 cursor-pointer transition-all group border-l-4 border-transparent hover:border-brand" onclick="window.openDossie('${s.id}')">
                     <div class="flex justify-between items-start mb-2">
@@ -289,7 +341,7 @@
                             <span class="font-bold text-gray-800">${s.referencia_lead === 'Orgânico' ? 'Visita Orgânica' : s.referencia_lead}</span>
                             <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${s.dispositivo || 'Dispositivo'} • ${s.id.substring(5, 12)}</span>
                         </div>
-                        <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">${new Date(s.data_entrada?.seconds * 1000).toLocaleTimeString('pt-BR')}</span>
+                        <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">${s.data_entrada ? new Date(s.data_entrada.seconds * 1000).toLocaleTimeString('pt-BR') : 'Agora'}</span>
                     </div>
                     <div class="flex items-center gap-3 text-xs text-gray-500">
                         <span class="flex items-center gap-1">📍 ${s.local?.cidade || 'Brasil'}</span>
@@ -301,6 +353,7 @@
         }
 
         window.openDossie = (id) => {
+            window.currentDossierId = id;
             const s = window.allSessions.find(item => item.id === id);
             const modal = document.getElementById('modal-dossie');
             const body = document.getElementById('modal-body');
@@ -343,7 +396,10 @@
             modal.classList.remove('hidden');
         };
 
-        window.closeModal = () => document.getElementById('modal-dossie').classList.add('hidden');
+        window.closeModal = () => {
+            document.getElementById('modal-dossie').classList.add('hidden');
+            window.currentDossierId = null;
+        }
 
         // Escuta Realtime do Firebase
         const q = query(collection(db, 'lp_acessos'));
